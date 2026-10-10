@@ -1,0 +1,910 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>آلة حاسبة الأسطر المتعددة</title>
+    <!-- إضافة مكتبة SheetJS لتصدير ملفات Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- إضافة مكتبة html2pdf لتصدير ملفات PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- إضافة مكتبة html2canvas لتصدير الصور -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0b0f19;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .calculator-container {
+            width: 100%;
+            height: 95vh;
+            max-width: 100%;
+            background-color: #111827;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            border: 1px solid #1f2937;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .sticky-top-section {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: #030712;
+            width: 100%;
+        }
+
+        .operator-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            background-color: #030712;
+            padding: 12px 20px;
+            border-bottom: 1px solid #1f2937;
+        }
+
+        .op-btn {
+            background-color: #1e293b;
+            color: #38bdf8;
+            border: 1px solid #38bdf8;
+            padding: 8px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .op-btn:hover {
+            background-color: #38bdf8;
+            color: #0b0f19;
+        }
+
+        .calculator-header {
+            background-color: #030712;
+            padding: 15px 30px;
+            border-bottom: 2px solid #1f2937;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .total-label-group {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .currency-toggle-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .currency-toggle-label input {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            accent-color: #38bdf8;
+        }
+
+        .total-value-container {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .total-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #38bdf8;
+            word-break: break-all;
+        }
+
+        .total-currency {
+            font-size: 1.2rem;
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        .total-value.negative {
+            color: #ef4444 !important;
+        }
+
+        /* تنسيق قسم التصدير وتوقيع المصمم بجانبه */
+        .header-right-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            justify-content: flex-end;
+        }
+
+        .designer-credit {
+            font-size: 0.85rem;
+            color: #6b7280;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .export-dropdown {
+            position: relative;
+            display: inline-block;
+            text-align: left;
+        }
+        .export-btn {
+            background-color: #1e293b;
+            color: #38bdf8;
+            border: 1px solid #38bdf8;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
+        }
+        .export-btn:hover {
+            background-color: #38bdf8;
+            color: #0b0f19;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            left: 0;
+            background-color: #1e293b;
+            min-width: 140px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.5);
+            border-radius: 6px;
+            z-index: 10;
+            border: 1px solid #38bdf8;
+            overflow: hidden;
+        }
+        .dropdown-content button {
+            color: #f8fafc;
+            padding: 10px 14px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: right;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .dropdown-content button:hover {
+            background-color: #38bdf8;
+            color: #0b0f19;
+        }
+        .export-dropdown.active .dropdown-content {
+            display: block;
+        }
+
+        .calculator-screen {
+            background-color: #0f172a;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            overflow-y: auto;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background-color: #1e293b;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .calc-row.active {
+            border-color: #38bdf8;
+            background-color: #1e293b;
+        }
+
+        .inputs-group {
+            display: flex;
+            gap: 15px;
+            flex-grow: 1;
+        }
+
+        .text-input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 4px 8px;
+            color: #f8fafc;
+            font-size: 1.1rem;
+            flex: 1;
+            outline: none;
+            font-family: inherit;
+            resize: none;
+            overflow-y: hidden;
+            min-height: 34px;
+            line-height: 1.4;
+        }
+
+        .calc-input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 4px 8px;
+            color: #f8fafc;
+            font-size: 1.1rem;
+            flex: 1;
+            outline: none;
+            font-family: inherit;
+            height: 34px;
+        }
+
+        .calc-input:focus, .text-input:focus {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .calc-output-container {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            min-width: 140px;
+            text-align: left;
+            padding-top: 4px;
+        }
+
+        .calc-output {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #10b981;
+            word-break: break-all;
+        }
+
+        .row-currency {
+            font-size: 1rem;
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        .calc-output.negative {
+            color: #ef4444 !important;
+        }
+
+        .mic-btn, .delete-row-btn {
+            background: transparent;
+            border: none;
+            color: #6b7280;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .mic-btn:hover {
+            background-color: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+        }
+
+        .mic-btn.listening {
+            color: #ef4444 !important;
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .delete-row-btn:hover {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .keyboard-hint {
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #6b7280;
+            background-color: #111827;
+            border-top: 1px solid #1f2937;
+            width: 100%;
+        }
+
+        .keyboard-hint span {
+            color: #38bdf8;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-container" id="calculatorContainer">
+        
+        <div class="sticky-top-section">
+            <div class="operator-bar">
+                <button class="op-btn" onclick="insertOperator('+')" title="جمع">+</button>
+                <button class="op-btn" onclick="insertOperator('-')" title="طرح">-</button>
+                <button class="op-btn" onclick="insertOperator('*')" title="ضرب">×</button>
+                <button class="op-btn" onclick="insertOperator('/')" title="قسمة">÷</button>
+                <button class="op-btn" onclick="insertOperator('%')" title="نسبة مئوية">%</button>
+            </div>
+
+            <div class="calculator-header">
+                <div class="total-label-group">
+                    <label class="currency-toggle-label" title="إظهار/إخفاء كلمة جنيه">
+                        <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
+                    </label>
+                </div>
+
+                <div class="total-value-container">
+                    <div id="grandTotal" class="total-value">0</div>
+                    <div id="grandTotalCurrency" class="total-currency">جنيه</div>
+                </div>
+                
+                <div class="header-right-group">
+                    <span class="designer-credit">designed by Sami Arouj</span>
+                    <div class="export-dropdown" id="exportDropdown">
+                        <button class="export-btn" onclick="toggleExportMenu(event)">
+                            تصدير <span>▼</span>
+                        </button>
+                        <div class="dropdown-content">
+                            <button onclick="exportToExcel()">إكسيل (Excel)</button>
+                            <button onclick="exportToWord()">وورد (Word)</button>
+                            <button onclick="exportToPDF()">بي دي إف (PDF)</button>
+                            <button onclick="exportToImage()">صورة (Image)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="screenContainer" class="calculator-screen"></div>
+
+        <div class="keyboard-hint">
+            <span>Home</span> للحساب بالقوة | <span>Page Up</span> لتجاهل ما قبل المؤشر | <span>Delete</span> لمسح السطر | <span>Enter</span> لسطر جديد
+        </div>
+    </div>
+
+    <script>
+        const screenContainer = document.getElementById('screenContainer');
+        const grandTotalEl = document.getElementById('grandTotal');
+        const grandTotalCurrencyEl = document.getElementById('grandTotalCurrency');
+        const showCurrencyCheckbox = document.getElementById('showCurrencyCheckbox');
+        const calculatorContainer = document.getElementById('calculatorContainer');
+
+        let rows = [
+            { textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0 }
+        ];
+        let activeRowIndex = 0;
+        let activeFieldIndex = 'calc';
+
+        function insertOperator(op) {
+            if (activeFieldIndex === 'calc') {
+                const activeInput = screenContainer.querySelector('.calc-row.active .calc-input');
+                if (activeInput) {
+                    const start = activeInput.selectionStart;
+                    const end = activeInput.selectionEnd;
+                    const val = activeInput.value;
+                    activeInput.value = val.substring(0, start) + op + val.substring(end);
+                    activeInput.focus();
+                    activeInput.setSelectionRange(start + op.length, start + op.length);
+                    
+                    rows[activeRowIndex].expression = activeInput.value;
+                    rows[activeRowIndex].forceCalc = false;
+                    evaluateRow(activeRowIndex);
+                    renderCalculator();
+                }
+            }
+        }
+
+        function formatDisplayValue(val) {
+            if (typeof val === 'number') {
+                if (val < 0) {
+                    return { text: `(${Math.abs(val)})`, isNegative: true };
+                }
+                return { text: `${val}`, isNegative: false };
+            }
+            return { text: val, isNegative: false };
+        }
+
+        function renderCalculator(focusTarget = null) {
+            screenContainer.innerHTML = '';
+            let totalSum = 0;
+            let targetInputToFocus = null;
+            const showCurrency = showCurrencyCheckbox.checked;
+
+            rows.forEach((row, index) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = `calc-row ${index === activeRowIndex ? 'active' : ''}`;
+
+                const inputsGroup = document.createElement('div');
+                inputsGroup.className = 'inputs-group';
+
+                const textInput = document.createElement('textarea');
+                textInput.className = 'text-input';
+                textInput.value = row.textExpression;
+                textInput.rows = 1;
+                
+                textInput.addEventListener('input', (e) => {
+                    rows[index].textExpression = e.target.value;
+                    e.target.style.height = 'auto';
+                    e.target.style.height = (e.target.scrollHeight) + 'px';
+                });
+
+                textInput.addEventListener('focus', () => {
+                    activeRowIndex = index;
+                    activeFieldIndex = 'text';
+                    updateActiveRowClasses();
+                });
+
+                const inputField = document.createElement('input');
+                inputField.type = 'text';
+                inputField.className = 'calc-input';
+                inputField.value = row.expression;
+                
+                inputField.addEventListener('input', (e) => {
+                    rows[index].expression = e.target.value;
+                    rows[index].forceCalc = false;
+                    if (e.target.value.length < rows[index].ignoreBeforeIndex) {
+                        rows[index].ignoreBeforeIndex = 0;
+                    }
+                    evaluateRow(index);
+                });
+
+                inputField.addEventListener('focus', () => {
+                    activeRowIndex = index;
+                    activeFieldIndex = 'calc';
+                    updateActiveRowClasses();
+                });
+
+                inputField.addEventListener('keydown', (e) => {
+                    if (e.key === 'Home') {
+                        e.preventDefault();
+                        rows[index].forceCalc = true;
+                        rows[index].ignoreBeforeIndex = 0;
+                        evaluateRow(index);
+                        renderCalculator('calc');
+                    }
+                    else if (e.key === 'PageUp') {
+                        e.preventDefault();
+                        rows[index].ignoreBeforeIndex = inputField.selectionStart;
+                        evaluateRow(index);
+                        renderCalculator('calc');
+                    }
+                    else if (e.key === 'Delete') {
+                        e.preventDefault();
+                        rows[index].expression = '';
+                        rows[index].result = 0;
+                        rows[index].forceCalc = false;
+                        rows[index].ignoreBeforeIndex = 0;
+                        renderCalculator('calc');
+                    }
+                });
+
+                inputsGroup.appendChild(textInput);
+                inputsGroup.appendChild(inputField);
+
+                if (index === activeRowIndex) {
+                    if (focusTarget === 'text') {
+                        targetInputToFocus = textInput;
+                    } else {
+                        targetInputToFocus = inputField;
+                    }
+                }
+
+                const outputContainer = document.createElement('div');
+                outputContainer.className = 'calc-output-container';
+
+                const outputDiv = document.createElement('div');
+                outputDiv.className = 'calc-output';
+
+                const currencySpan = document.createElement('span');
+                currencySpan.className = 'row-currency';
+                currencySpan.innerText = showCurrency ? 'جنيه' : '';
+
+                if (row.result !== '' && row.result !== 0) {
+                    const formatted = formatDisplayValue(row.result);
+                    outputDiv.innerText = formatted.text;
+                    if (formatted.isNegative) {
+                        outputDiv.classList.add('negative');
+                    } else {
+                        outputDiv.classList.remove('negative');
+                    }
+                } else {
+                    outputDiv.innerText = '';
+                    currencySpan.innerText = '';
+                }
+
+                outputContainer.appendChild(outputDiv);
+                outputContainer.appendChild(currencySpan);
+
+                const micBtn = document.createElement('button');
+                micBtn.className = 'mic-btn';
+                micBtn.innerHTML = '🎤';
+                micBtn.title = 'تحدث للإدخال في الحقل النشط';
+                micBtn.type = 'button';
+                micBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    startSpeechRecognition(index, micBtn);
+                });
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-row-btn';
+                deleteBtn.innerHTML = '✕';
+                deleteBtn.title = 'حذف السطر';
+                deleteBtn.type = 'button';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteRow(index);
+                });
+
+                rowDiv.appendChild(inputsGroup);
+                rowDiv.appendChild(outputContainer);
+                rowDiv.appendChild(micBtn);
+                rowDiv.appendChild(deleteBtn);
+                screenContainer.appendChild(rowDiv);
+
+                setTimeout(() => {
+                    textInput.style.height = 'auto';
+                    textInput.style.height = (textInput.scrollHeight) + 'px';
+                }, 0);
+
+                if (typeof row.result === 'number' && !isNaN(row.result)) {
+                    totalSum += row.result;
+                }
+            });
+
+            const formattedTotal = formatDisplayValue(Number.isInteger(totalSum) ? totalSum : parseFloat(totalSum.toFixed(6)));
+            grandTotalEl.innerText = formattedTotal.text;
+            grandTotalCurrencyEl.innerText = showCurrency ? 'جنيه' : '';
+            
+            if (formattedTotal.isNegative) {
+                grandTotalEl.classList.add('negative');
+            } else {
+                grandTotalEl.classList.remove('negative');
+            }
+
+            if (targetInputToFocus) {
+                setTimeout(() => {
+                    targetInputToFocus.focus();
+                }, 0);
+            }
+        }
+
+        function startSpeechRecognition(index, micBtn) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert('متصفحك لا يدعم خاصية التعرف على الصوت.');
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ar-SA';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            micBtn.classList.add('listening');
+            micBtn.innerHTML = '🔴';
+
+            recognition.onresult = (event) => {
+                const speechToText = event.results[0][0].transcript;
+                
+                if (activeFieldIndex === 'text') {
+                    rows[index].textExpression = rows[index].textExpression ? rows[index].textExpression + ' ' + speechToText : speechToText;
+                    renderCalculator('text');
+                } else {
+                    rows[index].expression = rows[index].expression ? rows[index].expression + ' ' + speechToText : speechToText;
+                    rows[index].forceCalc = false;
+                    evaluateRow(index);
+                    renderCalculator('calc');
+                }
+            };
+
+            recognition.onerror = () => {
+                micBtn.classList.remove('listening');
+                micBtn.innerHTML = '🎤';
+            };
+
+            recognition.onend = () => {
+                micBtn.classList.remove('listening');
+                micBtn.innerHTML = '🎤';
+            };
+
+            recognition.start();
+        }
+
+        function updateActiveRowClasses() {
+            const rowDivs = screenContainer.children;
+            for (let i = 0; i < rowDivs.length; i++) {
+                if (i === activeRowIndex) {
+                    rowDivs[i].classList.add('active');
+                } else {
+                    rowDivs[i].classList.remove('active');
+                }
+            }
+        }
+
+        function deleteRow(index) {
+            if (rows.length === 1) {
+                rows[0].textExpression = '';
+                rows[0].expression = '';
+                rows[0].result = 0;
+                rows[0].forceCalc = false;
+                rows[0].ignoreBeforeIndex = 0;
+            } else {
+                rows.splice(index, 1);
+                if (activeRowIndex >= rows.length) {
+                    activeRowIndex = rows.length - 1;
+                }
+            }
+            renderCalculator('calc');
+        }
+
+        function evaluateRow(index) {
+            let currentRow = rows[index];
+            let fullExpr = currentRow.expression.trim();
+
+            if (fullExpr === '') {
+                currentRow.result = 0;
+                updateGrandTotalOnly();
+                return;
+            }
+
+            let expr = fullExpr;
+            if (currentRow.ignoreBeforeIndex > 0) {
+                expr = fullExpr.substring(currentRow.ignoreBeforeIndex).trim();
+            }
+
+            if (expr === '') {
+                currentRow.result = 0;
+                updateGrandTotalOnly();
+                return;
+            }
+
+            let hasAttachedTextBeforeOrAfter = /(\d+[a-zA-Zأ-ي\u0600-\u06FF])|([a-zA-Zأ-ي\u0600-\u06FF]\d+)/.test(expr);
+
+            if (hasAttachedTextBeforeOrAfter && !currentRow.forceCalc) {
+                currentRow.result = 0;
+                updateGrandTotalOnly();
+                return;
+            }
+
+            let percentMatch = expr.match(/^([\d.]+)\s*([\+\-\*\/])\s*([\d.]+)%$/);
+            if (percentMatch) {
+                let baseNum = parseFloat(percentMatch[1]);
+                let operator = percentMatch[2];
+                let percentVal = parseFloat(percentMatch[3]);
+                let calculatedPercent = baseNum * (percentVal / 100);
+                let res = 0;
+
+                if (operator === '+') {
+                    res = baseNum + calculatedPercent;
+                } else if (operator === '-') {
+                    res = baseNum - calculatedPercent;
+                } else if (operator === '*') {
+                    res = calculatedPercent;
+                } else if (operator === '/') {
+                    res = calculatedPercent !== 0 ? baseNum / calculatedPercent : 0;
+                }
+
+                currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
+                updateGrandTotalOnly();
+                return;
+            }
+
+            let sanitizedExpr = expr
+                .replace(/×/g, '*')
+                .replace(/÷/g, '/');
+
+            let validMathPattern = /^[0-9+\-*/.\s()a-zA-Zأ-ي\u0600-\u06FF%]+$/;
+
+            if (validMathPattern.test(sanitizedExpr)) {
+                try {
+                    let singleNegativeMatch = expr.match(/^-\s*([\d.]+)$/);
+                    if (singleNegativeMatch) {
+                        let res = -parseFloat(singleNegativeMatch[1]);
+                        currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
+                        updateGrandTotalOnly();
+                        return;
+                    }
+
+                    let evalSafeExpr = sanitizedExpr.replace(/[^0-9+\-*/().]/g, '');
+                    let res = Function('"use strict"; return (' + evalSafeExpr + ')')();
+
+                    if (isNaN(res) || !isFinite(res)) {
+                        currentRow.result = 0;
+                    } else {
+                        currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
+                    }
+                } catch (e) {
+                    currentRow.result = 0;
+                }
+            } else {
+                currentRow.result = 0;
+            }
+            
+            updateGrandTotalOnly();
+        }
+
+        function updateGrandTotalOnly() {
+            let totalSum = 0;
+            const showCurrency = showCurrencyCheckbox.checked;
+
+            rows.forEach((row, index) => {
+                const rowDivs = screenContainer.children;
+                if (rowDivs[index]) {
+                    const outputDiv = rowDivs[index].querySelector('.calc-output');
+                    const currencySpan = rowDivs[index].querySelector('.row-currency');
+
+                    if (row.result !== '' && row.result !== 0) {
+                        const formatted = formatDisplayValue(row.result);
+                        outputDiv.innerText = formatted.text;
+                        currencySpan.innerText = showCurrency ? 'جنيه' : '';
+                        if (formatted.isNegative) {
+                            outputDiv.classList.add('negative');
+                        } else {
+                            outputDiv.classList.remove('negative');
+                        }
+                    } else {
+                        outputDiv.innerText = '';
+                        currencySpan.innerText = '';
+                    }
+                }
+                if (typeof row.result === 'number' && !isNaN(row.result)) {
+                    totalSum += row.result;
+                }
+            });
+
+            const formattedTotal = formatDisplayValue(Number.isInteger(totalSum) ? totalSum : parseFloat(totalSum.toFixed(6)));
+            grandTotalEl.innerText = formattedTotal.text;
+            grandTotalCurrencyEl.innerText = showCurrency ? 'جنيه' : '';
+
+            if (formattedTotal.isNegative) {
+                grandTotalEl.classList.add('negative');
+            } else {
+                grandTotalEl.classList.remove('negative');
+            }
+        }
+
+        function toggleExportMenu(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('exportDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        window.addEventListener('click', () => {
+            const dropdown = document.getElementById('exportDropdown');
+            if (dropdown) dropdown.classList.remove('active');
+        });
+
+        function exportToExcel() {
+            const showCurrency = showCurrencyCheckbox.checked;
+            let dataToExport = rows.map((r, i) => ({
+                "السطر": i + 1,
+                "العمود النصي (اليمين)": r.textExpression,
+                "العملية الحسابية (اليسار)": r.expression,
+                "النتيجة": showCurrency ? `${r.result} جنيه` : r.result
+            }));
+            
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "النتائج");
+            XLSX.writeFile(workbook, "Calculator_Results.xlsx");
+        }
+
+        function exportToWord() {
+            const showCurrency = showCurrencyCheckbox.checked;
+            let htmlContent = `<html dir="rtl"><head><meta charset='utf-8'></head><body>`;
+            htmlContent += `<h2>تقرير الآلة الحاسبة متعددة الأسطر</h2>`;
+            htmlContent += `<table border="1" style="border-collapse:collapse; width:100%;">`;
+            htmlContent += `<tr><th>السطر</th><th>العمود النصي (اليمين)</th><th>العملية الحسابية (اليسار)</th><th>النتيجة</th></tr>`;
+            
+            rows.forEach((r, i) => {
+                let resText = showCurrency ? `${r.result} جنيه` : r.result;
+                htmlContent += `<tr><td>${i+1}</td><td>${r.textExpression}</td><td>${r.expression}</td><td>${resText}</td></tr>`;
+            });
+            
+            htmlContent += `</table></body></html>`;
+
+            let blob = new Blob(['\ufeff' + htmlContent], {
+                type: 'application/msword'
+            });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'Calculator_Results.doc';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function exportToPDF() {
+            const opt = {
+                margin:       10,
+                filename:     'Calculator_Results.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().from(calculatorContainer).set(opt).save();
+        }
+
+        function exportToImage() {
+            const dropdown = document.getElementById('exportDropdown');
+            dropdown.classList.remove('active');
+            dropdown.style.display = 'none';
+
+            html2canvas(calculatorContainer).then(canvas => {
+                let link = document.createElement('a');
+                link.download = 'Calculator_Results.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                dropdown.style.display = 'inline-block';
+            });
+        }
+
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+
+            if (key === 'Enter') {
+                event.preventDefault();
+                evaluateRow(activeRowIndex);
+                rows.push({ textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0 });
+                activeRowIndex++;
+                activeFieldIndex = 'calc';
+                renderCalculator('calc');
+                screenContainer.scrollTop = screenContainer.scrollHeight;
+            } 
+            else if (key === 'Escape') {
+                rows = [{ textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0 }];
+                activeRowIndex = 0;
+                activeFieldIndex = 'calc';
+                renderCalculator('calc');
+            }
+            else if (key === 'Backspace') {
+                const activeInput = document.activeElement;
+                if (activeInput && (activeInput.classList.contains('calc-input') || activeInput.classList.contains('text-input'))) {
+                    if (activeInput.value === '' && activeRowIndex > 0) {
+                        event.preventDefault();
+                        rows.splice(activeRowIndex, 1);
+                        activeRowIndex--;
+                        activeFieldIndex = 'calc';
+                        renderCalculator('calc');
+                    }
+                }
+            }
+        });
+
+        renderCalculator('calc');
+    </script>
+</body>
+</html>
