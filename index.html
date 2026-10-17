@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -48,6 +48,40 @@
             z-index: 100;
             background-color: #030712;
             width: 100%;
+        }
+
+        /* شريط المجموع الموجب والسالب فوق شريط العمليات */
+        .totals-summary-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            background-color: #030712;
+            padding: 10px 20px 5px 20px;
+            border-bottom: 1px solid #1f2937;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .summary-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #38bdf8;
+        }
+
+        .positive-sum {
+            color: #10b981;
+        }
+
+        .negative-sum {
+            color: #ef4444;
         }
 
         .operator-bar {
@@ -131,7 +165,6 @@
             color: #ef4444 !important;
         }
 
-        /* تنسيق قسم التصدير وتوقيع المصمم بجانبه */
         .header-right-group {
             display: flex;
             align-items: center;
@@ -342,6 +375,21 @@
             color: #38bdf8;
             font-weight: bold;
         }
+
+        /* Print-safe layout: prevent viewport and overflow rules from clipping content. */
+        @media print {
+            @page { size: A4 landscape; margin: 10mm; }
+            html, body { display:block !important; min-height:0 !important; height:auto !important; margin:0 !important; padding:0 !important; overflow:visible !important; background:#fff !important; color:#000 !important; }
+            .calculator-container { width:100% !important; height:auto !important; max-width:none !important; overflow:visible !important; box-shadow:none !important; border:0 !important; background:#fff !important; }
+            .sticky-top-section { position:static !important; overflow:visible !important; background:#fff !important; }
+            .calculator-screen { display:block !important; height:auto !important; max-height:none !important; overflow:visible !important; padding:0 !important; background:#fff !important; }
+            .calc-row { display:flex !important; width:100% !important; break-inside:avoid !important; page-break-inside:avoid !important; background:#fff !important; color:#000 !important; border:1px solid #bbb !important; }
+            .inputs-group { display:flex !important; min-width:0 !important; }
+            .text-input, .calc-input { height:auto !important; min-height:34px !important; overflow:visible !important; white-space:pre-wrap !important; overflow-wrap:anywhere !important; color:#000 !important; background:#fff !important; border:1px solid #bbb !important; -webkit-text-fill-color:#000 !important; }
+            .calc-output-container, .calc-output, .row-currency, .total-value, .total-currency, .summary-item, .positive-sum, .negative-sum { color:#000 !important; overflow-wrap:anywhere !important; word-break:break-word !important; }
+            .operator-bar, .export-dropdown, .mic-btn, .delete-row-btn, .keyboard-hint { display:none !important; }
+        }
+
     </style>
 </head>
 <body>
@@ -349,6 +397,18 @@
     <div class="calculator-container" id="calculatorContainer">
         
         <div class="sticky-top-section">
+            <!-- الشريط الجديد لعرض مجموع الأعداد الموجبة والسالبة -->
+            <div class="totals-summary-bar">
+                <div class="summary-item">
+                    <input type="checkbox" id="showPositiveCheckbox" onchange="renderCalculator()">
+                    <span id="positiveTotalVal" class="positive-sum"></span>
+                </div>
+                <div class="summary-item">
+                    <input type="checkbox" id="showNegativeCheckbox" onchange="renderCalculator()">
+                    <span id="negativeTotalVal" class="negative-sum"></span>
+                </div>
+            </div>
+
             <div class="operator-bar">
                 <button class="op-btn" onclick="insertOperator('+')" title="جمع">+</button>
                 <button class="op-btn" onclick="insertOperator('-')" title="طرح">-</button>
@@ -398,6 +458,10 @@
         const grandTotalEl = document.getElementById('grandTotal');
         const grandTotalCurrencyEl = document.getElementById('grandTotalCurrency');
         const showCurrencyCheckbox = document.getElementById('showCurrencyCheckbox');
+        const showPositiveCheckbox = document.getElementById('showPositiveCheckbox');
+        const showNegativeCheckbox = document.getElementById('showNegativeCheckbox');
+        const positiveTotalValEl = document.getElementById('positiveTotalVal');
+        const negativeTotalValEl = document.getElementById('negativeTotalVal');
         const calculatorContainer = document.getElementById('calculatorContainer');
 
         let rows = [
@@ -438,6 +502,8 @@
         function renderCalculator(focusTarget = null) {
             screenContainer.innerHTML = '';
             let totalSum = 0;
+            let positiveSum = 0;
+            let negativeSum = 0;
             let targetInputToFocus = null;
             const showCurrency = showCurrencyCheckbox.checked;
 
@@ -579,6 +645,11 @@
 
                 if (typeof row.result === 'number' && !isNaN(row.result)) {
                     totalSum += row.result;
+                    if (row.result > 0) {
+                        positiveSum += row.result;
+                    } else if (row.result < 0) {
+                        negativeSum += row.result;
+                    }
                 }
             });
 
@@ -591,6 +662,13 @@
             } else {
                 grandTotalEl.classList.remove('negative');
             }
+
+            // تحديث مجاميع الأرقام الموجبة والسالبة بناءً على حالة المربعات
+            const posFormatted = formatDisplayValue(Number.isInteger(positiveSum) ? positiveSum : parseFloat(positiveSum.toFixed(6)));
+            const negFormatted = formatDisplayValue(Number.isInteger(negativeSum) ? negativeSum : parseFloat(negativeSum.toFixed(6)));
+
+            positiveTotalValEl.innerText = showPositiveCheckbox.checked ? posFormatted.text : '';
+            negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
 
             if (targetInputToFocus) {
                 setTimeout(() => {
@@ -756,6 +834,8 @@
 
         function updateGrandTotalOnly() {
             let totalSum = 0;
+            let positiveSum = 0;
+            let negativeSum = 0;
             const showCurrency = showCurrencyCheckbox.checked;
 
             rows.forEach((row, index) => {
@@ -780,6 +860,11 @@
                 }
                 if (typeof row.result === 'number' && !isNaN(row.result)) {
                     totalSum += row.result;
+                    if (row.result > 0) {
+                        positiveSum += row.result;
+                    } else if (row.result < 0) {
+                        negativeSum += row.result;
+                    }
                 }
             });
 
@@ -792,6 +877,12 @@
             } else {
                 grandTotalEl.classList.remove('negative');
             }
+
+            const posFormatted = formatDisplayValue(Number.isInteger(positiveSum) ? positiveSum : parseFloat(positiveSum.toFixed(6)));
+            const negFormatted = formatDisplayValue(Number.isInteger(negativeSum) ? negativeSum : parseFloat(negativeSum.toFixed(6)));
+
+            positiveTotalValEl.innerText = showPositiveCheckbox.checked ? posFormatted.text : '';
+            negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
         }
 
         function toggleExportMenu(e) {
@@ -903,6 +994,47 @@
                 }
             }
         });
+
+
+        function escapePreviewHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        }
+
+        function openPrintPreview() {
+            const showCurrency = showCurrencyCheckbox.checked;
+            const previewRows = rows.map((row, index) => {
+                const resultText = (row.result !== '' && row.result !== 0)
+                    ? formatDisplayValue(row.result).text + (showCurrency ? ' جنيه' : '') : '';
+                return `<tr><td class="number">${index + 1}</td><td class="cell text-cell">${escapePreviewHtml(row.textExpression)}</td><td class="cell expression-cell">${escapePreviewHtml(row.expression)}</td><td class="cell result-cell">${escapePreviewHtml(resultText)}</td></tr>`;
+            }).join('');
+            const totalText = grandTotalEl.innerText + (showCurrency && grandTotalCurrencyEl.innerText ? ' جنيه' : '');
+            const positiveText = showPositiveCheckbox.checked ? positiveTotalValEl.innerText : '';
+            const negativeText = showNegativeCheckbox.checked ? negativeTotalValEl.innerText : '';
+            const w = window.open('', '_blank', 'width=1100,height=800');
+            if (!w) { alert('يرجى السماح بفتح النوافذ المنبثقة لعرض معاينة الطباعة.'); return; }
+            w.document.open();
+            w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>معاينة الطباعة</title>
+<style>
+*{box-sizing:border-box}body{font-family:Tahoma,Arial,sans-serif;color:#172033;background:#f3f7fc;margin:20px}h2{text-align:center;margin:0 0 16px;color:#174a7e;border-bottom:3px solid #25a6c7;padding:0 0 12px}.summary{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;margin-bottom:16px}.summary div{flex:1;min-width:180px;padding:12px 14px;border:1px solid #b7d8ed;border-right:5px solid #168aad;border-radius:8px;background:#e7f4fb;color:#174a7e}.summary strong{color:#0b6e99}table{width:100%;border-collapse:collapse;table-layout:fixed;background:#fff;box-shadow:0 2px 8px #17324d18}th,td{border:1px solid #b8c9d8;padding:9px;vertical-align:top;text-align:right}th{background:#176b87;color:#fff;font-weight:bold;border-color:#12566d}.number{width:7%;text-align:center;background:#eaf2f8;font-weight:bold;color:#24577a}.text-cell{width:31%;background:#fffaf0;color:#553b14}.expression-cell{width:37%;direction:ltr;text-align:left;background:#f1f7ff;color:#174a7e;font-weight:500}.result-cell{width:25%;direction:ltr;text-align:left;background:#e9f8ef;color:#087443;font-weight:bold}.cell{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}tbody tr:nth-child(even) td{filter:brightness(.975)}tbody tr:hover td{background-color:#e1f4fb}.actions{margin-bottom:16px;text-align:center}button{padding:10px 22px;font-size:16px;cursor:pointer;border:0;border-radius:6px;background:#176b87;color:#fff;margin:0 4px}button+button{background:#64748b}@page{size:A4 landscape;margin:10mm}@media print{body{margin:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}.actions{display:none!important}tr{break-inside:avoid;page-break-inside:avoid}th,td,.summary div,.number,.text-cell,.expression-cell,.result-cell{print-color-adjust:exact;-webkit-print-color-adjust:exact}h2{color:#174a7e}}
+</style></head><body>
+<div class="actions"><button onclick="window.print()">طباعة التقرير</button> <button onclick="window.close()">إغلاق المعاينة</button></div>
+<h2>تقرير الآلة الحاسبة متعددة الأسطر</h2><div class="summary"><div><strong>الإجمالي:</strong> ${escapePreviewHtml(totalText)}</div>
+${positiveText !== '' ? `<div><strong>مجموع الموجب:</strong> ${escapePreviewHtml(positiveText)}</div>` : ''}
+${negativeText !== '' ? `<div><strong>مجموع السالب:</strong> ${escapePreviewHtml(negativeText)}</div>` : ''}</div>
+<table><thead><tr><th class="number">السطر</th><th>النص / الملاحظات</th><th>العملية الحسابية</th><th>النتيجة</th></tr></thead><tbody>${previewRows}</tbody></table></body></html>`);
+            w.document.close(); w.focus();
+        }
+
+        // Ctrl+B opens a dedicated preview that includes every column and value.
+        document.addEventListener('keydown', (event) => {
+            // Use the physical B key so the shortcut also works with Arabic keyboard layouts.
+            if (event.ctrlKey && !event.altKey && !event.shiftKey &&
+                (event.code === 'KeyB' || String(event.key).toLowerCase() === 'b')) {
+                event.preventDefault();
+                event.stopPropagation();
+                openPrintPreview();
+            }
+        }, true);
 
         renderCalculator('calc');
     </script>
