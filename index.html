@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <!-- السماح بالتحكم اليدوي للزوم ومنع الزوم الأوتوماتيكي عبر ضبط أحجام الخطوط -->
+    <!-- السماح بالزوم اليدوي بالكامل ومنع الزوم الأوتوماتيكي -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>آلة حاسبة الأسطر المتعددة</title>
     <!-- إضافة مكتبة SheetJS لتصدير ملفات Excel -->
@@ -44,14 +44,14 @@
             position: relative;
         }
 
-        /* تثبيت الهيدر العلوي تماماً ليبقى ظاهراً في الوش دائماً أثناء السحب والتمرير */
+        /* تثبيت القسم العلوي بالكامل (المجاميع، الخيارات، التصدير) بحيث لا تختفي أبداً مهما طالت السطور أو تم عمل سكرول */
         .sticky-top-section {
             position: sticky;
             top: 0;
             z-index: 1000;
             background-color: #030712;
             width: 100%;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
             flex-shrink: 0;
         }
 
@@ -278,6 +278,7 @@
             display: block;
         }
 
+        /* شاشة الأسطر القابلة للتمرير بداخل الحاوية فقط دون تحريك القسم العلوي */
         .calculator-screen {
             background-color: #0f172a;
             padding: 15px 15px;
@@ -457,7 +458,6 @@
             color: #ffffff;
         }
 
-        /* حجم خط ثابت 16px لمنع التكبير التلقائي عند التركيز في الحقول */
         .text-input {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid #334155;
@@ -615,7 +615,7 @@
 
     <div class="calculator-container" id="calculatorContainer">
         
-        <!-- القسم العلوي المثبت (الهيدر والأزرار والمجاميع) -->
+        <!-- القسم العلوي بالكامل مثبت ولن يختفي أبداً أثناء السكرول -->
         <div class="sticky-top-section">
             <div class="top-controls-wrapper">
                 <div class="options-dropdown" id="optionsDropdown">
@@ -667,7 +667,7 @@
             </div>
         </div>
 
-        <!-- شاشة الأسطر القابلة للتمرير -->
+        <!-- شاشة السطور القابلة للتمرير (سكرول) لآلاف السطور -->
         <div id="screenContainer" class="calculator-screen"></div>
 
         <div class="keyboard-hint">
@@ -1572,7 +1572,7 @@ ${negativeText !== '' ? `<div><strong>مجموع السالب:</strong> ${escape
 
         document.addEventListener('keydown', (event) => {
             if (event.ctrlKey && !event.altKey && !event.shiftKey &&
-                (event.code === 'KeyB' ||String(event.key).toLowerCase() === 'b')) {
+                (event.code === 'KeyB' || String(event.key).toLowerCase() === 'b')) {
                 event.preventDefault();
                 event.stopPropagation();
                 openPrintPreview();
