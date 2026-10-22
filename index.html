@@ -362,7 +362,7 @@
             flex-shrink: 0;
         }
 
-        /* تنسيق زر السهم الصغير في أقصى اليمين لفتح سطر وكيبورد الموبايل */
+        /* زر السهم الصغير لفتح كيبورد الأندرويد للسطر الحالي */
         .row-mobile-arrow-btn {
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid #38bdf8;
@@ -1080,7 +1080,6 @@
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
 
-                // تفعيل كيبورد الموبايل عند الضغط على زرار الكيبورد في الآلة المصغرة أو السهم
                 if (isMobile && !row.forceKeyboardText) {
                     textInput.setAttribute('readonly', 'true');
                     textInput.setAttribute('inputmode', 'none');
@@ -1093,39 +1092,20 @@
                 mobileArrowBtn.type = 'button';
                 mobileArrowBtn.className = 'row-mobile-arrow-btn';
                 mobileArrowBtn.innerHTML = '🔽';
-                mobileArrowBtn.title = 'إضافة سطر جديد وفتح الكيبورد';
+                mobileArrowBtn.title = 'فتح كيبورد الموبايل لنفس السطر';
                 
                 if (isMobile) {
                     mobileArrowBtn.style.display = 'flex';
                 }
 
+                // فتح كيبورد الأندرويد لنفس السطر والتركيز عليه فور الضغط
                 mobileArrowBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    // فتح كيبورد الموبايل لحقل النص
-                    rows[index].forceKeyboardText = true;
-                    textInput.removeAttribute('readonly');
-                    textInput.removeAttribute('inputmode');
-                    textInput.focus();
-                    
-                    // إضافة سطر جديد ونقل التركيز له
-                    evaluateRow(index);
-                    const currentIsMobile = isMobileDevice();
-                    rows.push({ 
-                        textExpression: '', 
-                        expression: '', 
-                        result: 0, 
-                        forceCalc: false, 
-                        ignoreBeforeIndex: 0, 
-                        isCalcVisible: true, 
-                        isCalcPadVisible: currentIsMobile, 
-                        isTextPadVisible: false,
-                        forceKeyboardText: false,
-                        forceKeyboardCalc: false
-                    });
-                    activeRowIndex = rows.length - 1;
+                    activeRowIndex = index;
                     activeFieldIndex = 'text';
+                    rows[index].forceKeyboardText = true;
+                    
                     renderCalculator('text');
-                    screenContainer.scrollTop = screenContainer.scrollHeight;
                 });
                 
                 textInput.addEventListener('input', (e) => {
