@@ -793,7 +793,6 @@
             topNotesFocusBtn.style.display = 'flex';
         }
 
-        // جعل الكيبورد معطلاً تلقائياً لعدم ظهوره من تلقاء نفسه
         let rows = [
             { 
                 textExpression: '', 
@@ -802,7 +801,7 @@
                 forceCalc: false, 
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
-                isCalcPadVisible: isMobile, 
+                isCalcPadVisible: false, 
                 isTextPadVisible: false,
                 forceKeyboardText: false,
                 forceKeyboardCalc: false
@@ -811,19 +810,21 @@
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
+        // وظيفة الزر العلوي: ينزل للسطر التالي، ولو في الأخير يزود سطر جديد بدون كيبورد أو آلة
         function handleTopActionBtnClick() {
             if (activeRowIndex < rows.length - 1) {
                 rows[activeRowIndex].isCalcPadVisible = false;
+                rows[activeRowIndex].isTextPadVisible = false;
                 rows[activeRowIndex].forceKeyboardCalc = false;
                 rows[activeRowIndex].forceKeyboardText = false;
                 activeRowIndex++;
                 activeFieldIndex = 'calc';
-                rows[activeRowIndex].isCalcPadVisible = isMobile;
                 renderCalculator('calc');
                 scrollToActiveRow();
             } else {
                 evaluateRow(activeRowIndex);
                 rows[activeRowIndex].isCalcPadVisible = false;
+                rows[activeRowIndex].isTextPadVisible = false;
                 rows[activeRowIndex].forceKeyboardCalc = false;
                 rows[activeRowIndex].forceKeyboardText = false;
                 rows.push({ 
@@ -833,7 +834,7 @@
                     forceCalc: false, 
                     ignoreBeforeIndex: 0, 
                     isCalcVisible: true, 
-                    isCalcPadVisible: isMobile, 
+                    isCalcPadVisible: false, 
                     isTextPadVisible: false,
                     forceKeyboardText: false,
                     forceKeyboardCalc: false
@@ -949,13 +950,30 @@
             }
         }
 
+        // التبادل الحصري: فتح الكيبورد يغلق الآلة المصغرة والعكس صحيح
         function openKeyboardForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
             if (field === 'text') {
                 rows[index].forceKeyboardText = true;
+                rows[index].isTextPadVisible = false; // إغلاق الآلة المصغرة
             } else {
                 rows[index].forceKeyboardCalc = true;
+                rows[index].isCalcPadVisible = false; // إغلاق الآلة المصغرة
+            }
+            renderCalculator(field);
+        }
+
+        function openCalcPadForField(index, field) {
+            activeRowIndex = index;
+            activeFieldIndex = field;
+            rows.forEach(r => { r.isCalcPadVisible = false; r.isTextPadVisible = false; });
+            if (field === 'text') {
+                rows[index].isTextPadVisible = true;
+                rows[index].forceKeyboardText = false; // إغلاق كيبورد الجهاز
+            } else {
+                rows[index].isCalcPadVisible = true;
+                rows[index].forceKeyboardCalc = false; // إغلاق كيبورد الجهاز
             }
             renderCalculator(field);
         }
@@ -970,8 +988,6 @@
             if (index < rows.length - 1) {
                 activeRowIndex = index + 1;
                 activeFieldIndex = field;
-                if (field === 'calc') rows[activeRowIndex].isCalcPadVisible = isMobile;
-                if (field === 'text') rows[activeRowIndex].isTextPadVisible = isMobile;
                 renderCalculator(field);
                 scrollToActiveRow();
             } else {
@@ -982,8 +998,8 @@
                     forceCalc: false, 
                     ignoreBeforeIndex: 0, 
                     isCalcVisible: true, 
-                    isCalcPadVisible: (field === 'calc' && isMobile), 
-                    isTextPadVisible: (field === 'text' && isMobile),
+                    isCalcPadVisible: false, 
+                    isTextPadVisible: false,
                     forceKeyboardText: false,
                     forceKeyboardCalc: false
                 });
@@ -1117,6 +1133,7 @@
             return keypadDiv;
         }
 
+        // التبادل الحصري: ضغطتان للآلة (وتغلق الكيبورد) / ضغطة مطولة للكيبورد (وتغلق الآلة)
         function attachTouchListeners(element, index, field) {
             let lastTapTime = 0;
             let longPressTimer = null;
@@ -1130,21 +1147,13 @@
                 if (tapLength < 300 && tapLength > 0) {
                     e.preventDefault();
                     clearTimeout(longPressTimer);
-                    rows.forEach(r => {
-                        r.isCalcPadVisible = false;
-                        r.isTextPadVisible = false;
-                    });
-                    if (field === 'text') rows[index].isTextPadVisible = true;
-                    if (field === 'calc') rows[index].isCalcPadVisible = true;
-                    renderCalculator(field);
+                    openCalcPadForField(index, field);
                     return;
                 }
                 lastTapTime = currentTime;
 
                 longPressTimer = setTimeout(() => {
-                    if (field === 'text') rows[index].forceKeyboardText = true;
-                    if (field === 'calc') rows[index].forceKeyboardCalc = true;
-                    renderCalculator(field);
+                    openKeyboardForField(index, field);
                 }, 600);
             }, { passive: false });
 
@@ -1450,7 +1459,6 @@
                     rows[index].isTextPadVisible = false;
                     activeRowIndex = index + 1;
                     activeFieldIndex = currentField;
-                    if (currentField === 'calc') rows[activeRowIndex].isCalcPadVisible = isMobile;
                     renderCalculator(currentField);
                     scrollToActiveRow();
                 }
@@ -1462,7 +1470,6 @@
                     rows[index].isTextPadVisible = false;
                     activeRowIndex = index - 1;
                     activeFieldIndex = currentField;
-                    if (currentField === 'calc') rows[activeRowIndex].isCalcPadVisible = isMobile;
                     renderCalculator(currentField);
                     scrollToActiveRow();
                 }
@@ -1545,7 +1552,7 @@
                 rows[0].forceCalc = false;
                 rows[0].ignoreBeforeIndex = 0;
                 rows[0].isCalcVisible = true;
-                rows[0].isCalcPadVisible = isMobile;
+                rows[0].isCalcPadVisible = false;
                 rows[0].isTextPadVisible = false;
                 rows[0].forceKeyboardText = false;
                 rows[0].forceKeyboardCalc = false;
@@ -1554,8 +1561,7 @@
                 if (activeRowIndex >= rows.length) {
                     activeRowIndex = rows.length - 1;
                 }
-                rows.forEach(r => r.isCalcPadVisible = false);
-                rows[activeRowIndex].isCalcPadVisible = isMobile;
+                rows.forEach(r => { r.isCalcPadVisible = false; r.isTextPadVisible = false; });
             }
             renderCalculator('calc');
         }
@@ -1781,7 +1787,6 @@
                 if (activeRowIndex < rows.length - 1) {
                     activeRowIndex++;
                     activeFieldIndex = 'calc';
-                    rows[activeRowIndex].isCalcPadVisible = isMobile;
                     renderCalculator('calc');
                     scrollToActiveRow();
                 } 
@@ -1793,7 +1798,7 @@
                         forceCalc: false, 
                         ignoreBeforeIndex: 0, 
                         isCalcVisible: true, 
-                        isCalcPadVisible: isMobile, 
+                        isCalcPadVisible: false, 
                         isTextPadVisible: false,
                         forceKeyboardText: false,
                         forceKeyboardCalc: false
@@ -1812,7 +1817,7 @@
                     forceCalc: false, 
                     ignoreBeforeIndex: 0, 
                     isCalcVisible: true, 
-                    isCalcPadVisible: isMobile,
+                    isCalcPadVisible: false,
                     isTextPadVisible: false,
                     forceKeyboardText: false,
                     forceKeyboardCalc: false
@@ -1828,8 +1833,7 @@
                         event.preventDefault();
                         rows.splice(activeRowIndex, 1);
                         activeRowIndex--;
-                        rows.forEach(r => r.isCalcPadVisible = false);
-                        rows[activeRowIndex].isCalcPadVisible = isMobile;
+                        rows.forEach(r => { r.isCalcPadVisible = false; r.isTextPadVisible = false; });
                         activeFieldIndex = 'calc';
                         renderCalculator('calc');
                     }
