@@ -351,7 +351,6 @@
             flex-shrink: 0;
         }
 
-        /* تصميم الآلة الحاسبة المصغرة القابلة للسحب من الهيدر الخاص بها */
         .row-keypad-container {
             display: flex;
             gap: 15px;
@@ -374,10 +373,9 @@
             direction: ltr;
             position: relative;
             box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-            touch-action: none; /* لمنع التعارض مع سكرول الصفحة أثناء سحب الآلة الصغيرة */
+            touch-action: none;
         }
 
-        /* هيدر الآلة الحاسبة المصغرة القابل للإمساك والسحب */
         .keypad-header {
             grid-column: span 4;
             display: flex;
@@ -447,14 +445,29 @@
             border-color: #38bdf8;
         }
 
+        /* زرار الحذف Backspace فوق ناحية اليمين */
         .mini-key-btn.backspace {
             background-color: #331f29;
             color: #ef4444;
             border-color: #ef4444;
+            font-size: 1rem;
         }
 
         .mini-key-btn.backspace:hover {
             background-color: #ef4444;
+            color: #fff;
+        }
+
+        /* زرار ديليت لمسح الخلية بالكامل */
+        .mini-key-btn.del-key {
+            background-color: #451a03;
+            color: #f59e0b;
+            border-color: #d97706;
+            font-size: 0.95rem;
+        }
+
+        .mini-key-btn.del-key:hover {
+            background-color: #d97706;
             color: #fff;
         }
 
@@ -693,7 +706,7 @@
         <div id="screenContainer" class="calculator-screen"></div>
 
         <div class="keyboard-hint">
-            <span>الأسهم</span> للتحرك بين الأسطر والحقول | <span>Home</span> للحساب بالقوة | <span>Page Up</span> لتجاهل ما قبل المؤشر | <span>Delete</span> لمسح السطر | <span>Enter</span> لسطر جديد
+            <span>الأسهم</span> للتحرك بين الأسطر والحقول | <span>Home</span> للحساب بالقوة | <span>Page Up</span> لتجاهل ما قبل المؤشر | <span>Delete</span> لمسح الخلية | <span>Enter</span> لسطر جديد
         </div>
     </div>
 
@@ -728,7 +741,9 @@
                 isCalcPadVisible: isMobile, 
                 isTextPadVisible: false,
                 forceShowMobileKeyboardText: false,
-                forceShowMobileKeyboardCalc: false
+                forceShowMobileKeyboardCalc: false,
+                padX: 0, // حفظ إحداثيات موقع الآلة المصغرة حتى لا تختفي عند الإنتير
+                padY: 0
             }
         ];
         let activeRowIndex = 0;
@@ -796,6 +811,22 @@
             }
         }
 
+        // دظيف وظيفة زر ديليت لمسح الخلية بالكامل
+        function handleDelForField(index, field) {
+            activeRowIndex = index;
+            activeFieldIndex = field;
+            if (field === 'text') {
+                rows[index].textExpression = '';
+                renderCalculator('text');
+            } else {
+                rows[index].expression = '';
+                rows[index].result = 0;
+                rows[index].forceCalc = false;
+                rows[index].ignoreBeforeIndex = 0;
+                renderCalculator('calc');
+            }
+        }
+
         function openKeyboardForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
@@ -820,7 +851,9 @@
                 isCalcPadVisible: currentIsMobile, 
                 isTextPadVisible: false,
                 forceShowMobileKeyboardText: false,
-                forceShowMobileKeyboardCalc: false
+                forceShowMobileKeyboardCalc: false,
+                padX: 0,
+                padY: 0
             });
             activeRowIndex = rows.length - 1;
             activeFieldIndex = 'calc';
@@ -842,12 +875,17 @@
             const keypadDiv = document.createElement('div');
             keypadDiv.className = 'row-mini-keypad';
             
+            // تطبيق آخر مكان سحبتها إليه حتى لا تعود لمكانها عند أي تحديث
+            let currentX = rows[index].padX || 0;
+            let currentY = rows[index].padY || 0;
+            keypadDiv.style.transform = `translate(${currentX}px, ${currentY}px)`;
+
             const headerDiv = document.createElement('div');
             headerDiv.className = 'keypad-header';
             
             const titleSpan = document.createElement('span');
             titleSpan.className = 'keypad-drag-title';
-            titleSpan.innerHTML = '☰ سحب الآلة (اسحب من هنا)';
+            titleSpan.innerHTML = '☰ سحب الآلة';
             headerDiv.appendChild(titleSpan);
 
             const closeBtn = document.createElement('button');
@@ -866,10 +904,9 @@
             headerDiv.appendChild(closeBtn);
             keypadDiv.appendChild(headerDiv);
 
-            // تفعيل السحب للآلة الحاسبة المصغرة بالإصبع أو الماوس من الهيدر
+            // تفعيل السحب للآلة المصغرة
             let isDraggingKeypad = false;
             let startX = 0, startY = 0;
-            let currentX = 0, currentY = 0;
 
             headerDiv.addEventListener('mousedown', startKeypadDrag);
             window.addEventListener('mousemove', onKeypadDrag);
@@ -894,6 +931,11 @@
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
                 currentX = clientX - startX;
                 currentY = clientY - startY;
+                
+                // حفظ الموقع في مصفوفة السطر
+                rows[index].padX = currentX;
+                rows[index].padY = currentY;
+
                 keypadDiv.style.transform = `translate(${currentX}px, ${currentY}px)`;
             }
 
@@ -901,12 +943,13 @@
                 isDraggingKeypad = false;
             }
 
+            // ترتيب الأزرار مع وضع Backspace فوق ناحية اليمين وإضافة زر Del لمسح الخلية
             const keys = [
-                '7', '8', '9', '/',
-                '4', '5', '6', '*',
-                '1', '2', '3', '-',
-                '0', '.', '%', '+',
-                '⌫', '⌨ Keyboard', 'Enter'
+                '⌫', 'Del', '%', '/',
+                '7', '8', '9', '*',
+                '4', '5', '6', '-',
+                '1', '2', '3', '+',
+                '0', '.', '⌨ Keyboard', 'Enter'
             ];
 
             keys.forEach(k => {
@@ -915,6 +958,7 @@
                 btn.className = 'mini-key-btn';
                 if (['+', '-', '*', '/', '%'].includes(k)) btn.classList.add('op');
                 if (k === '⌫') btn.classList.add('backspace');
+                if (k === 'Del') btn.classList.add('del-key');
                 if (k === '⌨ Keyboard') btn.classList.add('kbd-key');
                 if (k === 'Enter') btn.classList.add('enter-key');
 
@@ -923,6 +967,8 @@
                 btn.addEventListener('click', () => {
                     if (k === '⌫') {
                         handleBackspaceForField(index, field);
+                    } else if (k === 'Del') {
+                        handleDelForField(index, field);
                     } else if (k === '⌨ Keyboard') {
                         openKeyboardForField(index, field);
                     } else if (k === 'Enter') {
@@ -1093,11 +1139,16 @@
                     }
                     else if (e.key === 'Delete') {
                         e.preventDefault();
-                        rows[index].expression = '';
-                        rows[index].result = 0;
-                        rows[index].forceCalc = false;
-                        rows[index].ignoreBeforeIndex = 0;
-                        renderCalculator('calc');
+                        if (activeFieldIndex === 'text') {
+                            rows[index].textExpression = '';
+                            renderCalculator('text');
+                        } else {
+                            rows[index].expression = '';
+                            rows[index].result = 0;
+                            rows[index].forceCalc = false;
+                            rows[index].ignoreBeforeIndex = 0;
+                            renderCalculator('calc');
+                        }
                     }
                     else {
                         handleArrowNavigation(e, index, 'calc');
@@ -1330,6 +1381,8 @@
                 rows[0].isTextPadVisible = false;
                 rows[0].forceShowMobileKeyboardText = false;
                 rows[0].forceShowMobileKeyboardCalc = false;
+                rows[0].padX = 0;
+                rows[0].padY = 0;
             } else {
                 rows.splice(index, 1);
                 if (activeRowIndex >= rows.length) {
@@ -1563,7 +1616,9 @@
                     isCalcPadVisible: currentIsMobile, 
                     isTextPadVisible: false,
                     forceShowMobileKeyboardText: false,
-                    forceShowMobileKeyboardCalc: false
+                    forceShowMobileKeyboardCalc: false,
+                    padX: 0,
+                    padY: 0
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = 'calc';
@@ -1582,7 +1637,9 @@
                     isCalcPadVisible: currentIsMobile,
                     isTextPadVisible: false,
                     forceShowMobileKeyboardText: false,
-                    forceShowMobileKeyboardCalc: false
+                    forceShowMobileKeyboardCalc: false,
+                    padX: 0,
+                    padY: 0
                 }];
                 activeRowIndex = 0;
                 activeFieldIndex = 'calc';
