@@ -2,14 +2,10 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <!-- السماح بالزوم اليدوي بالكامل ومنع الزوم الأوتوماتيكي -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>آلة حاسبة الأسطر المتعددة</title>
-    <!-- إضافة مكتبة SheetJS لتصدير ملفات Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- إضافة مكتبة html2pdf لتصدير ملفات PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- إضافة مكتبة html2canvas لتصدير الصور -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
@@ -362,16 +358,15 @@
             flex-shrink: 0;
         }
 
-        /* زر السهم الصغير لفتح كيبورد الأندرويد للسطر الحالي */
         .row-mobile-arrow-btn {
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid #38bdf8;
             color: #38bdf8;
-            font-size: 1rem;
+            font-size: 0.9rem;
             width: 26px;
             height: 26px;
             border-radius: 50%;
-            display: none; /* مخفي افتراضياً على الكمبيوتر */
+            display: none;
             align-items: center;
             justify-content: center;
             cursor: pointer;
@@ -790,7 +785,7 @@
                 forceCalc: false, 
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
-                isCalcPadVisible: isMobile, 
+                isCalcPadVisible: false, 
                 isTextPadVisible: false,
                 forceKeyboardText: false,
                 forceKeyboardCalc: false
@@ -911,7 +906,6 @@
 
         function addNewRowFromPad(index) {
             evaluateRow(index);
-            const currentIsMobile = isMobileDevice();
             rows.push({ 
                 textExpression: '', 
                 expression: '', 
@@ -919,7 +913,7 @@
                 forceCalc: false, 
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
-                isCalcPadVisible: currentIsMobile, 
+                isCalcPadVisible: false, 
                 isTextPadVisible: false,
                 forceKeyboardText: false,
                 forceKeyboardCalc: false
@@ -1071,9 +1065,76 @@
                 const inputsGroup = document.createElement('div');
                 inputsGroup.className = 'inputs-group';
 
-                // 1. عمود الملاحظات (النص) في اليمين مع السهم الصغير الخاص بالموبايل
+                // 1. عمود الملاحظات (النص) في اليمين مع عناصر التحكم الجديدة
                 const textWrapper = document.createElement('div');
                 textWrapper.className = 'text-input-wrapper';
+
+                // أ) التشيك بوكس الكبير لفتح كيبورد الموبايل للسطر الحالي
+                const textToggleCheckbox = document.createElement('input');
+                textToggleCheckbox.type = 'checkbox';
+                textToggleCheckbox.className = 'row-toggle-checkbox';
+                textToggleCheckbox.checked = row.forceKeyboardText;
+                textToggleCheckbox.title = 'فتح كيبورد الموبايل للسطر الحالي';
+                textToggleCheckbox.addEventListener('change', (e) => {
+                    activeRowIndex = index;
+                    activeFieldIndex = 'text';
+                    rows[index].forceKeyboardText = e.target.checked;
+                    renderCalculator('text');
+                });
+
+                // ب) التشيك بوكس الصغير لفتح كيبورد الآلة المصغرة
+                const textPadCheckbox = document.createElement('input');
+                textPadCheckbox.type = 'checkbox';
+                textPadCheckbox.className = 'row-pad-checkbox';
+                textPadCheckbox.checked = row.isTextPadVisible;
+                textPadCheckbox.title = 'إظهار لوحة تحكم مصغرة لعمود الملاحظات';
+                textPadCheckbox.addEventListener('change', (e) => {
+                    activeRowIndex = index;
+                    rows[index].isTextPadVisible = e.target.checked;
+                    renderCalculator('text');
+                });
+
+                // ج) السهم الصغير الذكي للتنقل أو إضافة سطر مع فتح الكيبورد
+                const mobileArrowBtn = document.createElement('button');
+                mobileArrowBtn.type = 'button';
+                mobileArrowBtn.className = 'row-mobile-arrow-btn';
+                mobileArrowBtn.innerHTML = '🔽';
+                mobileArrowBtn.title = 'التنقل لأسفل أو إضافة سطر جديد';
+                
+                if (isMobile) {
+                    mobileArrowBtn.style.display = 'flex';
+                }
+
+                mobileArrowBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // إذا لم نكن في السطر الأخير: تنقل للسطر الذي أسفله
+                    if (index < rows.length - 1) {
+                        activeRowIndex = index + 1;
+                        activeFieldIndex = 'text';
+                        renderCalculator('text');
+                        scrollToActiveRow();
+                    } 
+                    // إذا كنا في السطر الأخير: أنشئ سطر جديد وافتح فيه كيبورد الأندرويد
+                    else {
+                        evaluateRow(index);
+                        rows.push({ 
+                            textExpression: '', 
+                            expression: '', 
+                            result: 0, 
+                            forceCalc: false, 
+                            ignoreBeforeIndex: 0, 
+                            isCalcVisible: true, 
+                            isCalcPadVisible: false, 
+                            isTextPadVisible: false,
+                            forceKeyboardText: true,
+                            forceKeyboardCalc: false
+                        });
+                        activeRowIndex = rows.length - 1;
+                        activeFieldIndex = 'text';
+                        renderCalculator('text');
+                        screenContainer.scrollTop = screenContainer.scrollHeight;
+                    }
+                });
 
                 const textInput = document.createElement('textarea');
                 textInput.className = 'text-input';
@@ -1087,26 +1148,6 @@
                     textInput.removeAttribute('readonly');
                     textInput.removeAttribute('inputmode');
                 }
-
-                const mobileArrowBtn = document.createElement('button');
-                mobileArrowBtn.type = 'button';
-                mobileArrowBtn.className = 'row-mobile-arrow-btn';
-                mobileArrowBtn.innerHTML = '🔽';
-                mobileArrowBtn.title = 'فتح كيبورد الموبايل لنفس السطر';
-                
-                if (isMobile) {
-                    mobileArrowBtn.style.display = 'flex';
-                }
-
-                // فتح كيبورد الأندرويد لنفس السطر والتركيز عليه فور الضغط
-                mobileArrowBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    activeRowIndex = index;
-                    activeFieldIndex = 'text';
-                    rows[index].forceKeyboardText = true;
-                    
-                    renderCalculator('text');
-                });
                 
                 textInput.addEventListener('input', (e) => {
                     rows[index].textExpression = e.target.value;
@@ -1129,6 +1170,8 @@
                     handleArrowNavigation(e, index, 'text');
                 });
 
+                textWrapper.appendChild(textToggleCheckbox);
+                textWrapper.appendChild(textPadCheckbox);
                 textWrapper.appendChild(mobileArrowBtn);
                 textWrapper.appendChild(textInput);
 
@@ -1432,7 +1475,6 @@
         }
 
         function deleteRow(index) {
-            const currentIsMobile = isMobileDevice();
             if (rows.length === 1) {
                 rows[0].textExpression = '';
                 rows[0].expression = '';
@@ -1440,7 +1482,7 @@
                 rows[0].forceCalc = false;
                 rows[0].ignoreBeforeIndex = 0;
                 rows[0].isCalcVisible = true;
-                rows[0].isCalcPadVisible = currentIsMobile;
+                rows[0].isCalcPadVisible = false;
                 rows[0].isTextPadVisible = false;
                 rows[0].forceKeyboardText = false;
                 rows[0].forceKeyboardCalc = false;
@@ -1673,7 +1715,6 @@
                     scrollToActiveRow();
                 } 
                 else {
-                    const currentIsMobile = isMobileDevice();
                     rows.push({ 
                         textExpression: '', 
                         expression: '', 
@@ -1681,7 +1722,7 @@
                         forceCalc: false, 
                         ignoreBeforeIndex: 0, 
                         isCalcVisible: true, 
-                        isCalcPadVisible: currentIsMobile, 
+                        isCalcPadVisible: false, 
                         isTextPadVisible: false,
                         forceKeyboardText: false,
                         forceKeyboardCalc: false
@@ -1693,7 +1734,6 @@
                 }
             } 
             else if (key === 'Escape') {
-                const currentIsMobile = isMobileDevice();
                 rows = [{ 
                     textExpression: '', 
                     expression: '', 
@@ -1701,7 +1741,7 @@
                     forceCalc: false, 
                     ignoreBeforeIndex: 0, 
                     isCalcVisible: true, 
-                    isCalcPadVisible: currentIsMobile,
+                    isCalcPadVisible: false,
                     isTextPadVisible: false,
                     forceKeyboardText: false,
                     forceKeyboardCalc: false
