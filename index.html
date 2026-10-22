@@ -641,17 +641,18 @@
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
                 isCalcPadVisible: false,
-                isTextPadVisible: false
+                isTextPadVisible: false,
+                forceShowMobileKeyboardText: false,
+                forceShowMobileKeyboardCalc: false
             }
         ];
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
-        // دالة ذكية للتعرف على الهواتف حتى لو كان وضع الديسك توب مفعلاً
+        // التعرف الموثوق على الشاشات المحمولة/اللمسية حتى في وضع سطح المكتب (Desktop Site)
         function isMobileDevice() {
             const hasTouchScreen = (('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) || ('msMaxTouchPoints' in navigator && navigator.msMaxTouchPoints > 0));
             const isUserAgentMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            // إذا كان الجهاز يحتوي على شاشة لمس وعرض الشاشة صغير (أو يقع ضمن شاشات الهواتف/التابلت)، يعتبر محمولاً حتى لو تم تفعيل وضع سطح المكتب
             const isSmallScreen = window.innerWidth <= 1024;
             return isUserAgentMobile || (hasTouchScreen && isSmallScreen);
         }
@@ -718,13 +719,14 @@
             }
         }
 
+        // عند الضغط على زر ⌨ Keyboard يتم إجبار فتح كيبورد الموبايل للعمود المطلوب
         function openKeyboardForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
             if (field === 'text') {
-                rows[index].isTextPadVisible = false;
+                rows[index].forceShowMobileKeyboardText = true;
             } else {
-                rows[index].isCalcPadVisible = false;
+                rows[index].forceShowMobileKeyboardCalc = true;
             }
             renderCalculator(field);
         }
@@ -739,7 +741,9 @@
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
                 isCalcPadVisible: false,
-                isTextPadVisible: false 
+                isTextPadVisible: false,
+                forceShowMobileKeyboardText: false,
+                forceShowMobileKeyboardCalc: false
             });
             activeRowIndex = rows.length - 1;
             activeFieldIndex = 'calc';
@@ -828,6 +832,7 @@
                 textPadCheckbox.addEventListener('change', (e) => {
                     activeRowIndex = index;
                     rows[index].isTextPadVisible = e.target.checked;
+                    rows[index].forceShowMobileKeyboardText = false;
                     renderCalculator('text');
                 });
 
@@ -836,8 +841,8 @@
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
 
-                // منع ظهور كيبورد الموبايل عند تفعيل الـ Checkbox (حتى لو كان وضع الديسك توب مفعلاً في المتصفح)
-                if (isMobile && row.isTextPadVisible) {
+                // الافتراضي في الموبايل: منع ظهور كيبورد النظام المزدحم إلا عند الضغط المباشر على أزرار الصوت أو زر ⌨ Keyboard
+                if (isMobile && !row.forceShowMobileKeyboardText) {
                     textInput.setAttribute('readonly', 'true');
                     textInput.setAttribute('inputmode', 'none');
                 } else {
@@ -862,7 +867,15 @@
                     }
                 });
 
-                textInput.addEventListener('keydown', (e) => handleArrowNavigation(e, index, 'text'));
+                // الاستجابة لأزرار الصوت أو الأسهم
+                textInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'VolumeUp' || e.key === 'VolumeDown' || e.code === 'VolumeUp' || e.code === 'VolumeDown') {
+                        rows[index].forceShowMobileKeyboardText = true;
+                        renderCalculator('text');
+                    } else {
+                        handleArrowNavigation(e, index, 'text');
+                    }
+                });
 
                 textWrapper.appendChild(textPadCheckbox);
                 textWrapper.appendChild(textInput);
@@ -891,6 +904,7 @@
                 calcPadCheckbox.addEventListener('change', (e) => {
                     activeRowIndex = index;
                     rows[index].isCalcPadVisible = e.target.checked;
+                    rows[index].forceShowMobileKeyboardCalc = false;
                     renderCalculator('calc');
                 });
 
@@ -899,8 +913,8 @@
                 inputField.className = 'calc-input';
                 inputField.value = row.expression;
 
-                // منع ظهور كيبورد الموبايل عند تفعيل الـ Checkbox (حتى لو كان وضع الديسك توب مفعلاً في المتصفح)
-                if (isMobile && row.isCalcPadVisible) {
+                // الافتراضي في الموبايل: منع ظهور كيبورد النظام المزدحم إلا عند الضغط المباشر على أزرار الصوت أو زر ⌨ Keyboard
+                if (isMobile && !row.forceShowMobileKeyboardCalc) {
                     inputField.setAttribute('readonly', 'true');
                     inputField.setAttribute('inputmode', 'none');
                 } else {
@@ -929,7 +943,11 @@
                 });
 
                 inputField.addEventListener('keydown', (e) => {
-                    if (e.key === 'Home') {
+                    if (e.key === 'VolumeUp' || e.key === 'VolumeDown' || e.code === 'VolumeUp' || e.code === 'VolumeDown') {
+                        rows[index].forceShowMobileKeyboardCalc = true;
+                        renderCalculator('calc');
+                    }
+                    else if (e.key === 'Home') {
                         e.preventDefault();
                         rows[index].forceCalc = true;
                         rows[index].ignoreBeforeIndex = 0;
@@ -1179,6 +1197,8 @@
                 rows[0].isCalcVisible = true;
                 rows[0].isCalcPadVisible = false;
                 rows[0].isTextPadVisible = false;
+                rows[0].forceShowMobileKeyboardText = false;
+                rows[0].forceShowMobileKeyboardCalc = false;
             } else {
                 rows.splice(index, 1);
                 if (activeRowIndex >= rows.length) {
@@ -1409,7 +1429,9 @@
                     ignoreBeforeIndex: 0, 
                     isCalcVisible: true, 
                     isCalcPadVisible: false,
-                    isTextPadVisible: false 
+                    isTextPadVisible: false,
+                    forceShowMobileKeyboardText: false,
+                    forceShowMobileKeyboardCalc: false
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = 'calc';
@@ -1425,7 +1447,9 @@
                     ignoreBeforeIndex: 0, 
                     isCalcVisible: true, 
                     isCalcPadVisible: false,
-                    isTextPadVisible: false 
+                    isTextPadVisible: false,
+                    forceShowMobileKeyboardText: false,
+                    forceShowMobileKeyboardCalc: false
                 }];
                 activeRowIndex = 0;
                 activeFieldIndex = 'calc';
