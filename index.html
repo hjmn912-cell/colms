@@ -647,6 +647,11 @@
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
+        // دالة للتحقق مما إذا كان المستخدم على جهاز محمول
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
         function toggleOptionsMenu(e) {
             e.stopPropagation();
             const dropdown = document.getElementById('optionsDropdownContent');
@@ -795,6 +800,7 @@
             let negativeSum = 0;
             let targetInputToFocus = null;
             const showCurrency = showCurrencyCheckbox.checked;
+            const isMobile = isMobileDevice();
 
             rows.forEach((row, index) => {
                 const rowDiv = document.createElement('div');
@@ -825,6 +831,15 @@
                 textInput.className = 'text-input';
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
+
+                // تطبيق شرط منع كيبورد الموبايل فقط إذا كان موبايل وتم تفعيل الـ Checkbox الخاص به
+                if (isMobile && row.isTextPadVisible) {
+                    textInput.setAttribute('readonly', 'true');
+                    textInput.setAttribute('inputmode', 'none');
+                } else {
+                    textInput.removeAttribute('readonly');
+                    textInput.removeAttribute('inputmode');
+                }
                 
                 textInput.addEventListener('input', (e) => {
                     rows[index].textExpression = e.target.value;
@@ -843,7 +858,6 @@
                     }
                 });
 
-                // تفعيل معالجة الأسهم في حقل النص
                 textInput.addEventListener('keydown', (e) => handleArrowNavigation(e, index, 'text'));
 
                 textWrapper.appendChild(textPadCheckbox);
@@ -880,6 +894,15 @@
                 inputField.type = 'text';
                 inputField.className = 'calc-input';
                 inputField.value = row.expression;
+
+                // تطبيق شرط منع كيبورد الموبايل فقط إذا كان موبايل وتم تفعيل الـ Checkbox الخاص به
+                if (isMobile && row.isCalcPadVisible) {
+                    inputField.setAttribute('readonly', 'true');
+                    inputField.setAttribute('inputmode', 'none');
+                } else {
+                    inputField.removeAttribute('readonly');
+                    inputField.removeAttribute('inputmode');
+                }
                 
                 inputField.addEventListener('input', (e) => {
                     rows[index].expression = e.target.value;
@@ -1053,9 +1076,7 @@
             }
         }
 
-        // دالة التنقل والتفاعل مع أسهم الكيبورد
         function handleArrowNavigation(e, index, currentField) {
-            const inputEl = e.target;
             const key = e.key;
 
             if (key === 'ArrowDown') {
@@ -1074,20 +1095,18 @@
                     renderCalculator(currentField);
                 }
             } 
-            else if (key === 'ArrowLeft') {
-                // الانتقال إلى عمود العملية الحسابية جهة اليسار عند الوصول للنهاية
-                if (currentField === 'text' && inputEl.selectionStart === inputEl.value.length) {
-                    e.preventDefault();
-                    activeFieldIndex = 'calc';
-                    renderCalculator('calc');
-                }
-            } 
             else if (key === 'ArrowRight') {
-                // الانتقال إلى عمود الملاحظات جهة اليمين عند الوصول للبداية
-                if (currentField === 'calc' && inputEl.selectionStart === 0) {
+                if (currentField === 'calc') {
                     e.preventDefault();
                     activeFieldIndex = 'text';
                     renderCalculator('text');
+                }
+            } 
+            else if (key === 'ArrowLeft') {
+                if (currentField === 'text') {
+                    e.preventDefault();
+                    activeFieldIndex = 'calc';
+                    renderCalculator('calc');
                 }
             }
         }
