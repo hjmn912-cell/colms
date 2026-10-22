@@ -345,7 +345,7 @@
             flex-shrink: 0;
         }
 
-        /* تصميم الآلة الحاسبة المصغرة */
+        /* تصميم الآلة الحاسبة المصغرة (أكبر حجماً وأوضح) */
         .row-keypad-container {
             display: flex;
             gap: 15px;
@@ -357,24 +357,48 @@
         .row-mini-keypad {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
+            gap: 8px;
             background-color: #030712;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
             border: 1px solid #1f2937;
             width: 100%;
-            max-width: 290px;
+            max-width: 350px;
             direction: ltr;
+        }
+
+        .keypad-header {
+            grid-column: span 4;
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 2px;
+        }
+
+        .close-keypad-btn {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .close-keypad-btn:hover {
+            background-color: #ef4444;
+            color: #fff;
         }
 
         .mini-key-btn {
             background-color: #1e293b;
             color: #f8fafc;
             border: 1px solid #334155;
-            padding: 8px 4px;
-            border-radius: 6px;
+            padding: 12px 6px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 1.15rem;
             font-weight: 600;
             text-align: center;
             transition: all 0.2s;
@@ -419,7 +443,7 @@
             background-color: #1e1b4b;
             color: #818cf8;
             border-color: #6366f1;
-            font-size: 0.85rem;
+            font-size: 0.95rem;
         }
 
         .mini-key-btn.kbd-key:hover {
@@ -561,7 +585,7 @@
         
         <div class="sticky-top-section">
             <div class="top-controls-wrapper">
-                <!-- الكومبو بوكس ناحية اليمين فوق -->
+                <!-- الكومبو بوكس جهة اليمين فوق -->
                 <div class="options-dropdown" id="optionsDropdown">
                     <button class="options-btn" type="button" onclick="toggleOptionsMenu(event)">
                         الخيارات <span>▼</span>
@@ -632,6 +656,16 @@
         const negativeTotalValEl = document.getElementById('negativeTotalVal');
         const calculatorContainer = document.getElementById('calculatorContainer');
 
+        function isMobileDevice() {
+            const hasTouchScreen = (('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) || ('msMaxTouchPoints' in navigator && navigator.msMaxTouchPoints > 0));
+            const isUserAgentMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const isSmallScreen = window.innerWidth <= 1024;
+            return isUserAgentMobile || (hasTouchScreen && isSmallScreen);
+        }
+
+        // تحديد الحالة الافتراضية للتشيك بوكس بناءً على نوع الجهاز (موبايل = مفعل، كمبيوتر = غير مفعل)
+        const isMobile = isMobileDevice();
+
         let rows = [
             { 
                 textExpression: '', 
@@ -640,7 +674,7 @@
                 forceCalc: false, 
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
-                isCalcPadVisible: false,
+                isCalcPadVisible: isMobile, // مفعل تلقائياً على الموبايل وغير مفعل على الكمبيوتر
                 isTextPadVisible: false,
                 forceShowMobileKeyboardText: false,
                 forceShowMobileKeyboardCalc: false
@@ -648,14 +682,6 @@
         ];
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
-
-        // التعرف الموثوق على الشاشات المحمولة/اللمسية حتى في وضع سطح المكتب (Desktop Site)
-        function isMobileDevice() {
-            const hasTouchScreen = (('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) || ('msMaxTouchPoints' in navigator && navigator.msMaxTouchPoints > 0));
-            const isUserAgentMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            const isSmallScreen = window.innerWidth <= 1024;
-            return isUserAgentMobile || (hasTouchScreen && isSmallScreen);
-        }
 
         function toggleOptionsMenu(e) {
             e.stopPropagation();
@@ -719,7 +745,6 @@
             }
         }
 
-        // عند الضغط على زر ⌨ Keyboard يتم إجبار فتح كيبورد الموبايل للعمود المطلوب
         function openKeyboardForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
@@ -733,6 +758,7 @@
 
         function addNewRowFromPad(index) {
             evaluateRow(index);
+            const currentIsMobile = isMobileDevice();
             rows.push({ 
                 textExpression: '', 
                 expression: '', 
@@ -740,7 +766,7 @@
                 forceCalc: false, 
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
-                isCalcPadVisible: false,
+                isCalcPadVisible: currentIsMobile, // تفعيل الكيبورد تلقائياً عند الضغط على Enter إذا كان موبايل
                 isTextPadVisible: false,
                 forceShowMobileKeyboardText: false,
                 forceShowMobileKeyboardCalc: false
@@ -765,6 +791,25 @@
             const keypadDiv = document.createElement('div');
             keypadDiv.className = 'row-mini-keypad';
             
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'keypad-header';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'close-keypad-btn';
+            closeBtn.innerText = 'إخفاء ✕';
+            closeBtn.title = 'إخفاء الآلة الحاسبة';
+            closeBtn.addEventListener('click', () => {
+                if (field === 'text') {
+                    rows[index].isTextPadVisible = false;
+                } else {
+                    rows[index].isCalcPadVisible = false;
+                }
+                renderCalculator(field);
+            });
+            headerDiv.appendChild(closeBtn);
+            keypadDiv.appendChild(headerDiv);
+
             const keys = [
                 '7', '8', '9', '/',
                 '4', '5', '6', '*',
@@ -808,7 +853,7 @@
             let negativeSum = 0;
             let targetInputToFocus = null;
             const showCurrency = showCurrencyCheckbox.checked;
-            const isMobile = isMobileDevice();
+            const currentIsMobile = isMobileDevice();
 
             rows.forEach((row, index) => {
                 const rowDiv = document.createElement('div');
@@ -841,8 +886,7 @@
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
 
-                // الافتراضي في الموبايل: منع ظهور كيبورد النظام المزدحم إلا عند الضغط المباشر على أزرار الصوت أو زر ⌨ Keyboard
-                if (isMobile && !row.forceShowMobileKeyboardText) {
+                if (currentIsMobile && !row.forceShowMobileKeyboardText) {
                     textInput.setAttribute('readonly', 'true');
                     textInput.setAttribute('inputmode', 'none');
                 } else {
@@ -867,7 +911,6 @@
                     }
                 });
 
-                // الاستجابة لأزرار الصوت أو الأسهم
                 textInput.addEventListener('keydown', (e) => {
                     if (e.key === 'VolumeUp' || e.key === 'VolumeDown' || e.code === 'VolumeUp' || e.code === 'VolumeDown') {
                         rows[index].forceShowMobileKeyboardText = true;
@@ -913,8 +956,7 @@
                 inputField.className = 'calc-input';
                 inputField.value = row.expression;
 
-                // الافتراضي في الموبايل: منع ظهور كيبورد النظام المزدحم إلا عند الضغط المباشر على أزرار الصوت أو زر ⌨ Keyboard
-                if (isMobile && !row.forceShowMobileKeyboardCalc) {
+                if (currentIsMobile && !row.forceShowMobileKeyboardCalc) {
                     inputField.setAttribute('readonly', 'true');
                     inputField.setAttribute('inputmode', 'none');
                 } else {
@@ -1040,7 +1082,6 @@
                 rowMain.appendChild(deleteBtn);
                 rowDiv.appendChild(rowMain);
 
-                // عرض لوحات الآلة الحاسبة المصغرة لأي سطر نشط
                 if (index === activeRowIndex && (row.isTextPadVisible || row.isCalcPadVisible)) {
                     const keypadContainer = document.createElement('div');
                     keypadContainer.className = 'row-keypad-container';
@@ -1188,6 +1229,7 @@
         }
 
         function deleteRow(index) {
+            const currentIsMobile = isMobileDevice();
             if (rows.length === 1) {
                 rows[0].textExpression = '';
                 rows[0].expression = '';
@@ -1195,7 +1237,7 @@
                 rows[0].forceCalc = false;
                 rows[0].ignoreBeforeIndex = 0;
                 rows[0].isCalcVisible = true;
-                rows[0].isCalcPadVisible = false;
+                rows[0].isCalcPadVisible = currentIsMobile;
                 rows[0].isTextPadVisible = false;
                 rows[0].forceShowMobileKeyboardText = false;
                 rows[0].forceShowMobileKeyboardCalc = false;
@@ -1421,6 +1463,7 @@
             if (key === 'Enter') {
                 event.preventDefault();
                 evaluateRow(activeRowIndex);
+                const currentIsMobile = isMobileDevice();
                 rows.push({ 
                     textExpression: '', 
                     expression: '', 
@@ -1428,7 +1471,7 @@
                     forceCalc: false, 
                     ignoreBeforeIndex: 0, 
                     isCalcVisible: true, 
-                    isCalcPadVisible: false,
+                    isCalcPadVisible: currentIsMobile, 
                     isTextPadVisible: false,
                     forceShowMobileKeyboardText: false,
                     forceShowMobileKeyboardCalc: false
@@ -1439,6 +1482,7 @@
                 screenContainer.scrollTop = screenContainer.scrollHeight;
             } 
             else if (key === 'Escape') {
+                const currentIsMobile = isMobileDevice();
                 rows = [{ 
                     textExpression: '', 
                     expression: '', 
@@ -1446,7 +1490,7 @@
                     forceCalc: false, 
                     ignoreBeforeIndex: 0, 
                     isCalcVisible: true, 
-                    isCalcPadVisible: false,
+                    isCalcPadVisible: currentIsMobile,
                     isTextPadVisible: false,
                     forceShowMobileKeyboardText: false,
                     forceShowMobileKeyboardCalc: false
@@ -1489,7 +1533,7 @@
             w.document.open();
             w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>معاينة الطباعة</title>
 <style>
-*{box-sizing:border-box}body{font-family:Tahoma,Arial,sans-serif;color:#172033;background:#f3f7fc;margin:20px}h2{text-align:center;margin:0 0 16px;color:#174a7e;border-bottom:3px solid #25a6c7;padding:0 0 12px}.summary{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;margin-bottom:16px}.summary div{flex:1;min-width:180px;padding:12px 14px;border:1px solid #b7d8ed;border-right:5px solid #168aad;border-radius:8px;background:#e7f4fb;color:#174a7e}.summary strong{color:#0b6e99}table{width:100%;border-collapse:collapse;table-layout:fixed;background:#fff;box-shadow:0 2px 8px #17324d18}th,td{border:1px solid #b8c9d8;padding:9px;vertical-align:top;text-align:right}th{background:#176b87;color:#fff;font-weight:bold;border-color:#12566d}.number{width:7%;text-align:center;background:#eaf2f8;font-weight:bold;color:#24577a}.text-cell{width:31%;background:#fffaf0;color:#553b14}.expression-cell{width:37%;direction:ltr;text-align:left;background:#f1f7ff;color:#174a7e;font-weight:500}.result-cell{width:25%;direction:ltr;text-align:left;background:#e9f8ef;color:#087443;font-weight:bold}.cell{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}tbody tr:nth-child(even) td{filter:brightness(.975)}tbody tr:hover td{background-color:#e1f4fb}.actions{margin-bottom:16px;text-align:center}button{padding:10px 22px;font-size:16px;cursor:pointer;border:0;border-radius:6px;background:#176b87;color:#fff;margin:0 4px}button+button{background:#64748b}@page{size:A4 landscape;margin:10mm}@media print{body{margin:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}.actions{display:none!important}tr{break-inside:avoid;page-break-inside:avoid}th,td,.summary div,.number,.text-cell,.expression-cell,.result-cell{print-color-adjust:exact;-webkit-print-color-adjust:exact}h2{color:#174a7e}}
+*{box-init:border-box}body{font-family:Tahoma,Arial,sans-serif;color:#172033;background:#f3f7fc;margin:20px}h2{text-align:center;margin:0 0 16px;color:#174a7e;border-bottom:3px solid #25a6c7;padding:0 0 12px}.summary{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;margin-bottom:16px}.summary div{flex:1;min-width:180px;padding:12px 14px;border:1px solid #b7d8ed;border-right:5px solid #168aad;border-radius:8px;background:#e7f4fb;color:#174a7e}.summary strong{color:#0b6e99}table{width:100%;border-collapse:collapse;table-layout:fixed;background:#fff;box-shadow:0 2px 8px #17324d18}th,td{border:1px solid #b8c9d8;padding:9px;vertical-align:top;text-align:right}th{background:#176b87;color:#fff;font-weight:bold;border-color:#12566d}.number{width:7%;text-align:center;background:#eaf2f8;font-weight:bold;color:#24577a}.text-cell{width:31%;background:#fffaf0;color:#553b14}.expression-cell{width:37%;direction:ltr;text-align:left;background:#f1f7ff;color:#174a7e;font-weight:500}.result-cell{width:25%;direction:ltr;text-align:left;background:#e9f8ef;color:#087443;font-weight:bold}.cell{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}tbody tr:nth-child(even) td{filter:brightness(.975)}tbody tr:hover td{background-color:#e1f4fb}.actions{margin-bottom:16px;text-align:center}button{padding:10px 22px;font-size:16px;cursor:pointer;border:0;border-radius:6px;background:#176b87;color:#fff;margin:0 4px}button+button{background:#64748b}@page{size:A4 landscape;margin:10mm}@media print{body{margin:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}.actions{display:none!important}tr{break-inside:avoid;page-break-inside:avoid}th,td,.summary div,.number,.text-cell,.expression-cell,.result-cell{print-color-adjust:exact;-webkit-print-color-adjust:exact}h2{color:#174a7e}}
 </style></head><body>
 <div class="actions"><button onclick="window.print()">طباعة التقرير</button> <button onclick="window.close()">إغلاق المعاينة</button></div>
 <h2>تقرير الآلة الحاسبة متعددة الأسطر</h2><div class="summary"><div><strong>الإجمالي:</strong> ${escapePreviewHtml(totalText)}</div>
