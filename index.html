@@ -740,7 +740,6 @@
 
             <div class="calculator-header">
                 <div class="header-right-group">
-                    <!-- تم تعكيس الأزرار: أصبح زر الملاحظات على اليمين والزر الفارغ على شماله -->
                     <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="التركيز على عمود الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
                     <button type="button" id="topActionBtn" class="top-action-btn" title="الانتقال للسطر التالي أو إنشاء سطر جديد" onclick="handleTopActionBtnClick()"></button>
                     
@@ -794,6 +793,7 @@
             topNotesFocusBtn.style.display = 'flex';
         }
 
+        // جعل الكيبورد معطلاً تلقائياً لعدم ظهوره من تلقاء نفسه
         let rows = [
             { 
                 textExpression: '', 
@@ -814,6 +814,8 @@
         function handleTopActionBtnClick() {
             if (activeRowIndex < rows.length - 1) {
                 rows[activeRowIndex].isCalcPadVisible = false;
+                rows[activeRowIndex].forceKeyboardCalc = false;
+                rows[activeRowIndex].forceKeyboardText = false;
                 activeRowIndex++;
                 activeFieldIndex = 'calc';
                 rows[activeRowIndex].isCalcPadVisible = isMobile;
@@ -822,6 +824,8 @@
             } else {
                 evaluateRow(activeRowIndex);
                 rows[activeRowIndex].isCalcPadVisible = false;
+                rows[activeRowIndex].forceKeyboardCalc = false;
+                rows[activeRowIndex].forceKeyboardText = false;
                 rows.push({ 
                     textExpression: '', 
                     expression: '', 
@@ -960,6 +964,8 @@
             evaluateRow(index);
             rows[index].isCalcPadVisible = false;
             rows[index].isTextPadVisible = false;
+            rows[index].forceKeyboardCalc = false;
+            rows[index].forceKeyboardText = false;
 
             if (index < rows.length - 1) {
                 activeRowIndex = index + 1;
@@ -1111,7 +1117,6 @@
             return keypadDiv;
         }
 
-        // إعداذ اللمس (ضغطتان متتاليتان للآلة / ضغطة مطولة للكيبورد)
         function attachTouchListeners(element, index, field) {
             let lastTapTime = 0;
             let longPressTimer = null;
@@ -1122,7 +1127,6 @@
                 const currentTime = new Date().getTime();
                 const tapLength = currentTime - lastTapTime;
 
-                // ضغطتان متتاليتان (Double Tap) -> تفتح الآلة المصغرة
                 if (tapLength < 300 && tapLength > 0) {
                     e.preventDefault();
                     clearTimeout(longPressTimer);
@@ -1137,7 +1141,6 @@
                 }
                 lastTapTime = currentTime;
 
-                // ضغطة مطولة (Long Press) -> تفتح كيبورد الجهاز
                 longPressTimer = setTimeout(() => {
                     if (field === 'text') rows[index].forceKeyboardText = true;
                     if (field === 'calc') rows[index].forceKeyboardCalc = true;
@@ -1172,7 +1175,6 @@
                 const inputsGroup = document.createElement('div');
                 inputsGroup.className = 'inputs-group';
 
-                // 1. عمود الملاحظات (النص) في اليمين (بدون تشيك بوكس)
                 const textWrapper = document.createElement('div');
                 textWrapper.className = 'text-input-wrapper';
 
@@ -1196,6 +1198,7 @@
                     } else {
                         evaluateRow(index);
                         rows[index].isTextPadVisible = false;
+                        rows[index].forceKeyboardText = false;
                         rows.push({ 
                             textExpression: '', 
                             expression: '', 
@@ -1205,7 +1208,7 @@
                             isCalcVisible: true, 
                             isCalcPadVisible: false, 
                             isTextPadVisible: false,
-                            forceKeyboardText: true,
+                            forceKeyboardText: false,
                             forceKeyboardCalc: false
                         });
                         activeRowIndex = rows.length - 1;
@@ -1254,7 +1257,6 @@
                 textWrapper.appendChild(mobileArrowBtn);
                 textWrapper.appendChild(textInput);
 
-                // 2. عمود النتيجة في الوسط
                 const outputContainer = document.createElement('div');
                 outputContainer.className = 'calc-output-container';
 
@@ -1281,7 +1283,6 @@
                 outputContainer.appendChild(outputDiv);
                 outputContainer.appendChild(currencySpan);
 
-                // 3. عمود العملية الحسابية (المعادلة) في الشمال (بدون تشيك بوكس)
                 const calcWrapper = document.createElement('div');
                 calcWrapper.className = 'calc-input-wrapper';
 
@@ -1774,6 +1775,8 @@
                 evaluateRow(activeRowIndex);
                 rows[activeRowIndex].isCalcPadVisible = false;
                 rows[activeRowIndex].isTextPadVisible = false;
+                rows[activeRowIndex].forceKeyboardCalc = false;
+                rows[activeRowIndex].forceKeyboardText = false;
 
                 if (activeRowIndex < rows.length - 1) {
                     activeRowIndex++;
