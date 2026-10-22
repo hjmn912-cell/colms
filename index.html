@@ -362,7 +362,7 @@
             flex-shrink: 0;
         }
 
-        /* Checkbox الخاص بكيبورد الموبايل في عمود الملاحظات بحيث يكون أكبر حجمًا */
+        /* Checkbox الكبير الخاص بالملاحظات فقط وبحجم أكبر */
         .row-kbd-checkbox {
             width: 20px;
             height: 20px;
@@ -777,9 +777,9 @@
                 forceCalc: false, 
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
-                isCalcPadVisible: isMobile, // افتراضي موبايل متعلم، ديسك توب غير متعلم
+                isCalcPadVisible: isMobile, // آلة حاسبة مصغرة: مفعلة افتراضياً للموبايل ومعطلة للكمبيوتر
                 isTextPadVisible: false,
-                showMobileKeyboard: false // افتراضي غير متعلم ومختفي تماماً
+                showTextKeyboard: false // الكيبورد الخاص بالملاحظات: غير متعلم وافتراضياً مختفي للموبايل والكمبيوتر
             }
         ];
         let activeRowIndex = 0;
@@ -887,7 +887,6 @@
         function openKeyboardForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
-            rows[index].showMobileKeyboard = true;
             renderCalculator(field);
         }
 
@@ -903,7 +902,7 @@
                 isCalcVisible: true, 
                 isCalcPadVisible: currentIsMobile, 
                 isTextPadVisible: false,
-                showMobileKeyboard: false
+                showTextKeyboard: false
             });
             activeRowIndex = rows.length - 1;
             activeFieldIndex = 'calc';
@@ -1052,19 +1051,19 @@
                 const inputsGroup = document.createElement('div');
                 inputsGroup.className = 'inputs-group';
 
-                // 1. عمود الملاحظات (النص) في اليمين مع Checkbox كيبورد الموبايل الأكبر حجماً
+                // 1. عمود الملاحظات (النص) في اليمين مع Checkbox كيبورد الملاحظات الخاص بها فقط
                 const textWrapper = document.createElement('div');
                 textWrapper.className = 'text-input-wrapper';
 
                 const kbdCheckbox = document.createElement('input');
                 kbdCheckbox.type = 'checkbox';
                 kbdCheckbox.className = 'row-kbd-checkbox';
-                kbdCheckbox.checked = row.showMobileKeyboard;
-                kbdCheckbox.title = 'إظهار/إخفاء لوحة مفاتيح الجهاز';
+                kbdCheckbox.checked = row.showTextKeyboard;
+                kbdCheckbox.title = 'إظهار/إخفاء لوحة مفاتيح الملاحظات';
                 kbdCheckbox.addEventListener('change', (e) => {
                     activeRowIndex = index;
-                    rows[index].showMobileKeyboard = e.target.checked;
-                    renderCalculator(activeFieldIndex);
+                    rows[index].showTextKeyboard = e.target.checked;
+                    renderCalculator('text');
                 });
 
                 const textPadCheckbox = document.createElement('input');
@@ -1083,11 +1082,17 @@
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
 
-                // تفعيل أو إلغاء كيبورد الموبايل بناءً على حالة الـ checkbox الجديد
-                if (!row.showMobileKeyboard) {
-                    textInput.setAttribute('readonly', 'true');
-                    textInput.setAttribute('inputmode', 'none');
+                // تطبيق حالة التشغيل بناءً على الجهاز أو الـ Checkbox للملاحظات فقط
+                if (isMobile) {
+                    if (!row.showTextKeyboard) {
+                        textInput.setAttribute('readonly', 'true');
+                        textInput.setAttribute('inputmode', 'none');
+                    } else {
+                        textInput.removeAttribute('readonly');
+                        textInput.removeAttribute('inputmode');
+                    }
                 } else {
+                    // على الكمبيوتر: الكيبورد العادي يعمل في كل الحقول افتراضياً
                     textInput.removeAttribute('readonly');
                     textInput.removeAttribute('inputmode');
                 }
@@ -1176,8 +1181,8 @@
                 inputField.className = 'calc-input';
                 inputField.value = row.expression;
 
-                // تفعيل أو إلغاء كيبورد الموبايل بناءً على حالة الـ checkbox الجديد
-                if (!row.showMobileKeyboard) {
+                // على الموبايل: حقل الحسابات يعتمد كلياً على الآلة الحاسبة المصغرة (readonly افتراضياً) ولا يتأثر بcheckbox الملاحظات. على الكمبيوتر: يعمل الكيبورد العادي افتراضياً.
+                if (isMobile) {
                     inputField.setAttribute('readonly', 'true');
                     inputField.setAttribute('inputmode', 'none');
                 } else {
@@ -1428,7 +1433,7 @@
                 rows[0].isCalcVisible = true;
                 rows[0].isCalcPadVisible = currentIsMobile;
                 rows[0].isTextPadVisible = false;
-                rows[0].showMobileKeyboard = false;
+                rows[0].showTextKeyboard = false;
             } else {
                 rows.splice(index, 1);
                 if (activeRowIndex >= rows.length) {
@@ -1668,7 +1673,7 @@
                         isCalcVisible: true, 
                         isCalcPadVisible: currentIsMobile, 
                         isTextPadVisible: false,
-                        showMobileKeyboard: false
+                        showTextKeyboard: false
                     });
                     activeRowIndex = rows.length - 1;
                     activeFieldIndex = 'calc';
@@ -1687,7 +1692,7 @@
                     isCalcVisible: true, 
                     isCalcPadVisible: currentIsMobile,
                     isTextPadVisible: false,
-                    showMobileKeyboard: false
+                    showTextKeyboard: false
                 }];
                 activeRowIndex = 0;
                 activeFieldIndex = 'calc';
