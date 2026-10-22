@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <!-- السماح بالزوم اليدوي بالكامل ومنع الزوم الأوتوماتيكي عبر ضبط الأحجام القياسية -->
+    <!-- السماح بالتحكم اليدوي للزوم ومنع الزوم الأوتوماتيكي عبر ضبط أحجام الخطوط -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>آلة حاسبة الأسطر المتعددة</title>
     <!-- إضافة مكتبة SheetJS لتصدير ملفات Excel -->
@@ -44,12 +44,15 @@
             position: relative;
         }
 
+        /* تثبيت الهيدر العلوي تماماً ليبقى ظاهراً في الوش دائماً أثناء السحب والتمرير */
         .sticky-top-section {
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
             background-color: #030712;
             width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            flex-shrink: 0;
         }
 
         /* تنسيق قسم التحكم العلوي */
@@ -98,7 +101,7 @@
             min-width: 190px;
             box-shadow: 0px 8px 16px rgba(0,0,0,0.5);
             border-radius: 6px;
-            z-index: 200;
+            z-index: 2000;
             border: 1px solid #38bdf8;
             padding: 10px 12px;
             flex-direction: column;
@@ -159,7 +162,7 @@
             color: #ef4444;
         }
 
-        /* تعديل الهيدر ليضمن ظهور المجموع الكلي دائماً بشكل بارز بدون اختفاء */
+        /* الهيدر الخاص بالمجموع الكلي */
         .calculator-header {
             background-color: #030712;
             padding: 12px 15px;
@@ -248,7 +251,7 @@
             min-width: 140px;
             box-shadow: 0px 8px 16px rgba(0,0,0,0.5);
             border-radius: 6px;
-            z-index: 10;
+            z-index: 2000;
             border: 1px solid #38bdf8;
             overflow: hidden;
         }
@@ -454,7 +457,7 @@
             color: #ffffff;
         }
 
-        /* حجم الخط ثابت 16px لمنع التكبير التلقائي عند التركيز داخل الحقل */
+        /* حجم خط ثابت 16px لمنع التكبير التلقائي عند التركيز في الحقول */
         .text-input {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid #334155;
@@ -570,7 +573,6 @@
             font-weight: bold;
         }
 
-        /* تنسيقات الشاشات الصغيرة للموبايل لضمان بقاء المجموع الكلي واضحاً */
         @media (max-width: 600px) {
             .calculator-header {
                 flex-direction: column;
@@ -613,9 +615,9 @@
 
     <div class="calculator-container" id="calculatorContainer">
         
+        <!-- القسم العلوي المثبت (الهيدر والأزرار والمجاميع) -->
         <div class="sticky-top-section">
             <div class="top-controls-wrapper">
-                <!-- الكومبو بوكس جهة اليمين فوق -->
                 <div class="options-dropdown" id="optionsDropdown">
                     <button class="options-btn" type="button" onclick="toggleOptionsMenu(event)">
                         الخيارات <span>▼</span>
@@ -628,7 +630,6 @@
                     </div>
                 </div>
 
-                <!-- شريط مجموع الأعداد الموجبة والسالبة متمركز في المنتصف -->
                 <div class="totals-summary-bar">
                     <div class="summary-item">
                         <input type="checkbox" id="showPositiveCheckbox" onchange="renderCalculator()">
@@ -644,7 +645,6 @@
             </div>
 
             <div class="calculator-header">
-                <!-- المجموع الكلي ظاهراً دائماً وبشكل واضح -->
                 <div class="total-value-container">
                     <div id="grandTotal" class="total-value">0</div>
                     <div id="grandTotalCurrency" class="total-currency">جنيه</div>
@@ -667,6 +667,7 @@
             </div>
         </div>
 
+        <!-- شاشة الأسطر القابلة للتمرير -->
         <div id="screenContainer" class="calculator-screen"></div>
 
         <div class="keyboard-hint">
@@ -1571,7 +1572,7 @@ ${negativeText !== '' ? `<div><strong>مجموع السالب:</strong> ${escape
 
         document.addEventListener('keydown', (event) => {
             if (event.ctrlKey && !event.altKey && !event.shiftKey &&
-                (event.code === 'KeyB' || String(event.key).toLowerCase() === 'b')) {
+                (event.code === 'KeyB' ||String(event.key).toLowerCase() === 'b')) {
                 event.preventDefault();
                 event.stopPropagation();
                 openPrintPreview();
