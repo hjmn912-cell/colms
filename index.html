@@ -362,22 +362,6 @@
             flex: 1;
         }
 
-        .row-toggle-checkbox {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: #38bdf8;
-            flex-shrink: 0;
-        }
-
-        .row-pad-checkbox {
-            width: 13px;
-            height: 13px;
-            cursor: pointer;
-            accent-color: #10b981;
-            flex-shrink: 0;
-        }
-
         .row-mobile-arrow-btn {
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid #38bdf8;
@@ -567,6 +551,7 @@
             overflow-y: hidden;
             min-height: 42px;
             line-height: 1.3;
+            user-select: none;
         }
 
         .calc-input {
@@ -583,6 +568,7 @@
             height: 42px;
             direction: ltr;
             text-align: right;
+            user-select: none;
         }
 
         .calc-input:focus, .text-input:focus {
@@ -706,7 +692,7 @@
             .calculator-screen { display:block !important; height:auto !important; max-height:none !important; overflow:visible !important; padding:0 !important; background:#fff !important; }
             .calc-row { display:flex !important; width:100% !important; break-inside:avoid !important; page-break-inside:avoid !important; background:#fff !important; color:#000 !important; border:1px solid #bbb !important; }
             .inputs-group { display:flex !important; min-width:0 !important; }
-            .row-toggle-checkbox, .row-pad-checkbox, .row-mobile-arrow-btn, .row-keypad-container { display:none !important; }
+            .row-mobile-arrow-btn, .row-keypad-container { display:none !important; }
             .text-input, .calc-input { height:auto !important; min-height:34px !important; overflow:visible !important; white-space:pre-wrap !important; overflow-wrap:anywhere !important; color:#000 !important; background:#fff !important; border:1px solid #bbb !important; -webkit-text-fill-color:#000 !important; visibility:visible !important; font-size:16px !important; }
             .calc-output-container, .calc-output, .row-currency, .total-value, .total-currency, .summary-item, .positive-sum, .negative-sum { color:#000 !important; overflow-wrap:anywhere !important; word-break:break-word !important; }
             .top-controls-wrapper, .export-dropdown, .mic-btn, .delete-row-btn, .keyboard-hint { display:none !important; }
@@ -754,10 +740,10 @@
 
             <div class="calculator-header">
                 <div class="header-right-group">
-                    <!-- الزر الأول العلوي (الخاص بإنشاء أو التنقل للسطر التالي) -->
-                    <button type="button" id="topActionBtn" class="top-action-btn" title="الانتقال للسطر التالي أو إنشاء سطر جديد" onclick="handleTopActionBtnClick()"></button>
-                    <!-- الزر العلوي الجديد الثاني (لنقل التركيز لعمود الملاحظات) -->
+                    <!-- تم تعكيس الأزرار: أصبح زر الملاحظات على اليمين والزر الفارغ على شماله -->
                     <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="التركيز على عمود الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
+                    <button type="button" id="topActionBtn" class="top-action-btn" title="الانتقال للسطر التالي أو إنشاء سطر جديد" onclick="handleTopActionBtnClick()"></button>
+                    
                     <span class="designer-credit">designed by Sami Arouj</span>
                     <div class="export-dropdown" id="exportDropdown">
                         <button class="export-btn" onclick="toggleExportMenu(event)">
@@ -825,10 +811,8 @@
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
-        // وظيفة الزر العلوي الأول (التحرك خطوة بخطوة وإنشاء سطر جديد عند الأخير)
         function handleTopActionBtnClick() {
             if (activeRowIndex < rows.length - 1) {
-                // إلغاء تفعيل الآلة المصغرة للسطر القديم وتفعيلها للجديد
                 rows[activeRowIndex].isCalcPadVisible = false;
                 activeRowIndex++;
                 activeFieldIndex = 'calc';
@@ -837,7 +821,7 @@
                 scrollToActiveRow();
             } else {
                 evaluateRow(activeRowIndex);
-                rows[activeRowIndex].isCalcPadVisible = false; // إغلاق الآلة للسطر السابق
+                rows[activeRowIndex].isCalcPadVisible = false;
                 rows.push({ 
                     textExpression: '', 
                     expression: '', 
@@ -857,7 +841,6 @@
             }
         }
 
-        // وظيفة الزر العلوي الثاني الجديد (نقل التركيز فوراً إلى عمود الملاحظات)
         function handleTopNotesFocusClick() {
             activeFieldIndex = 'text';
             renderCalculator('text');
@@ -973,7 +956,6 @@
             renderCalculator(field);
         }
 
-        // عند الضغط على إنتر في الآلة المصغرة: إلغاء تفعيل السطر السابق وتفعيل الجديد
         function addNewRowFromPad(index, field) {
             evaluateRow(index);
             rows[index].isCalcPadVisible = false;
@@ -1129,6 +1111,49 @@
             return keypadDiv;
         }
 
+        // إعداذ اللمس (ضغطتان متتاليتان للآلة / ضغطة مطولة للكيبورد)
+        function attachTouchListeners(element, index, field) {
+            let lastTapTime = 0;
+            let longPressTimer = null;
+
+            element.addEventListener('touchstart', (e) => {
+                activeRowIndex = index;
+                activeFieldIndex = field;
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTapTime;
+
+                // ضغطتان متتاليتان (Double Tap) -> تفتح الآلة المصغرة
+                if (tapLength < 300 && tapLength > 0) {
+                    e.preventDefault();
+                    clearTimeout(longPressTimer);
+                    rows.forEach(r => {
+                        r.isCalcPadVisible = false;
+                        r.isTextPadVisible = false;
+                    });
+                    if (field === 'text') rows[index].isTextPadVisible = true;
+                    if (field === 'calc') rows[index].isCalcPadVisible = true;
+                    renderCalculator(field);
+                    return;
+                }
+                lastTapTime = currentTime;
+
+                // ضغطة مطولة (Long Press) -> تفتح كيبورد الجهاز
+                longPressTimer = setTimeout(() => {
+                    if (field === 'text') rows[index].forceKeyboardText = true;
+                    if (field === 'calc') rows[index].forceKeyboardCalc = true;
+                    renderCalculator(field);
+                }, 600);
+            }, { passive: false });
+
+            element.addEventListener('touchend', () => {
+                clearTimeout(longPressTimer);
+            });
+
+            element.addEventListener('touchmove', () => {
+                clearTimeout(longPressTimer);
+            });
+        }
+
         function renderCalculator(focusTarget = null) {
             screenContainer.innerHTML = '';
             let totalSum = 0;
@@ -1147,34 +1172,9 @@
                 const inputsGroup = document.createElement('div');
                 inputsGroup.className = 'inputs-group';
 
-                // 1. عمود الملاحظات (النص) في اليمين
+                // 1. عمود الملاحظات (النص) في اليمين (بدون تشيك بوكس)
                 const textWrapper = document.createElement('div');
                 textWrapper.className = 'text-input-wrapper';
-
-                const textToggleCheckbox = document.createElement('input');
-                textToggleCheckbox.type = 'checkbox';
-                textToggleCheckbox.className = 'row-toggle-checkbox';
-                textToggleCheckbox.checked = row.forceKeyboardText;
-                textToggleCheckbox.title = 'فتح كيبورد الموبايل للسطر الحالي';
-                textToggleCheckbox.addEventListener('change', (e) => {
-                    activeRowIndex = index;
-                    activeFieldIndex = 'text';
-                    rows[index].forceKeyboardText = e.target.checked;
-                    renderCalculator('text');
-                });
-
-                const textPadCheckbox = document.createElement('input');
-                textPadCheckbox.type = 'checkbox';
-                textPadCheckbox.className = 'row-pad-checkbox';
-                textPadCheckbox.checked = row.isTextPadVisible;
-                textPadCheckbox.title = 'إظهار لوحة تحكم مصغرة لعمود الملاحظات';
-                textPadCheckbox.addEventListener('change', (e) => {
-                    activeRowIndex = index;
-                    // إلغاء تفعيل الآلة للأسطر الأخرى
-                    rows.forEach(r => r.isTextPadVisible = false);
-                    rows[index].isTextPadVisible = e.target.checked;
-                    renderCalculator('text');
-                });
 
                 const mobileArrowBtn = document.createElement('button');
                 mobileArrowBtn.type = 'button';
@@ -1227,7 +1227,9 @@
                     textInput.removeAttribute('readonly');
                     textInput.removeAttribute('inputmode');
                 }
-                
+
+                attachTouchListeners(textInput, index, 'text');
+
                 textInput.addEventListener('input', (e) => {
                     rows[index].textExpression = e.target.value;
                     e.target.style.height = 'auto';
@@ -1249,8 +1251,6 @@
                     handleArrowNavigation(e, index, 'text');
                 });
 
-                textWrapper.appendChild(textToggleCheckbox);
-                textWrapper.appendChild(textPadCheckbox);
                 textWrapper.appendChild(mobileArrowBtn);
                 textWrapper.appendChild(textInput);
 
@@ -1281,34 +1281,9 @@
                 outputContainer.appendChild(outputDiv);
                 outputContainer.appendChild(currencySpan);
 
-                // 3. عمود العملية الحسابية (المعادلة) في الشمال (اليسار)
+                // 3. عمود العملية الحسابية (المعادلة) في الشمال (بدون تشيك بوكس)
                 const calcWrapper = document.createElement('div');
                 calcWrapper.className = 'calc-input-wrapper';
-
-                const rowToggleCheckbox = document.createElement('input');
-                rowToggleCheckbox.type = 'checkbox';
-                rowToggleCheckbox.className = 'row-toggle-checkbox';
-                rowToggleCheckbox.checked = row.isCalcVisible;
-                rowToggleCheckbox.title = 'إظهار/إخفاء العملية الحسابية للسطر';
-                rowToggleCheckbox.addEventListener('change', (e) => {
-                    activeRowIndex = index;
-                    rows[index].isCalcVisible = e.target.checked;
-                    evaluateRow(index);
-                    renderCalculator(activeFieldIndex);
-                });
-
-                const calcPadCheckbox = document.createElement('input');
-                calcPadCheckbox.type = 'checkbox';
-                calcPadCheckbox.className = 'row-pad-checkbox';
-                calcPadCheckbox.checked = row.isCalcPadVisible;
-                calcPadCheckbox.title = 'إظهار آلة حاسبة لعمود العملية الحسابية';
-                calcPadCheckbox.addEventListener('change', (e) => {
-                    activeRowIndex = index;
-                    // إلغاء تفعيل الآلة من كل الأسطر السابقة والتركيز على هذا السطر فقط
-                    rows.forEach(r => r.isCalcPadVisible = false);
-                    rows[index].isCalcPadVisible = e.target.checked;
-                    renderCalculator('calc');
-                });
 
                 const inputField = document.createElement('input');
                 inputField.type = 'text';
@@ -1322,7 +1297,9 @@
                     inputField.removeAttribute('readonly');
                     inputField.removeAttribute('inputmode');
                 }
-                
+
+                attachTouchListeners(inputField, index, 'calc');
+
                 inputField.addEventListener('input', (e) => {
                     rows[index].expression = e.target.value;
                     rows[index].forceCalc = false;
@@ -1366,8 +1343,6 @@
                     }
                 });
 
-                calcWrapper.appendChild(rowToggleCheckbox);
-                calcWrapper.appendChild(calcPadCheckbox);
                 calcWrapper.appendChild(inputField);
 
                 inputsGroup.appendChild(textWrapper);
@@ -1791,7 +1766,6 @@
             });
         }
 
-        // معالجة مفتاح Enter العام (من لوحة المفاتيح) مع إغلاق الآلة للسطر السابق وتفعيلها للجديد
         document.addEventListener('keydown', (event) => {
             const key = event.key;
 
