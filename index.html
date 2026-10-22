@@ -791,7 +791,9 @@
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
                 isCalcPadVisible: isMobile, 
-                isTextPadVisible: false
+                isTextPadVisible: false,
+                forceKeyboardText: false,
+                forceKeyboardCalc: false
             }
         ];
         let activeRowIndex = 0;
@@ -899,6 +901,11 @@
         function openKeyboardForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
+            if (field === 'text') {
+                rows[index].forceKeyboardText = true;
+            } else {
+                rows[index].forceKeyboardCalc = true;
+            }
             renderCalculator(field);
         }
 
@@ -913,7 +920,9 @@
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
                 isCalcPadVisible: currentIsMobile, 
-                isTextPadVisible: false
+                isTextPadVisible: false,
+                forceKeyboardText: false,
+                forceKeyboardCalc: false
             });
             activeRowIndex = rows.length - 1;
             activeFieldIndex = 'calc';
@@ -1071,8 +1080,8 @@
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
 
-                // على الكمبيوتر: الكيبورد العادي يعمل. على الموبايل: الحقل readonly حتى يتم الضغط على السهم الصغير أو إدخال نص عبر الآلة الحاسبة المصغرة
-                if (isMobile) {
+                // تفعيل كيبورد الموبايل عند الضغط على زرار الكيبورد في الآلة المصغرة أو السهم
+                if (isMobile && !row.forceKeyboardText) {
                     textInput.setAttribute('readonly', 'true');
                     textInput.setAttribute('inputmode', 'none');
                 } else {
@@ -1080,7 +1089,6 @@
                     textInput.removeAttribute('inputmode');
                 }
 
-                // إنشاء زر السهم الصغير الموجود حصرياً للموبايل/التابلت في أقصى اليمين بجانب حقل النص
                 const mobileArrowBtn = document.createElement('button');
                 mobileArrowBtn.type = 'button';
                 mobileArrowBtn.className = 'row-mobile-arrow-btn';
@@ -1093,11 +1101,13 @@
 
                 mobileArrowBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    // 1. إزالة readonly وفتح كيبورد الموبايل
+                    // فتح كيبورد الموبايل لحقل النص
+                    rows[index].forceKeyboardText = true;
                     textInput.removeAttribute('readonly');
                     textInput.removeAttribute('inputmode');
+                    textInput.focus();
                     
-                    // 2. إضافة سطر جديد أسفل السطر الحالي ونقل التركيز له
+                    // إضافة سطر جديد ونقل التركيز له
                     evaluateRow(index);
                     const currentIsMobile = isMobileDevice();
                     rows.push({ 
@@ -1108,7 +1118,9 @@
                         ignoreBeforeIndex: 0, 
                         isCalcVisible: true, 
                         isCalcPadVisible: currentIsMobile, 
-                        isTextPadVisible: false
+                        isTextPadVisible: false,
+                        forceKeyboardText: false,
+                        forceKeyboardCalc: false
                     });
                     activeRowIndex = rows.length - 1;
                     activeFieldIndex = 'text';
@@ -1199,7 +1211,7 @@
                 inputField.className = 'calc-input';
                 inputField.value = row.expression;
 
-                if (isMobile) {
+                if (isMobile && !row.forceKeyboardCalc) {
                     inputField.setAttribute('readonly', 'true');
                     inputField.setAttribute('inputmode', 'none');
                 } else {
@@ -1450,6 +1462,8 @@
                 rows[0].isCalcVisible = true;
                 rows[0].isCalcPadVisible = currentIsMobile;
                 rows[0].isTextPadVisible = false;
+                rows[0].forceKeyboardText = false;
+                rows[0].forceKeyboardCalc = false;
             } else {
                 rows.splice(index, 1);
                 if (activeRowIndex >= rows.length) {
@@ -1688,7 +1702,9 @@
                         ignoreBeforeIndex: 0, 
                         isCalcVisible: true, 
                         isCalcPadVisible: currentIsMobile, 
-                        isTextPadVisible: false
+                        isTextPadVisible: false,
+                        forceKeyboardText: false,
+                        forceKeyboardCalc: false
                     });
                     activeRowIndex = rows.length - 1;
                     activeFieldIndex = 'calc';
@@ -1706,7 +1722,9 @@
                     ignoreBeforeIndex: 0, 
                     isCalcVisible: true, 
                     isCalcPadVisible: currentIsMobile,
-                    isTextPadVisible: false
+                    isTextPadVisible: false,
+                    forceKeyboardText: false,
+                    forceKeyboardCalc: false
                 }];
                 activeRowIndex = 0;
                 activeFieldIndex = 'calc';
