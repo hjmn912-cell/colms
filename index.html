@@ -221,7 +221,6 @@
             white-space: nowrap;
         }
 
-        /* الزر الفارغ العلوي الجديد في الموبايل والتابلت */
         .top-action-btn {
             background-color: #1e293b;
             border: 1px solid #38bdf8;
@@ -230,7 +229,7 @@
             height: 32px;
             border-radius: 6px;
             cursor: pointer;
-            display: none; /* مخفي افتراضياً، يظهر على الموبايل والتابلت عبر الجافاسكريبت أو الكلاس */
+            display: none;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
@@ -351,7 +350,7 @@
         .text-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 10px; /* تباعد كافي ومريح بين المربعات والسهم في عمود الملاحظات للتحكم باللمس */
+            gap: 10px;
             flex: 1;
         }
 
@@ -754,7 +753,7 @@
 
             <div class="calculator-header">
                 <div class="header-right-group">
-                    <button type="button" id="topActionBtn" class="top-action-btn" title="إنشاء سطر أو الانتقال لآخره" onclick="handleTopActionBtnClick()"></button>
+                    <button type="button" id="topActionBtn" class="top-action-btn" title="الانتقال للسطر التالي أو إنشاء سطر جديد" onclick="handleTopActionBtnClick()"></button>
                     <span class="designer-credit">designed by Sami Arouj</span>
                     <div class="export-dropdown" id="exportDropdown">
                         <button class="export-btn" onclick="toggleExportMenu(event)">
@@ -799,7 +798,6 @@
 
         const isMobile = isMobileDevice();
 
-        // إظهار الزر العلوي حصرياً على الموبايل والتابلت
         if (isMobile) {
             topActionBtn.style.display = 'flex';
         }
@@ -812,7 +810,6 @@
                 forceCalc: false, 
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
-                // تفعيل الآلة الحاسبة المصغرة افتراضياً على الموبايل في عمود العملية الحسابية
                 isCalcPadVisible: isMobile, 
                 isTextPadVisible: false,
                 forceKeyboardText: false,
@@ -822,10 +819,14 @@
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
-        // وظيفة الزر العلوي الفارغ ناحية اليمين على الموبايل والتابلت
+        // تعديل الزر العلوي: ينزل خطوة بخطوة وإذا كان في السطر الأخير ينشئ سطر جديد
         function handleTopActionBtnClick() {
-            if (activeRowIndex === rows.length - 1) {
-                // إذا كنا في آخر صف بالفعل: أنشئ صف جديد، ركز على المعادلة وافتح الآلة المصغرة
+            if (activeRowIndex < rows.length - 1) {
+                activeRowIndex++;
+                activeFieldIndex = 'calc';
+                renderCalculator('calc');
+                scrollToActiveRow();
+            } else {
                 evaluateRow(activeRowIndex);
                 rows.push({ 
                     textExpression: '', 
@@ -843,12 +844,6 @@
                 activeFieldIndex = 'calc';
                 renderCalculator('calc');
                 screenContainer.scrollTop = screenContainer.scrollHeight;
-            } else {
-                // إذا لم نكن في آخر صف: انتقل إلى آخر صف مباشرة
-                activeRowIndex = rows.length - 1;
-                activeFieldIndex = 'calc';
-                renderCalculator('calc');
-                scrollToActiveRow();
             }
         }
 
@@ -962,24 +957,32 @@
             renderCalculator(field);
         }
 
-        function addNewRowFromPad(index) {
+        // تعديل زر Enter في الآلة الحاسبة المصغرة بمرونة حسب الحقل الحالي (معادلة أم ملاحظات)
+        function addNewRowFromPad(index, field) {
             evaluateRow(index);
-            rows.push({ 
-                textExpression: '', 
-                expression: '', 
-                result: 0, 
-                forceCalc: false, 
-                ignoreBeforeIndex: 0, 
-                isCalcVisible: true, 
-                isCalcPadVisible: isMobile, 
-                isTextPadVisible: false,
-                forceKeyboardText: false,
-                forceKeyboardCalc: false
-            });
-            activeRowIndex = rows.length - 1;
-            activeFieldIndex = 'calc';
-            renderCalculator('calc');
-            screenContainer.scrollTop = screenContainer.scrollHeight;
+            if (index < rows.length - 1) {
+                activeRowIndex = index + 1;
+                activeFieldIndex = field;
+                renderCalculator(field);
+                scrollToActiveRow();
+            } else {
+                rows.push({ 
+                    textExpression: '', 
+                    expression: '', 
+                    result: 0, 
+                    forceCalc: false, 
+                    ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, 
+                    isCalcPadVisible: (field === 'calc' && isMobile), 
+                    isTextPadVisible: (field === 'text' && isMobile),
+                    forceKeyboardText: false,
+                    forceKeyboardCalc: false
+                });
+                activeRowIndex = rows.length - 1;
+                activeFieldIndex = field;
+                renderCalculator(field);
+                screenContainer.scrollTop = screenContainer.scrollHeight;
+            }
         }
 
         function formatDisplayValue(val) {
@@ -1094,7 +1097,7 @@
                     } else if (k === '🗑 Del') {
                         clearCurrentField();
                     } else if (k === 'Enter') {
-                        addNewRowFromPad(index);
+                        addNewRowFromPad(index, field);
                     } else {
                         insertValueForField(index, field, k);
                     }
@@ -1123,7 +1126,7 @@
                 const inputsGroup = document.createElement('div');
                 inputsGroup.className = 'inputs-group';
 
-                // 1. عمود الملاحظات (النص) في اليمين مع تباعد ومسافات مريحة للمس
+                // 1. عمود الملاحظات (النص) في اليمين
                 const textWrapper = document.createElement('div');
                 textWrapper.className = 'text-input-wrapper';
 
@@ -1176,7 +1179,7 @@
                             forceCalc: false, 
                             ignoreBeforeIndex: 0, 
                             isCalcVisible: true, 
-                            isCalcPadVisible: isMobile, 
+                            isCalcPadVisible: false, 
                             isTextPadVisible: false,
                             forceKeyboardText: true,
                             forceKeyboardCalc: false
