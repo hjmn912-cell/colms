@@ -187,6 +187,8 @@
             font-weight: 700;
             color: #38bdf8;
             white-space: nowrap;
+            direction: ltr;
+            unicode-bidi: isolate;
         }
 
         .total-currency {
@@ -469,7 +471,6 @@
             color: #fff;
         }
 
-        /* تنسيق زرار الأسهم UP و DOWN الصغيرين */
         .mini-key-btn.arrow-key {
             background-color: #0f172a;
             color: #38bdf8;
@@ -520,8 +521,10 @@
             overflow-y: hidden;
             min-height: 38px;
             line-height: 1.4;
+            direction: rtl;
         }
 
+        /* حقل العملية الحسابية تم توجيهه من اليسار لليمين لمنع لخبطة ترتيب العمليات والرموز */
         .calc-input {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid #334155;
@@ -533,6 +536,8 @@
             outline: none;
             font-family: inherit;
             height: 38px;
+            direction: ltr !important;
+            text-align: left;
         }
 
         .calc-input:focus, .text-input:focus {
@@ -560,6 +565,8 @@
             font-weight: 600;
             color: #10b981;
             white-space: nowrap;
+            direction: ltr;
+            unicode-bidi: isolate;
         }
 
         .row-currency {
@@ -861,15 +868,12 @@
             renderCalculator(field);
         }
 
-        // تطوير زر Enter: ينزل للسطر التالي إذا كنا في الوسط، ويضيف سطر جديد فقط إذا كنا في آخر سطر
         function handleEnterLogic(index) {
             evaluateRow(index);
             if (index < rows.length - 1) {
-                // إذا كنا في وسط السطور ينزل للسطر التابع
                 activeRowIndex = index + 1;
                 renderCalculator(activeFieldIndex);
             } else {
-                // إذا كنا في آخر سطر يضيف سطر جديد
                 const currentIsMobile = isMobileDevice();
                 rows.push({ 
                     textExpression: '', 
@@ -971,7 +975,6 @@
                 isDraggingKeypad = false;
             }
 
-            // ترتيب الأزرار وإضافة المفتاحين الصغيرين ▲ (UP) و ▼ (DOWN)
             const keys = [
                 '▲', '▼', '⌫', 'Del',
                 '7', '8', '9', '/',
