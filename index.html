@@ -210,7 +210,7 @@
         .header-right-group {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             justify-content: flex-end;
         }
 
@@ -219,6 +219,26 @@
             color: #6b7280;
             letter-spacing: 0.5px;
             white-space: nowrap;
+        }
+
+        /* الزر الفارغ العلوي الجديد في الموبايل والتابلت */
+        .top-action-btn {
+            background-color: #1e293b;
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: none; /* مخفي افتراضياً، يظهر على الموبايل والتابلت عبر الجافاسكريبت أو الكلاس */
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .top-action-btn:active {
+            background-color: #38bdf8;
+            color: #0b0f19;
         }
 
         .export-dropdown {
@@ -331,7 +351,7 @@
         .text-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px; /* تباعد كافي ومريح بين المربعات والسهم في عمود الملاحظات للتحكم باللمس */
             flex: 1;
         }
 
@@ -734,6 +754,7 @@
 
             <div class="calculator-header">
                 <div class="header-right-group">
+                    <button type="button" id="topActionBtn" class="top-action-btn" title="إنشاء سطر أو الانتقال لآخره" onclick="handleTopActionBtnClick()"></button>
                     <span class="designer-credit">designed by Sami Arouj</span>
                     <div class="export-dropdown" id="exportDropdown">
                         <button class="export-btn" onclick="toggleExportMenu(event)">
@@ -767,6 +788,7 @@
         const positiveTotalValEl = document.getElementById('positiveTotalVal');
         const negativeTotalValEl = document.getElementById('negativeTotalVal');
         const calculatorContainer = document.getElementById('calculatorContainer');
+        const topActionBtn = document.getElementById('topActionBtn');
 
         function isMobileDevice() {
             const hasTouchScreen = (('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) || ('msMaxTouchPoints' in navigator && navigator.msMaxTouchPoints > 0));
@@ -777,6 +799,11 @@
 
         const isMobile = isMobileDevice();
 
+        // إظهار الزر العلوي حصرياً على الموبايل والتابلت
+        if (isMobile) {
+            topActionBtn.style.display = 'flex';
+        }
+
         let rows = [
             { 
                 textExpression: '', 
@@ -785,7 +812,8 @@
                 forceCalc: false, 
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
-                isCalcPadVisible: false, 
+                // تفعيل الآلة الحاسبة المصغرة افتراضياً على الموبايل في عمود العملية الحسابية
+                isCalcPadVisible: isMobile, 
                 isTextPadVisible: false,
                 forceKeyboardText: false,
                 forceKeyboardCalc: false
@@ -793,6 +821,36 @@
         ];
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
+
+        // وظيفة الزر العلوي الفارغ ناحية اليمين على الموبايل والتابلت
+        function handleTopActionBtnClick() {
+            if (activeRowIndex === rows.length - 1) {
+                // إذا كنا في آخر صف بالفعل: أنشئ صف جديد، ركز على المعادلة وافتح الآلة المصغرة
+                evaluateRow(activeRowIndex);
+                rows.push({ 
+                    textExpression: '', 
+                    expression: '', 
+                    result: 0, 
+                    forceCalc: false, 
+                    ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, 
+                    isCalcPadVisible: isMobile, 
+                    isTextPadVisible: false,
+                    forceKeyboardText: false,
+                    forceKeyboardCalc: false
+                });
+                activeRowIndex = rows.length - 1;
+                activeFieldIndex = 'calc';
+                renderCalculator('calc');
+                screenContainer.scrollTop = screenContainer.scrollHeight;
+            } else {
+                // إذا لم نكن في آخر صف: انتقل إلى آخر صف مباشرة
+                activeRowIndex = rows.length - 1;
+                activeFieldIndex = 'calc';
+                renderCalculator('calc');
+                scrollToActiveRow();
+            }
+        }
 
         function goToFirstRow() {
             if (rows.length > 0) {
@@ -913,7 +971,7 @@
                 forceCalc: false, 
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
-                isCalcPadVisible: false, 
+                isCalcPadVisible: isMobile, 
                 isTextPadVisible: false,
                 forceKeyboardText: false,
                 forceKeyboardCalc: false
@@ -1065,11 +1123,10 @@
                 const inputsGroup = document.createElement('div');
                 inputsGroup.className = 'inputs-group';
 
-                // 1. عمود الملاحظات (النص) في اليمين مع عناصر التحكم الجديدة
+                // 1. عمود الملاحظات (النص) في اليمين مع تباعد ومسافات مريحة للمس
                 const textWrapper = document.createElement('div');
                 textWrapper.className = 'text-input-wrapper';
 
-                // أ) التشيك بوكس الكبير لفتح كيبورد الموبايل للسطر الحالي
                 const textToggleCheckbox = document.createElement('input');
                 textToggleCheckbox.type = 'checkbox';
                 textToggleCheckbox.className = 'row-toggle-checkbox';
@@ -1082,7 +1139,6 @@
                     renderCalculator('text');
                 });
 
-                // ب) التشيك بوكس الصغير لفتح كيبورد الآلة المصغرة
                 const textPadCheckbox = document.createElement('input');
                 textPadCheckbox.type = 'checkbox';
                 textPadCheckbox.className = 'row-pad-checkbox';
@@ -1094,7 +1150,6 @@
                     renderCalculator('text');
                 });
 
-                // ج) السهم الصغير الذكي للتنقل أو إضافة سطر مع فتح الكيبورد
                 const mobileArrowBtn = document.createElement('button');
                 mobileArrowBtn.type = 'button';
                 mobileArrowBtn.className = 'row-mobile-arrow-btn';
@@ -1107,15 +1162,12 @@
 
                 mobileArrowBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    // إذا لم نكن في السطر الأخير: تنقل للسطر الذي أسفله
                     if (index < rows.length - 1) {
                         activeRowIndex = index + 1;
                         activeFieldIndex = 'text';
                         renderCalculator('text');
                         scrollToActiveRow();
-                    } 
-                    // إذا كنا في السطر الأخير: أنشئ سطر جديد وافتح فيه كيبورد الأندرويد
-                    else {
+                    } else {
                         evaluateRow(index);
                         rows.push({ 
                             textExpression: '', 
@@ -1124,7 +1176,7 @@
                             forceCalc: false, 
                             ignoreBeforeIndex: 0, 
                             isCalcVisible: true, 
-                            isCalcPadVisible: false, 
+                            isCalcPadVisible: isMobile, 
                             isTextPadVisible: false,
                             forceKeyboardText: true,
                             forceKeyboardCalc: false
@@ -1482,7 +1534,7 @@
                 rows[0].forceCalc = false;
                 rows[0].ignoreBeforeIndex = 0;
                 rows[0].isCalcVisible = true;
-                rows[0].isCalcPadVisible = false;
+                rows[0].isCalcPadVisible = isMobile;
                 rows[0].isTextPadVisible = false;
                 rows[0].forceKeyboardText = false;
                 rows[0].forceKeyboardCalc = false;
@@ -1722,7 +1774,7 @@
                         forceCalc: false, 
                         ignoreBeforeIndex: 0, 
                         isCalcVisible: true, 
-                        isCalcPadVisible: false, 
+                        isCalcPadVisible: isMobile, 
                         isTextPadVisible: false,
                         forceKeyboardText: false,
                         forceKeyboardCalc: false
@@ -1741,7 +1793,7 @@
                     forceCalc: false, 
                     ignoreBeforeIndex: 0, 
                     isCalcVisible: true, 
-                    isCalcPadVisible: false,
+                    isCalcPadVisible: isMobile,
                     isTextPadVisible: false,
                     forceKeyboardText: false,
                     forceKeyboardCalc: false
