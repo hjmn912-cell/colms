@@ -647,9 +647,13 @@
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
-        // دالة للتحقق مما إذا كان المستخدم على جهاز محمول
+        // دالة ذكية للتعرف على الهواتف حتى لو كان وضع الديسك توب مفعلاً
         function isMobileDevice() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const hasTouchScreen = (('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) || ('msMaxTouchPoints' in navigator && navigator.msMaxTouchPoints > 0));
+            const isUserAgentMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            // إذا كان الجهاز يحتوي على شاشة لمس وعرض الشاشة صغير (أو يقع ضمن شاشات الهواتف/التابلت)، يعتبر محمولاً حتى لو تم تفعيل وضع سطح المكتب
+            const isSmallScreen = window.innerWidth <= 1024;
+            return isUserAgentMobile || (hasTouchScreen && isSmallScreen);
         }
 
         function toggleOptionsMenu(e) {
@@ -832,7 +836,7 @@
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
 
-                // تطبيق شرط منع كيبورد الموبايل فقط إذا كان موبايل وتم تفعيل الـ Checkbox الخاص به
+                // منع ظهور كيبورد الموبايل عند تفعيل الـ Checkbox (حتى لو كان وضع الديسك توب مفعلاً في المتصفح)
                 if (isMobile && row.isTextPadVisible) {
                     textInput.setAttribute('readonly', 'true');
                     textInput.setAttribute('inputmode', 'none');
@@ -895,7 +899,7 @@
                 inputField.className = 'calc-input';
                 inputField.value = row.expression;
 
-                // تطبيق شرط منع كيبورد الموبايل فقط إذا كان موبايل وتم تفعيل الـ Checkbox الخاص به
+                // منع ظهور كيبورد الموبايل عند تفعيل الـ Checkbox (حتى لو كان وضع الديسك توب مفعلاً في المتصفح)
                 if (isMobile && row.isCalcPadVisible) {
                     inputField.setAttribute('readonly', 'true');
                     inputField.setAttribute('inputmode', 'none');
