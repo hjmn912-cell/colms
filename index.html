@@ -2,20 +2,50 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" 
+
+content="width=device-width, initial-
+
+scale=1.0">
     <title>آلة حاسبة الأسطر المتعددة</title>
-    <!-- إضافة مكتبة SheetJS لتصدير ملفات Excel -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- إضافة مكتبة html2pdf لتصدير ملفات PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- إضافة مكتبة html2canvas لتصدير الصور -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- إضافة مكتبة SheetJS لتصدير ملفات 
+
+Excel -->
+    <script 
+
+src="https://cdnjs.cloudflare.com/ajax/
+
+libs/xlsx/0.18.5/xlsx.full.min.js"></sc
+
+ript>
+    <!-- إضافة مكتبة html2pdf لتصدير ملفات PDF 
+
+-->
+    <script 
+
+src="https://cdnjs.cloudflare.com/ajax/
+
+libs/html2pdf.js/0.10.1/html2pdf.bundle
+
+.min.js"></script>
+    <!-- إضافة مكتبة html2canvas لتصدير الصور 
+
+-->
+    <script 
+
+src="https://cdnjs.cloudflare.com/ajax/
+
+libs/html2canvas/1.4.1/html2canvas.min.
+
+js"></script>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', 
+
+Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
@@ -34,7 +64,9 @@
             max-width: 100%;
             background-color: #111827;
             border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 20px 40px 
+
+rgba(0, 0, 0, 0.7);
             border: 1px solid #1f2937;
             overflow: hidden;
             display: flex;
@@ -50,15 +82,140 @@
             width: 100%;
         }
 
-        /* شريط المجموع الموجب والسالب فوق شريط العمليات */
+        /* تنسيق قسم التحكم العلوي */
+        .top-controls-wrapper {
+            display: flex;
+            justify-content: space-
+
+between;
+            align-items: center;
+            padding: 10px 20px 5px 
+
+20px;
+            border-bottom: 1px solid 
+
+#1f2937;
+            gap: 15px;
+            position: relative;
+        }
+
+        /* الكومبو بوكس جهة اليمين فوق */
+        .options-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .options-btn {
+            background-color: #1e293b;
+            color: #38bdf8;
+            border: 1px solid #38bdf8;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .options-btn:hover {
+            background-color: #38bdf8;
+            color: #0b0f19;
+        }
+
+        .options-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 110%;
+            background-color: #1e293b;
+            min-width: 190px;
+            box-shadow: 0px 8px 16px 
+
+rgba(0,0,0,0.5);
+            border-radius: 6px;
+            z-index: 200;
+            border: 1px solid #38bdf8;
+            padding: 10px 12px;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .options-dropdown-
+
+content.active {
+            display: flex;
+        }
+
+        .option-toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.95rem;
+            color: #f8fafc;
+            white-space: nowrap;
+        }
+
+        .option-toggle-label input {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            accent-color: #38bdf8;
+        }
+
+        /* لوحة الأرقام وزر الحذف في النص */
+        .numpad-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            direction: ltr;
+        }
+
+        .numpad-bar.hidden {
+            display: none !important;
+        }
+
+        .num-btn {
+            background-color: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .num-btn:hover {
+            background-color: #38bdf8;
+            color: #0b0f19;
+            border-color: #38bdf8;
+        }
+
+        .backspace-btn {
+            background-color: #331f29;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+
+        .backspace-btn:hover {
+            background-color: #ef4444;
+            color: #ffffff;
+        }
+
+        /* شريط المجموع الموجب والسالب */
         .totals-summary-bar {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 30px;
-            background-color: #030712;
-            padding: 10px 20px 5px 20px;
-            border-bottom: 1px solid #1f2937;
         }
 
         .summary-item {
@@ -69,7 +226,9 @@
             font-weight: 600;
         }
 
-        .summary-item input[type="checkbox"] {
+        .summary-item input
+
+[type="checkbox"] {
             width: 18px;
             height: 18px;
             cursor: pointer;
@@ -90,7 +249,9 @@
             gap: 10px;
             background-color: #030712;
             padding: 12px 20px;
-            border-bottom: 1px solid #1f2937;
+            border-bottom: 1px solid 
+
+#1f2937;
         }
 
         .op-btn {
@@ -113,9 +274,13 @@
         .calculator-header {
             background-color: #030712;
             padding: 15px 30px;
-            border-bottom: 2px solid #1f2937;
+            border-bottom: 2px solid 
+
+#1f2937;
             display: flex;
-            justify-content: space-between;
+            justify-content: space-
+
+between;
             align-items: center;
             width: 100%;
         }
@@ -124,20 +289,6 @@
             display: flex;
             align-items: center;
             flex: 1;
-        }
-
-        .currency-toggle-label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .currency-toggle-label input {
-            cursor: pointer;
-            width: 20px;
-            height: 20px;
-            accent-color: #38bdf8;
         }
 
         .total-value-container {
@@ -185,6 +336,7 @@
             display: inline-block;
             text-align: left;
         }
+
         .export-btn {
             background-color: #1e293b;
             color: #38bdf8;
@@ -196,24 +348,31 @@
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            transition: background 0.2s;
+            transition: background 
+
+0.2s;
         }
+
         .export-btn:hover {
             background-color: #38bdf8;
             color: #0b0f19;
         }
+
         .dropdown-content {
             display: none;
             position: absolute;
             left: 0;
             background-color: #1e293b;
             min-width: 140px;
-            box-shadow: 0px 8px 16px rgba(0,0,0,0.5);
+            box-shadow: 0px 8px 16px 
+
+rgba(0,0,0,0.5);
             border-radius: 6px;
             z-index: 10;
             border: 1px solid #38bdf8;
             overflow: hidden;
         }
+
         .dropdown-content button {
             color: #f8fafc;
             padding: 10px 14px;
@@ -226,11 +385,17 @@
             cursor: pointer;
             font-size: 0.9rem;
         }
-        .dropdown-content button:hover {
+
+        .dropdown-content button:hover 
+
+{
             background-color: #38bdf8;
             color: #0b0f19;
         }
-        .export-dropdown.active .dropdown-content {
+
+        .export-dropdown.active 
+
+.dropdown-content {
             display: block;
         }
 
@@ -247,13 +412,19 @@
 
         .calc-row {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-
+
+between;
             align-items: flex-start;
             background-color: #1e293b;
             padding: 10px 15px;
             border-radius: 8px;
-            border: 1px solid transparent;
-            transition: border-color 0.2s;
+            border: 1px solid 
+
+transparent;
+            transition: border-color 
+
+0.2s;
             gap: 15px;
             width: 100%;
         }
@@ -265,12 +436,34 @@
 
         .inputs-group {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             flex-grow: 1;
+            align-items: center;
+        }
+
+        /* حاوية عمود العملية الحسابية للسطر */
+        .calc-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        /* التشيك بوكس الصغير لعمود العملية الحسابية 
+
+*/
+        .row-toggle-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #38bdf8;
+            flex-shrink: 0;
         }
 
         .text-input {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 
+
+255, 0.03);
             border: 1px solid #334155;
             border-radius: 6px;
             padding: 4px 8px;
@@ -286,21 +479,41 @@
         }
 
         .calc-input {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 
+
+255, 0.03);
             border: 1px solid #334155;
             border-radius: 6px;
             padding: 4px 8px;
             color: #f8fafc;
             font-size: 1.1rem;
-            flex: 1;
+            width: 100%;
             outline: none;
             font-family: inherit;
             height: 34px;
         }
 
-        .calc-input:focus, .text-input:focus {
+        .calc-input:focus, .text-
+
+input:focus {
             border-color: #38bdf8;
-            background: rgba(56, 189, 248, 0.05);
+            background: rgba(56, 189, 
+
+248, 0.05);
+        }
+
+        /* إخفاء إدخال حقل العملية الحسابية فقط عند 
+
+إزالة التحديد */
+        .calc-row.hidden-calc .calc-
+
+input {
+            visibility: hidden !
+
+important;
+            pointer-events: none !
+
+important;
         }
 
         .calc-output-container {
@@ -341,13 +554,17 @@
         }
 
         .mic-btn:hover {
-            background-color: rgba(56, 189, 248, 0.15);
+            background-color: rgba(56, 
+
+189, 248, 0.15);
             color: #38bdf8;
         }
 
         .mic-btn.listening {
             color: #ef4444 !important;
-            animation: pulse 1.2s infinite;
+            animation: pulse 1.2s 
+
+infinite;
         }
 
         @keyframes pulse {
@@ -357,7 +574,9 @@
         }
 
         .delete-row-btn:hover {
-            background-color: rgba(239, 68, 68, 0.15);
+            background-color: rgba(239, 
+
+68, 68, 0.15);
             color: #ef4444;
         }
 
@@ -367,7 +586,9 @@
             font-size: 0.85rem;
             color: #6b7280;
             background-color: #111827;
-            border-top: 1px solid #1f2937;
+            border-top: 1px solid 
+
+#1f2937;
             width: 100%;
         }
 
@@ -376,379 +597,1458 @@
             font-weight: bold;
         }
 
-        /* Print-safe layout: prevent viewport and overflow rules from clipping content. */
         @media print {
-            @page { size: A4 landscape; margin: 10mm; }
-            html, body { display:block !important; min-height:0 !important; height:auto !important; margin:0 !important; padding:0 !important; overflow:visible !important; background:#fff !important; color:#000 !important; }
-            .calculator-container { width:100% !important; height:auto !important; max-width:none !important; overflow:visible !important; box-shadow:none !important; border:0 !important; background:#fff !important; }
-            .sticky-top-section { position:static !important; overflow:visible !important; background:#fff !important; }
-            .calculator-screen { display:block !important; height:auto !important; max-height:none !important; overflow:visible !important; padding:0 !important; background:#fff !important; }
-            .calc-row { display:flex !important; width:100% !important; break-inside:avoid !important; page-break-inside:avoid !important; background:#fff !important; color:#000 !important; border:1px solid #bbb !important; }
-            .inputs-group { display:flex !important; min-width:0 !important; }
-            .text-input, .calc-input { height:auto !important; min-height:34px !important; overflow:visible !important; white-space:pre-wrap !important; overflow-wrap:anywhere !important; color:#000 !important; background:#fff !important; border:1px solid #bbb !important; -webkit-text-fill-color:#000 !important; }
-            .calc-output-container, .calc-output, .row-currency, .total-value, .total-currency, .summary-item, .positive-sum, .negative-sum { color:#000 !important; overflow-wrap:anywhere !important; word-break:break-word !important; }
-            .operator-bar, .export-dropdown, .mic-btn, .delete-row-btn, .keyboard-hint { display:none !important; }
+            @page { size: A4 landscape; 
+
+margin: 10mm; }
+            html, body { display:block 
+
+!important; min-height:0 !important; 
+
+height:auto !important; margin:0 !
+
+important; padding:0 !important; 
+
+overflow:visible !important; 
+
+background:#fff !important; color:#000 
+
+!important; }
+            .calculator-container { 
+
+width:100% !important; height:auto !
+
+important; max-width:none !important; 
+
+overflow:visible !important; box-
+
+shadow:none !important; border:0 !
+
+important; background:#fff !important; 
+
+}
+            .sticky-top-section { 
+
+position:static !important; 
+
+overflow:visible !important; 
+
+background:#fff !important; }
+            .calculator-screen { 
+
+display:block !important; height:auto 
+
+!important; max-height:none !important; 
+
+overflow:visible !important; padding:0 
+
+!important; background:#fff !important; 
+
+}
+            .calc-row { display:flex !
+
+important; width:100% !important; 
+
+break-inside:avoid !important; page-
+
+break-inside:avoid !important; 
+
+background:#fff !important; color:#000 
+
+!important; border:1px solid #bbb !
+
+important; }
+            .inputs-group { 
+
+display:flex !important; min-width:0 !
+
+important; }
+            .row-toggle-checkbox { 
+
+display:none !important; }
+            .text-input, .calc-input { 
+
+height:auto !important; min-height:34px 
+
+!important; overflow:visible !
+
+important; white-space:pre-wrap !
+
+important; overflow-wrap:anywhere !
+
+important; color:#000 !important; 
+
+background:#fff !important; border:1px 
+
+solid #bbb !important; -webkit-text-
+
+fill-color:#000 !important; 
+
+visibility:visible !important; }
+            .calc-output-container, 
+
+.calc-output, .row-currency, .total-
+
+value, .total-currency, .summary-item, 
+
+.positive-sum, .negative-sum { 
+
+color:#000 !important; overflow-
+
+wrap:anywhere !important; word-
+
+break:break-word !important; }
+            .operator-bar, .top-
+
+controls-wrapper, .export-dropdown, 
+
+.mic-btn, .delete-row-btn, .keyboard-
+
+hint { display:none !important; }
         }
 
     </style>
 </head>
 <body>
 
-    <div class="calculator-container" id="calculatorContainer">
+    <div class="calculator-container" 
+
+id="calculatorContainer">
         
-        <div class="sticky-top-section">
-            <!-- الشريط الجديد لعرض مجموع الأعداد الموجبة والسالبة -->
-            <div class="totals-summary-bar">
-                <div class="summary-item">
-                    <input type="checkbox" id="showPositiveCheckbox" onchange="renderCalculator()">
-                    <span id="positiveTotalVal" class="positive-sum"></span>
+        <div class="sticky-top-
+
+section">
+            <div class="top-controls-
+
+wrapper">
+                <!-- الكومبو بوكس ناحية اليمين 
+
+فوق -->
+                <div class="options-
+
+dropdown" id="optionsDropdown">
+                    <button 
+
+class="options-btn" type="button" 
+
+onclick="toggleOptionsMenu(event)">
+                        الخيارات 
+
+<span>▼</span>
+                    </button>
+                    <div 
+
+class="options-dropdown-content" 
+
+id="optionsDropdownContent">
+                        <label 
+
+class="option-toggle-label">
+                            <input 
+
+type="checkbox" 
+
+id="showCurrencyCheckbox" checked 
+
+onchange="renderCalculator()">
+                            إظهار كلمة جنيه
+                        </label>
+                        <label 
+
+class="option-toggle-label">
+                            <input 
+
+type="checkbox" id="showNumpadCheckbox" 
+
+checked 
+
+onchange="toggleNumpadVisibility()">
+                            إظهار لوحة 
+
+الأرقام (0-9)
+                        </label>
+                    </div>
                 </div>
-                <div class="summary-item">
-                    <input type="checkbox" id="showNegativeCheckbox" onchange="renderCalculator()">
-                    <span id="negativeTotalVal" class="negative-sum"></span>
+
+                <!-- أزرار الأرقام وزر التراجع في 
+
+النص -->
+                <div class="numpad-bar" 
+
+id="numpadBar">
+                    <button 
+
+class="num-btn" onclick="insertValue
+
+('0')">0</button>
+                    <button 
+
+class="num-btn" onclick="insertValue
+
+('1')">1</button>
+                    <button 
+
+class="num-btn" onclick="insertValue
+
+('2')">2</button>
+                    <button 
+
+class="num-btn" onclick="insertValue
+
+('3')">3</button>
+                    <button 
+
+class="num-btn" onclick="insertValue
+
+('4')">4</button>
+                    <button 
+
+class="num-btn" onclick="insertValue
+
+('5')">5</button>
+                    <button 
+
+class="num-btn" onclick="insertValue
+
+('6')">6</button>
+                    <button 
+
+class="num-btn" onclick="insertValue
+
+('7')">7</button>
+                    <button 
+
+class="num-btn" onclick="insertValue
+
+('8')">8</button>
+                    <button 
+
+class="num-btn" onclick="insertValue
+
+('9')">9</button>
+                    <button 
+
+class="num-btn backspace-btn" 
+
+onclick="handleBackspace()" title="
+
+حذف/تراجع">⌫</button>
+                </div>
+
+                <!-- شريط مجموع الأعداد الموجبة 
+
+والسالبة -->
+                <div class="totals-
+
+summary-bar">
+                    <div 
+
+class="summary-item">
+                        <input 
+
+type="checkbox" 
+
+id="showPositiveCheckbox" 
+
+onchange="renderCalculator()">
+                        <span 
+
+id="positiveTotalVal" class="positive-
+
+sum"></span>
+                    </div>
+                    <div 
+
+class="summary-item">
+                        <input 
+
+type="checkbox" 
+
+id="showNegativeCheckbox" 
+
+onchange="renderCalculator()">
+                        <span 
+
+id="negativeTotalVal" class="negative-
+
+sum"></span>
+                    </div>
                 </div>
             </div>
 
             <div class="operator-bar">
-                <button class="op-btn" onclick="insertOperator('+')" title="جمع">+</button>
-                <button class="op-btn" onclick="insertOperator('-')" title="طرح">-</button>
-                <button class="op-btn" onclick="insertOperator('*')" title="ضرب">×</button>
-                <button class="op-btn" onclick="insertOperator('/')" title="قسمة">÷</button>
-                <button class="op-btn" onclick="insertOperator('%')" title="نسبة مئوية">%</button>
+                <button class="op-btn" 
+
+onclick="insertOperator('+')" title="
+
+جمع">+</button>
+                <button class="op-btn" 
+
+onclick="insertOperator('-')" title="
+
+طرح">-</button>
+                <button class="op-btn" 
+
+onclick="insertOperator('*')" title="
+
+ضرب">×</button>
+                <button class="op-btn" 
+
+onclick="insertOperator('/')" title="
+
+قسمة">÷</button>
+                <button class="op-btn" 
+
+onclick="insertOperator('%')" title="
+
+نسبة مئوية">%</button>
             </div>
 
-            <div class="calculator-header">
-                <div class="total-label-group">
-                    <label class="currency-toggle-label" title="إظهار/إخفاء كلمة جنيه">
-                        <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
-                    </label>
-                </div>
+            <div class="calculator-
 
-                <div class="total-value-container">
-                    <div id="grandTotal" class="total-value">0</div>
-                    <div id="grandTotalCurrency" class="total-currency">جنيه</div>
+header">
+                <div class="total-
+
+label-group"></div>
+
+                <div class="total-
+
+value-container">
+                    <div 
+
+id="grandTotal" class="total-
+
+value">0</div>
+                    <div 
+
+id="grandTotalCurrency" class="total-
+
+currency">جنيه</div>
                 </div>
                 
-                <div class="header-right-group">
-                    <span class="designer-credit">designed by Sami Arouj</span>
-                    <div class="export-dropdown" id="exportDropdown">
-                        <button class="export-btn" onclick="toggleExportMenu(event)">
-                            تصدير <span>▼</span>
+                <div class="header-
+
+right-group">
+                    <span 
+
+class="designer-credit">designed by 
+
+Sami Arouj</span>
+                    <div 
+
+class="export-dropdown" 
+
+id="exportDropdown">
+                        <button 
+
+class="export-btn" 
+
+onclick="toggleExportMenu(event)">
+                            تصدير 
+
+<span>▼</span>
                         </button>
-                        <div class="dropdown-content">
-                            <button onclick="exportToExcel()">إكسيل (Excel)</button>
-                            <button onclick="exportToWord()">وورد (Word)</button>
-                            <button onclick="exportToPDF()">بي دي إف (PDF)</button>
-                            <button onclick="exportToImage()">صورة (Image)</button>
+                        <div 
+
+class="dropdown-content">
+                            <button 
+
+onclick="exportToExcel()">إكسيل 
+
+(Excel)</button>
+                            <button 
+
+onclick="exportToWord()">وورد 
+
+(Word)</button>
+                            <button 
+
+onclick="exportToPDF()">بي دي إف 
+
+(PDF)</button>
+                            <button 
+
+onclick="exportToImage()">صورة 
+
+(Image)</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="screenContainer" class="calculator-screen"></div>
+        <div id="screenContainer" 
+
+class="calculator-screen"></div>
 
         <div class="keyboard-hint">
-            <span>Home</span> للحساب بالقوة | <span>Page Up</span> لتجاهل ما قبل المؤشر | <span>Delete</span> لمسح السطر | <span>Enter</span> لسطر جديد
+            <span>Home</span> للحساب بالقوة 
+
+| <span>Page Up</span> لتجاهل ما قبل المؤشر | 
+
+<span>Delete</span> لمسح السطر | 
+
+<span>Enter</span> لسطر جديد
         </div>
     </div>
 
     <script>
-        const screenContainer = document.getElementById('screenContainer');
-        const grandTotalEl = document.getElementById('grandTotal');
-        const grandTotalCurrencyEl = document.getElementById('grandTotalCurrency');
-        const showCurrencyCheckbox = document.getElementById('showCurrencyCheckbox');
-        const showPositiveCheckbox = document.getElementById('showPositiveCheckbox');
-        const showNegativeCheckbox = document.getElementById('showNegativeCheckbox');
-        const positiveTotalValEl = document.getElementById('positiveTotalVal');
-        const negativeTotalValEl = document.getElementById('negativeTotalVal');
-        const calculatorContainer = document.getElementById('calculatorContainer');
+        const screenContainer = 
+
+document.getElementById
+
+('screenContainer');
+        const grandTotalEl = 
+
+document.getElementById('grandTotal');
+        const grandTotalCurrencyEl = 
+
+document.getElementById
+
+('grandTotalCurrency');
+        const showCurrencyCheckbox = 
+
+document.getElementById
+
+('showCurrencyCheckbox');
+        const showNumpadCheckbox = 
+
+document.getElementById
+
+('showNumpadCheckbox');
+        const numpadBar = 
+
+document.getElementById('numpadBar');
+        const showPositiveCheckbox = 
+
+document.getElementById
+
+('showPositiveCheckbox');
+        const showNegativeCheckbox = 
+
+document.getElementById
+
+('showNegativeCheckbox');
+        const positiveTotalValEl = 
+
+document.getElementById
+
+('positiveTotalVal');
+        const negativeTotalValEl = 
+
+document.getElementById
+
+('negativeTotalVal');
+        const calculatorContainer = 
+
+document.getElementById
+
+('calculatorContainer');
 
         let rows = [
-            { textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0 }
+            { textExpression: '', 
+
+expression: '', result: 0, forceCalc: 
+
+false, ignoreBeforeIndex: 0, 
+
+isCalcVisible: true }
         ];
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
-        function insertOperator(op) {
-            if (activeFieldIndex === 'calc') {
-                const activeInput = screenContainer.querySelector('.calc-row.active .calc-input');
-                if (activeInput) {
-                    const start = activeInput.selectionStart;
-                    const end = activeInput.selectionEnd;
-                    const val = activeInput.value;
-                    activeInput.value = val.substring(0, start) + op + val.substring(end);
-                    activeInput.focus();
-                    activeInput.setSelectionRange(start + op.length, start + op.length);
+        function 
+
+toggleNumpadVisibility() {
+            if 
+
+(showNumpadCheckbox.checked) {
+                
+
+numpadBar.classList.remove('hidden');
+            } else {
+                
+
+numpadBar.classList.add('hidden');
+            }
+        }
+
+        function toggleOptionsMenu(e) {
+            e.stopPropagation();
+            const dropdown = 
+
+document.getElementById
+
+('optionsDropdownContent');
+            const exportDropdown = 
+
+document.querySelector('#exportDropdown 
+
+.dropdown-content');
+            if (exportDropdown) 
+
+exportDropdown.parentElement.classList.
+
+remove('active');
+            dropdown.classList.toggle
+
+('active');
+        }
+
+        function toggleExportMenu(e) {
+            e.stopPropagation();
+            const dropdown = 
+
+document.getElementById
+
+('exportDropdown');
+            const optionsDropdown = 
+
+document.getElementById
+
+('optionsDropdownContent');
+            if (optionsDropdown) 
+
+optionsDropdown.classList.remove
+
+('active');
+            dropdown.classList.toggle
+
+('active');
+        }
+
+        window.addEventListener
+
+('click', (e) => {
+            const optionsDropdown = 
+
+document.getElementById
+
+('optionsDropdownContent');
+            const exportDropdown = 
+
+document.getElementById
+
+('exportDropdown');
+            
+            if (optionsDropdown && !
+
+optionsDropdown.contains(e.target) && 
+
+!e.target.closest('.options-btn')) {
+                
+
+optionsDropdown.classList.remove
+
+('active');
+            }
+            if (exportDropdown && !
+
+exportDropdown.contains(e.target)) {
+                
+
+exportDropdown.classList.remove
+
+('active');
+            }
+        });
+
+        function insertValue(val) {
+            if (activeFieldIndex === 
+
+'calc' && !rows
+
+[activeRowIndex].isCalcVisible) return;
+            const selector = 
+
+activeFieldIndex === 'text' ? '.text-
+
+input' : '.calc-input';
+            const activeInput = 
+
+screenContainer.querySelector(`.calc-
+
+row.active ${selector}`);
+            
+            if (activeInput) {
+                const start = 
+
+activeInput.selectionStart ?? 
+
+activeInput.value.length;
+                const end = 
+
+activeInput.selectionEnd ?? 
+
+activeInput.value.length;
+                const currentVal = 
+
+activeInput.value;
+                
+                activeInput.value = 
+
+currentVal.substring(0, start) + val + 
+
+currentVal.substring(end);
+                activeInput.focus();
+                
+
+activeInput.setSelectionRange(start + 
+
+val.length, start + val.length);
+                
+                if (activeFieldIndex 
+
+=== 'text') {
+                    rows
+
+[activeRowIndex].textExpression = 
+
+activeInput.value;
                     
-                    rows[activeRowIndex].expression = activeInput.value;
-                    rows[activeRowIndex].forceCalc = false;
-                    evaluateRow(activeRowIndex);
-                    renderCalculator();
+
+activeInput.style.height = 'auto';
+                    
+
+activeInput.style.height = 
+
+(activeInput.scrollHeight) + 'px';
+                } else {
+                    rows
+
+[activeRowIndex].expression = 
+
+activeInput.value;
+                    rows
+
+[activeRowIndex].forceCalc = false;
+                    evaluateRow
+
+(activeRowIndex);
+                    renderCalculator
+
+('calc');
                 }
             }
         }
 
-        function formatDisplayValue(val) {
-            if (typeof val === 'number') {
+        function handleBackspace() {
+            if (activeFieldIndex === 
+
+'calc' && !rows
+
+[activeRowIndex].isCalcVisible) return;
+            const selector = 
+
+activeFieldIndex === 'text' ? '.text-
+
+input' : '.calc-input';
+            const activeInput = 
+
+screenContainer.querySelector(`.calc-
+
+row.active ${selector}`);
+            
+            if (activeInput) {
+                const start = 
+
+activeInput.selectionStart;
+                const end = 
+
+activeInput.selectionEnd;
+                const currentVal = 
+
+activeInput.value;
+
+                if (start === end && 
+
+start > 0) {
+                    activeInput.value = 
+
+currentVal.substring(0, start - 1) + 
+
+currentVal.substring(start);
+                    activeInput.focus
+
+();
+                    
+
+activeInput.setSelectionRange(start - 
+
+1, start - 1);
+                } else if (start !== 
+
+end) {
+                    activeInput.value = 
+
+currentVal.substring(0, start) + 
+
+currentVal.substring(end);
+                    activeInput.focus
+
+();
+                    
+
+activeInput.setSelectionRange(start, 
+
+start);
+                }
+
+                if (activeFieldIndex 
+
+=== 'text') {
+                    rows
+
+[activeRowIndex].textExpression = 
+
+activeInput.value;
+                    
+
+activeInput.style.height = 'auto';
+                    
+
+activeInput.style.height = 
+
+(activeInput.scrollHeight) + 'px';
+                } else {
+                    rows
+
+[activeRowIndex].expression = 
+
+activeInput.value;
+                    rows
+
+[activeRowIndex].forceCalc = false;
+                    evaluateRow
+
+(activeRowIndex);
+                    renderCalculator
+
+('calc');
+                }
+            }
+        }
+
+        function insertOperator(op) {
+            if (activeFieldIndex === 
+
+'calc') {
+                insertValue(op);
+            }
+        }
+
+        function formatDisplayValue
+
+(val) {
+            if (typeof val === 
+
+'number') {
                 if (val < 0) {
-                    return { text: `(${Math.abs(val)})`, isNegative: true };
+                    return { text: `
+
+(${Math.abs(val)})`, isNegative: true 
+
+};
                 }
-                return { text: `${val}`, isNegative: false };
+                return { text: `${val}
+
+`, isNegative: false };
             }
-            return { text: val, isNegative: false };
+            return { text: val, 
+
+isNegative: false };
         }
 
-        function renderCalculator(focusTarget = null) {
-            screenContainer.innerHTML = '';
+        function renderCalculator
+
+(focusTarget = null) {
+            screenContainer.innerHTML = 
+
+'';
             let totalSum = 0;
             let positiveSum = 0;
             let negativeSum = 0;
-            let targetInputToFocus = null;
-            const showCurrency = showCurrencyCheckbox.checked;
+            let targetInputToFocus = 
 
-            rows.forEach((row, index) => {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = `calc-row ${index === activeRowIndex ? 'active' : ''}`;
+null;
+            const showCurrency = 
 
-                const inputsGroup = document.createElement('div');
-                inputsGroup.className = 'inputs-group';
+showCurrencyCheckbox.checked;
 
-                const textInput = document.createElement('textarea');
-                textInput.className = 'text-input';
-                textInput.value = row.textExpression;
+            rows.forEach((row, index) 
+
+=> {
+                const rowDiv = 
+
+document.createElement('div');
+                rowDiv.className = 
+
+`calc-row ${index === activeRowIndex ? 
+
+'active' : ''} ${!row.isCalcVisible ? 
+
+'hidden-calc' : ''}`;
+
+                const inputsGroup = 
+
+document.createElement('div');
+                inputsGroup.className = 
+
+'inputs-group';
+
+                const textInput = 
+
+document.createElement('textarea');
+                textInput.className = 
+
+'text-input';
+                textInput.value = 
+
+row.textExpression;
                 textInput.rows = 1;
                 
-                textInput.addEventListener('input', (e) => {
-                    rows[index].textExpression = e.target.value;
-                    e.target.style.height = 'auto';
-                    e.target.style.height = (e.target.scrollHeight) + 'px';
-                });
-
-                textInput.addEventListener('focus', () => {
-                    activeRowIndex = index;
-                    activeFieldIndex = 'text';
-                    updateActiveRowClasses();
-                });
-
-                const inputField = document.createElement('input');
-                inputField.type = 'text';
-                inputField.className = 'calc-input';
-                inputField.value = row.expression;
                 
-                inputField.addEventListener('input', (e) => {
-                    rows[index].expression = e.target.value;
-                    rows[index].forceCalc = false;
-                    if (e.target.value.length < rows[index].ignoreBeforeIndex) {
-                        rows[index].ignoreBeforeIndex = 0;
+
+textInput.addEventListener('input', (e) 
+
+=> {
+                    rows
+
+[index].textExpression = 
+
+e.target.value;
+                    
+
+e.target.style.height = 'auto';
+                    
+
+e.target.style.height = 
+
+(e.target.scrollHeight) + 'px';
+                });
+
+                
+
+textInput.addEventListener('focus', () 
+
+=> {
+                    activeRowIndex = 
+
+index;
+                    activeFieldIndex = 
+
+'text';
+                    
+
+updateActiveRowClasses();
+                });
+
+                // حاوية لعمود العملية الحسابية مع 
+
+زر التشيك بوكس الصغير الخص به
+                const calcWrapper = 
+
+document.createElement('div');
+                calcWrapper.className = 
+
+'calc-input-wrapper';
+
+                const rowToggleCheckbox 
+
+= document.createElement('input');
+                rowToggleCheckbox.type 
+
+= 'checkbox';
+                
+
+rowToggleCheckbox.className = 'row-
+
+toggle-checkbox';
+                
+
+rowToggleCheckbox.checked = 
+
+row.isCalcVisible;
+                rowToggleCheckbox.title 
+
+= 'إظهار/إخفاء العملية الحسابية للسطر';
+                
+
+rowToggleCheckbox.addEventListener
+
+('change', (e) => {
+                    rows
+
+[index].isCalcVisible = 
+
+e.target.checked;
+                    evaluateRow(index);
+                    renderCalculator
+
+(activeFieldIndex);
+                });
+
+                const inputField = 
+
+document.createElement('input');
+                inputField.type = 
+
+'text';
+                inputField.className = 
+
+'calc-input';
+                inputField.value = 
+
+row.expression;
+                
+                
+
+inputField.addEventListener('input', 
+
+(e) => {
+                    rows
+
+[index].expression = e.target.value;
+                    rows
+
+[index].forceCalc = false;
+                    if 
+
+(e.target.value.length < rows
+
+[index].ignoreBeforeIndex) {
+                        rows
+
+[index].ignoreBeforeIndex = 0;
                     }
                     evaluateRow(index);
                 });
 
-                inputField.addEventListener('focus', () => {
-                    activeRowIndex = index;
-                    activeFieldIndex = 'calc';
-                    updateActiveRowClasses();
+                
+
+inputField.addEventListener('focus', () 
+
+=> {
+                    activeRowIndex = 
+
+index;
+                    activeFieldIndex = 
+
+'calc';
+                    
+
+updateActiveRowClasses();
                 });
 
-                inputField.addEventListener('keydown', (e) => {
-                    if (e.key === 'Home') {
-                        e.preventDefault();
-                        rows[index].forceCalc = true;
-                        rows[index].ignoreBeforeIndex = 0;
-                        evaluateRow(index);
-                        renderCalculator('calc');
+                
+
+inputField.addEventListener('keydown', 
+
+(e) => {
+                    if (e.key === 
+
+'Home') {
+                        
+
+e.preventDefault();
+                        rows
+
+[index].forceCalc = true;
+                        rows
+
+[index].ignoreBeforeIndex = 0;
+                        evaluateRow
+
+(index);
+                        
+
+renderCalculator('calc');
                     }
-                    else if (e.key === 'PageUp') {
-                        e.preventDefault();
-                        rows[index].ignoreBeforeIndex = inputField.selectionStart;
-                        evaluateRow(index);
-                        renderCalculator('calc');
+                    else if (e.key === 
+
+'PageUp') {
+                        
+
+e.preventDefault();
+                        rows
+
+[index].ignoreBeforeIndex = 
+
+inputField.selectionStart;
+                        evaluateRow
+
+(index);
+                        
+
+renderCalculator('calc');
                     }
-                    else if (e.key === 'Delete') {
-                        e.preventDefault();
-                        rows[index].expression = '';
-                        rows[index].result = 0;
-                        rows[index].forceCalc = false;
-                        rows[index].ignoreBeforeIndex = 0;
-                        renderCalculator('calc');
+                    else if (e.key === 
+
+'Delete') {
+                        
+
+e.preventDefault();
+                        rows
+
+[index].expression = '';
+                        rows
+
+[index].result = 0;
+                        rows
+
+[index].forceCalc = false;
+                        rows
+
+[index].ignoreBeforeIndex = 0;
+                        
+
+renderCalculator('calc');
                     }
                 });
 
-                inputsGroup.appendChild(textInput);
-                inputsGroup.appendChild(inputField);
+                
 
-                if (index === activeRowIndex) {
-                    if (focusTarget === 'text') {
-                        targetInputToFocus = textInput;
+calcWrapper.appendChild
+
+(rowToggleCheckbox);
+                
+
+calcWrapper.appendChild(inputField);
+
+                
+
+inputsGroup.appendChild(textInput);
+                
+
+inputsGroup.appendChild(calcWrapper);
+
+                if (index === 
+
+activeRowIndex) {
+                    if (focusTarget === 
+
+'text') {
+                        
+
+targetInputToFocus = textInput;
                     } else {
-                        targetInputToFocus = inputField;
+                        
+
+targetInputToFocus = inputField;
                     }
                 }
 
-                const outputContainer = document.createElement('div');
-                outputContainer.className = 'calc-output-container';
+                const outputContainer = 
 
-                const outputDiv = document.createElement('div');
-                outputDiv.className = 'calc-output';
+document.createElement('div');
+                
 
-                const currencySpan = document.createElement('span');
-                currencySpan.className = 'row-currency';
-                currencySpan.innerText = showCurrency ? 'جنيه' : '';
+outputContainer.className = 'calc-
 
-                if (row.result !== '' && row.result !== 0) {
-                    const formatted = formatDisplayValue(row.result);
-                    outputDiv.innerText = formatted.text;
-                    if (formatted.isNegative) {
-                        outputDiv.classList.add('negative');
+output-container';
+
+                const outputDiv = 
+
+document.createElement('div');
+                outputDiv.className = 
+
+'calc-output';
+
+                const currencySpan = 
+
+document.createElement('span');
+                currencySpan.className 
+
+= 'row-currency';
+                currencySpan.innerText 
+
+= showCurrency ? 'جنيه' : '';
+
+                if (row.result !== '' 
+
+&& row.result !== 0) {
+                    const formatted = 
+
+formatDisplayValue(row.result);
+                    outputDiv.innerText 
+
+= formatted.text;
+                    if 
+
+(formatted.isNegative) {
+                        
+
+outputDiv.classList.add('negative');
                     } else {
-                        outputDiv.classList.remove('negative');
+                        
+
+outputDiv.classList.remove('negative');
                     }
                 } else {
-                    outputDiv.innerText = '';
-                    currencySpan.innerText = '';
+                    outputDiv.innerText 
+
+= '';
+                    
+
+currencySpan.innerText = '';
                 }
 
-                outputContainer.appendChild(outputDiv);
-                outputContainer.appendChild(currencySpan);
+                
 
-                const micBtn = document.createElement('button');
-                micBtn.className = 'mic-btn';
-                micBtn.innerHTML = '🎤';
-                micBtn.title = 'تحدث للإدخال في الحقل النشط';
+outputContainer.appendChild(outputDiv);
+                
+
+outputContainer.appendChild
+
+(currencySpan);
+
+                const micBtn = 
+
+document.createElement('button');
+                micBtn.className = 
+
+'mic-btn';
+                micBtn.innerHTML = 
+
+'🎤';
+                micBtn.title = 'تحدث 
+
+للإدخال في الحقل النشط';
                 micBtn.type = 'button';
-                micBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    startSpeechRecognition(index, micBtn);
+                
+
+micBtn.addEventListener('click', (e) => 
+
+{
+                    e.stopPropagation
+
+();
+                    
+
+startSpeechRecognition(index, micBtn);
                 });
 
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-row-btn';
-                deleteBtn.innerHTML = '✕';
-                deleteBtn.title = 'حذف السطر';
-                deleteBtn.type = 'button';
-                deleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
+                const deleteBtn = 
+
+document.createElement('button');
+                deleteBtn.className = 
+
+'delete-row-btn';
+                deleteBtn.innerHTML = 
+
+'✕';
+                deleteBtn.title = 'حذف 
+
+السطر';
+                deleteBtn.type = 
+
+'button';
+                
+
+deleteBtn.addEventListener('click', (e) 
+
+=> {
+                    e.stopPropagation
+
+();
                     deleteRow(index);
                 });
 
-                rowDiv.appendChild(inputsGroup);
-                rowDiv.appendChild(outputContainer);
-                rowDiv.appendChild(micBtn);
-                rowDiv.appendChild(deleteBtn);
-                screenContainer.appendChild(rowDiv);
+                rowDiv.appendChild
+
+(inputsGroup);
+                rowDiv.appendChild
+
+(outputContainer);
+                rowDiv.appendChild
+
+(micBtn);
+                rowDiv.appendChild
+
+(deleteBtn);
+                
+
+screenContainer.appendChild(rowDiv);
 
                 setTimeout(() => {
-                    textInput.style.height = 'auto';
-                    textInput.style.height = (textInput.scrollHeight) + 'px';
+                    
+
+textInput.style.height = 'auto';
+                    
+
+textInput.style.height = 
+
+(textInput.scrollHeight) + 'px';
                 }, 0);
 
-                if (typeof row.result === 'number' && !isNaN(row.result)) {
-                    totalSum += row.result;
-                    if (row.result > 0) {
-                        positiveSum += row.result;
-                    } else if (row.result < 0) {
-                        negativeSum += row.result;
+                if (typeof row.result 
+
+=== 'number' && !isNaN(row.result)) {
+                    totalSum += 
+
+row.result;
+                    if (row.result > 0) 
+
+{
+                        positiveSum += 
+
+row.result;
+                    } else if 
+
+(row.result < 0) {
+                        negativeSum += 
+
+row.result;
                     }
                 }
             });
 
-            const formattedTotal = formatDisplayValue(Number.isInteger(totalSum) ? totalSum : parseFloat(totalSum.toFixed(6)));
-            grandTotalEl.innerText = formattedTotal.text;
-            grandTotalCurrencyEl.innerText = showCurrency ? 'جنيه' : '';
+            const formattedTotal = 
+
+formatDisplayValue(Number.isInteger
+
+(totalSum) ? totalSum : parseFloat
+
+(totalSum.toFixed(6)));
+            grandTotalEl.innerText = 
+
+formattedTotal.text;
             
-            if (formattedTotal.isNegative) {
-                grandTotalEl.classList.add('negative');
+
+grandTotalCurrencyEl.innerText = 
+
+showCurrency ? 'جنيه' : '';
+            
+            if 
+
+(formattedTotal.isNegative) {
+                
+
+grandTotalEl.classList.add('negative');
             } else {
-                grandTotalEl.classList.remove('negative');
+                
+
+grandTotalEl.classList.remove
+
+('negative');
             }
 
-            // تحديث مجاميع الأرقام الموجبة والسالبة بناءً على حالة المربعات
-            const posFormatted = formatDisplayValue(Number.isInteger(positiveSum) ? positiveSum : parseFloat(positiveSum.toFixed(6)));
-            const negFormatted = formatDisplayValue(Number.isInteger(negativeSum) ? negativeSum : parseFloat(negativeSum.toFixed(6)));
+            const posFormatted = 
 
-            positiveTotalValEl.innerText = showPositiveCheckbox.checked ? posFormatted.text : '';
-            negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
+formatDisplayValue(Number.isInteger
+
+(positiveSum) ? positiveSum : 
+
+parseFloat(positiveSum.toFixed(6)));
+            const negFormatted = 
+
+formatDisplayValue(Number.isInteger
+
+(negativeSum) ? negativeSum : 
+
+parseFloat(negativeSum.toFixed(6)));
+
+            
+
+positiveTotalValEl.innerText = 
+
+showPositiveCheckbox.checked ? 
+
+posFormatted.text : '';
+            
+
+negativeTotalValEl.innerText = 
+
+showNegativeCheckbox.checked ? 
+
+negFormatted.text : '';
 
             if (targetInputToFocus) {
-                setTimeout(() => {
-                    targetInputToFocus.focus();
-                }, 0);
+                if (activeFieldIndex 
+
+=== 'calc' && !rows
+
+[activeRowIndex].isCalcVisible) {
+                    const activeText = 
+
+screenContainer.querySelector('.calc-
+
+row.active .text-input');
+                    if (activeText) 
+
+setTimeout(() => activeText.focus(), 
+
+0);
+                } else {
+                    setTimeout(() => 
+
+targetInputToFocus.focus(), 0);
+                }
             }
         }
 
-        function startSpeechRecognition(index, micBtn) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        function 
+
+startSpeechRecognition(index, micBtn) {
+            if (activeFieldIndex === 
+
+'calc' && !rows[index].isCalcVisible) 
+
+return;
+            const SpeechRecognition = 
+
+window.SpeechRecognition || 
+
+window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                alert('متصفحك لا يدعم خاصية التعرف على الصوت.');
+                alert('متصفحك لا يدعم خاصية 
+
+التعرف على الصوت.');
                 return;
             }
 
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'ar-SA';
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
+            const recognition = new 
 
-            micBtn.classList.add('listening');
+SpeechRecognition();
+            recognition.lang = 'ar-SA';
+            recognition.interimResults 
+
+= false;
+            recognition.maxAlternatives 
+
+= 1;
+
+            micBtn.classList.add
+
+('listening');
             micBtn.innerHTML = '🔴';
 
-            recognition.onresult = (event) => {
-                const speechToText = event.results[0][0].transcript;
+            recognition.onresult = 
+
+(event) => {
+                const speechToText = 
+
+event.results[0][0].transcript;
                 
-                if (activeFieldIndex === 'text') {
-                    rows[index].textExpression = rows[index].textExpression ? rows[index].textExpression + ' ' + speechToText : speechToText;
-                    renderCalculator('text');
+                if (activeFieldIndex 
+
+=== 'text') {
+                    rows
+
+[index].textExpression = rows
+
+[index].textExpression ? rows
+
+[index].textExpression + ' ' + 
+
+speechToText : speechToText;
+                    renderCalculator
+
+('text');
                 } else {
-                    rows[index].expression = rows[index].expression ? rows[index].expression + ' ' + speechToText : speechToText;
-                    rows[index].forceCalc = false;
+                    rows
+
+[index].expression = rows
+
+[index].expression ? rows
+
+[index].expression + ' ' + speechToText 
+
+: speechToText;
+                    rows
+
+[index].forceCalc = false;
                     evaluateRow(index);
-                    renderCalculator('calc');
+                    renderCalculator
+
+('calc');
                 }
             };
 
-            recognition.onerror = () => {
-                micBtn.classList.remove('listening');
-                micBtn.innerHTML = '🎤';
+            recognition.onerror = () => 
+
+{
+                
+
+micBtn.classList.remove('listening');
+                micBtn.innerHTML = 
+
+'🎤';
             };
 
             recognition.onend = () => {
-                micBtn.classList.remove('listening');
-                micBtn.innerHTML = '🎤';
+                
+
+micBtn.classList.remove('listening');
+                micBtn.innerHTML = 
+
+'🎤';
             };
 
             recognition.start();
         }
 
-        function updateActiveRowClasses() {
-            const rowDivs = screenContainer.children;
-            for (let i = 0; i < rowDivs.length; i++) {
-                if (i === activeRowIndex) {
-                    rowDivs[i].classList.add('active');
+        function 
+
+updateActiveRowClasses() {
+            const rowDivs = 
+
+screenContainer.children;
+            for (let i = 0; i < 
+
+rowDivs.length; i++) {
+                if (i === 
+
+activeRowIndex) {
+                    rowDivs
+
+[i].classList.add('active');
                 } else {
-                    rowDivs[i].classList.remove('active');
+                    rowDivs
+
+[i].classList.remove('active');
                 }
             }
         }
 
         function deleteRow(index) {
             if (rows.length === 1) {
-                rows[0].textExpression = '';
-                rows[0].expression = '';
+                rows[0].textExpression 
+
+= '';
+                rows[0].expression = 
+
+'';
                 rows[0].result = 0;
-                rows[0].forceCalc = false;
-                rows[0].ignoreBeforeIndex = 0;
+                rows[0].forceCalc = 
+
+false;
+                rows
+
+[0].ignoreBeforeIndex = 0;
+                rows[0].isCalcVisible = 
+
+true;
             } else {
                 rows.splice(index, 1);
-                if (activeRowIndex >= rows.length) {
-                    activeRowIndex = rows.length - 1;
+                if (activeRowIndex >= 
+
+rows.length) {
+                    activeRowIndex = 
+
+rows.length - 1;
                 }
             }
             renderCalculator('calc');
         }
 
         function evaluateRow(index) {
-            let currentRow = rows[index];
-            let fullExpr = currentRow.expression.trim();
+            let currentRow = rows
+
+[index];
+            let fullExpr = 
+
+currentRow.expression.trim();
 
             if (fullExpr === '') {
                 currentRow.result = 0;
@@ -757,8 +2057,14 @@
             }
 
             let expr = fullExpr;
-            if (currentRow.ignoreBeforeIndex > 0) {
-                expr = fullExpr.substring(currentRow.ignoreBeforeIndex).trim();
+            if 
+
+(currentRow.ignoreBeforeIndex > 0) {
+                expr = 
+
+fullExpr.substring
+
+(currentRow.ignoreBeforeIndex).trim();
             }
 
             if (expr === '') {
@@ -767,33 +2073,75 @@
                 return;
             }
 
-            let hasAttachedTextBeforeOrAfter = /(\d+[a-zA-Zأ-ي\u0600-\u06FF])|([a-zA-Zأ-ي\u0600-\u06FF]\d+)/.test(expr);
+            let 
 
-            if (hasAttachedTextBeforeOrAfter && !currentRow.forceCalc) {
+hasAttachedTextBeforeOrAfter = /(\d
+
++[a-zA-Zأ-ي\u0600-\u06FF])|([a-zA-Z
+
+أ-ي\u0600-\u06FF]\d+)/.test(expr);
+
+            if 
+
+(hasAttachedTextBeforeOrAfter && !
+
+currentRow.forceCalc) {
                 currentRow.result = 0;
                 updateGrandTotalOnly();
                 return;
             }
 
-            let percentMatch = expr.match(/^([\d.]+)\s*([\+\-\*\/])\s*([\d.]+)%$/);
+            let percentMatch = 
+
+expr.match(/^([\d.]+)\s*([\+\-\*
+
+\/])\s*([\d.]+)%$/);
             if (percentMatch) {
-                let baseNum = parseFloat(percentMatch[1]);
-                let operator = percentMatch[2];
-                let percentVal = parseFloat(percentMatch[3]);
-                let calculatedPercent = baseNum * (percentVal / 100);
+                let baseNum = 
+
+parseFloat(percentMatch[1]);
+                let operator = 
+
+percentMatch[2];
+                let percentVal = 
+
+parseFloat(percentMatch[3]);
+                let calculatedPercent = 
+
+baseNum * (percentVal / 100);
                 let res = 0;
 
                 if (operator === '+') {
-                    res = baseNum + calculatedPercent;
-                } else if (operator === '-') {
-                    res = baseNum - calculatedPercent;
-                } else if (operator === '*') {
-                    res = calculatedPercent;
-                } else if (operator === '/') {
-                    res = calculatedPercent !== 0 ? baseNum / calculatedPercent : 0;
+                    res = baseNum + 
+
+calculatedPercent;
+                } else if (operator === 
+
+'-') {
+                    res = baseNum - 
+
+calculatedPercent;
+                } else if (operator === 
+
+'*') {
+                    res = 
+
+calculatedPercent;
+                } else if (operator === 
+
+'/') {
+                    res = 
+
+calculatedPercent !== 0 ? baseNum / 
+
+calculatedPercent : 0;
                 }
 
-                currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
+                currentRow.result = 
+
+Number.isInteger(res) ? res : 
+
+parseFloat(res.toFixed(6));
                 updateGrandTotalOnly();
                 return;
             }
@@ -802,28 +2150,70 @@
                 .replace(/×/g, '*')
                 .replace(/÷/g, '/');
 
-            let validMathPattern = /^[0-9+\-*/.\s()a-zA-Zأ-ي\u0600-\u06FF%]+$/;
+            let validMathPattern = /^
 
-            if (validMathPattern.test(sanitizedExpr)) {
+[0-9+\-*/.\s()a-zA-Zأ-ي\u0600-\u06FF
+
+%]+$/;
+
+            if (validMathPattern.test
+
+(sanitizedExpr)) {
                 try {
-                    let singleNegativeMatch = expr.match(/^-\s*([\d.]+)$/);
-                    if (singleNegativeMatch) {
-                        let res = -parseFloat(singleNegativeMatch[1]);
-                        currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
-                        updateGrandTotalOnly();
+                    let 
+
+singleNegativeMatch = expr.match(/^-
+
+\s*([\d.]+)$/);
+                    if 
+
+(singleNegativeMatch) {
+                        let res = -
+
+parseFloat(singleNegativeMatch[1]);
+                        
+
+currentRow.result = Number.isInteger
+
+(res) ? res : parseFloat(res.toFixed
+
+(6));
+                        
+
+updateGrandTotalOnly();
                         return;
                     }
 
-                    let evalSafeExpr = sanitizedExpr.replace(/[^0-9+\-*/().]/g, '');
-                    let res = Function('"use strict"; return (' + evalSafeExpr + ')')();
+                    let evalSafeExpr = 
 
-                    if (isNaN(res) || !isFinite(res)) {
-                        currentRow.result = 0;
+sanitizedExpr.replace(/[^0-9+\-*/
+
+().]/g, '');
+                    let res = Function
+
+('"use strict"; return (' + 
+
+evalSafeExpr + ')')();
+
+                    if (isNaN(res) || 
+
+!isFinite(res)) {
+                        
+
+currentRow.result = 0;
                     } else {
-                        currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
+                        
+
+currentRow.result = Number.isInteger
+
+(res) ? res : parseFloat(res.toFixed
+
+(6));
                     }
                 } catch (e) {
-                    currentRow.result = 0;
+                    currentRow.result = 
+
+0;
                 }
             } else {
                 currentRow.result = 0;
@@ -832,206 +2222,670 @@
             updateGrandTotalOnly();
         }
 
-        function updateGrandTotalOnly() {
+        function updateGrandTotalOnly() 
+
+{
             let totalSum = 0;
             let positiveSum = 0;
             let negativeSum = 0;
-            const showCurrency = showCurrencyCheckbox.checked;
+            const showCurrency = 
 
-            rows.forEach((row, index) => {
-                const rowDivs = screenContainer.children;
+showCurrencyCheckbox.checked;
+
+            rows.forEach((row, index) 
+
+=> {
+                const rowDivs = 
+
+screenContainer.children;
                 if (rowDivs[index]) {
-                    const outputDiv = rowDivs[index].querySelector('.calc-output');
-                    const currencySpan = rowDivs[index].querySelector('.row-currency');
+                    const outputDiv = 
 
-                    if (row.result !== '' && row.result !== 0) {
-                        const formatted = formatDisplayValue(row.result);
-                        outputDiv.innerText = formatted.text;
-                        currencySpan.innerText = showCurrency ? 'جنيه' : '';
-                        if (formatted.isNegative) {
-                            outputDiv.classList.add('negative');
+rowDivs[index].querySelector('.calc-
+
+output');
+                    const currencySpan 
+
+= rowDivs[index].querySelector('.row-
+
+currency');
+
+                    if (row.result !== 
+
+'' && row.result !== 0) {
+                        const formatted 
+
+= formatDisplayValue(row.result);
+                        
+
+outputDiv.innerText = formatted.text;
+                        
+
+currencySpan.innerText = showCurrency ? 
+
+'جنيه' : '';
+                        if 
+
+(formatted.isNegative) {
+                            
+
+outputDiv.classList.add('negative');
                         } else {
-                            outputDiv.classList.remove('negative');
+                            
+
+outputDiv.classList.remove('negative');
                         }
                     } else {
-                        outputDiv.innerText = '';
-                        currencySpan.innerText = '';
+                        
+
+outputDiv.innerText = '';
+                        
+
+currencySpan.innerText = '';
                     }
                 }
-                if (typeof row.result === 'number' && !isNaN(row.result)) {
-                    totalSum += row.result;
-                    if (row.result > 0) {
-                        positiveSum += row.result;
-                    } else if (row.result < 0) {
-                        negativeSum += row.result;
+                if (typeof row.result 
+
+=== 'number' && !isNaN(row.result)) {
+                    totalSum += 
+
+row.result;
+                    if (row.result > 0) 
+
+{
+                        positiveSum += 
+
+row.result;
+                    } else if 
+
+(row.result < 0) {
+                        negativeSum += 
+
+row.result;
                     }
                 }
             });
 
-            const formattedTotal = formatDisplayValue(Number.isInteger(totalSum) ? totalSum : parseFloat(totalSum.toFixed(6)));
-            grandTotalEl.innerText = formattedTotal.text;
-            grandTotalCurrencyEl.innerText = showCurrency ? 'جنيه' : '';
+            const formattedTotal = 
 
-            if (formattedTotal.isNegative) {
-                grandTotalEl.classList.add('negative');
+formatDisplayValue(Number.isInteger
+
+(totalSum) ? totalSum : parseFloat
+
+(totalSum.toFixed(6)));
+            grandTotalEl.innerText = 
+
+formattedTotal.text;
+            
+
+grandTotalCurrencyEl.innerText = 
+
+showCurrency ? 'جنيه' : '';
+
+            if 
+
+(formattedTotal.isNegative) {
+                
+
+grandTotalEl.classList.add('negative');
             } else {
-                grandTotalEl.classList.remove('negative');
+                
+
+grandTotalEl.classList.remove
+
+('negative');
             }
 
-            const posFormatted = formatDisplayValue(Number.isInteger(positiveSum) ? positiveSum : parseFloat(positiveSum.toFixed(6)));
-            const negFormatted = formatDisplayValue(Number.isInteger(negativeSum) ? negativeSum : parseFloat(negativeSum.toFixed(6)));
+            const posFormatted = 
 
-            positiveTotalValEl.innerText = showPositiveCheckbox.checked ? posFormatted.text : '';
-            negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
+formatDisplayValue(Number.isInteger
+
+(positiveSum) ? positiveSum : 
+
+parseFloat(positiveSum.toFixed(6)));
+            const negFormatted = 
+
+formatDisplayValue(Number.isInteger
+
+(negativeSum) ? negativeSum : 
+
+parseFloat(negativeSum.toFixed(6)));
+
+            
+
+positiveTotalValEl.innerText = 
+
+showPositiveCheckbox.checked ? 
+
+posFormatted.text : '';
+            
+
+negativeTotalValEl.innerText = 
+
+showNegativeCheckbox.checked ? 
+
+negFormatted.text : '';
         }
-
-        function toggleExportMenu(e) {
-            e.stopPropagation();
-            const dropdown = document.getElementById('exportDropdown');
-            dropdown.classList.toggle('active');
-        }
-
-        window.addEventListener('click', () => {
-            const dropdown = document.getElementById('exportDropdown');
-            if (dropdown) dropdown.classList.remove('active');
-        });
 
         function exportToExcel() {
-            const showCurrency = showCurrencyCheckbox.checked;
-            let dataToExport = rows.map((r, i) => ({
+            const showCurrency = 
+
+showCurrencyCheckbox.checked;
+            let dataToExport = 
+
+rows.map((r, i) => ({
                 "السطر": i + 1,
-                "العمود النصي (اليمين)": r.textExpression,
-                "العملية الحسابية (اليسار)": r.expression,
-                "النتيجة": showCurrency ? `${r.result} جنيه` : r.result
+                "العمود النصي (اليمين)": 
+
+r.textExpression,
+                "العملية الحسابية (اليسار)": 
+
+r.isCalcVisible ? r.expression : '',
+                "النتيجة": showCurrency ? 
+
+`${r.result} جنيه` : r.result
             }));
             
-            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "النتائج");
-            XLSX.writeFile(workbook, "Calculator_Results.xlsx");
+            const worksheet = 
+
+XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = 
+
+XLSX.utils.book_new();
+            
+
+XLSX.utils.book_append_sheet(workbook, 
+
+worksheet, "النتائج");
+            XLSX.writeFile(workbook, 
+
+"Calculator_Results.xlsx");
         }
 
         function exportToWord() {
-            const showCurrency = showCurrencyCheckbox.checked;
-            let htmlContent = `<html dir="rtl"><head><meta charset='utf-8'></head><body>`;
-            htmlContent += `<h2>تقرير الآلة الحاسبة متعددة الأسطر</h2>`;
-            htmlContent += `<table border="1" style="border-collapse:collapse; width:100%;">`;
-            htmlContent += `<tr><th>السطر</th><th>العمود النصي (اليمين)</th><th>العملية الحسابية (اليسار)</th><th>النتيجة</th></tr>`;
+            const showCurrency = 
+
+showCurrencyCheckbox.checked;
+            let htmlContent = `<html 
+
+dir="rtl"><head><meta charset='utf-
+
+8'></head><body>`;
+            htmlContent += `<h2>تقرير الآلة 
+
+الحاسبة متعددة الأسطر</h2>`;
+            htmlContent += `<table 
+
+border="1" style="border-
+
+collapse:collapse; width:100%;">`;
+            htmlContent += `<tr><th>
+
+السطر</th><th>العمود النصي (اليمين)</th><th>العملية 
+
+الحسابية (اليسار)</th><th>النتيجة</th></tr>`;
             
             rows.forEach((r, i) => {
-                let resText = showCurrency ? `${r.result} جنيه` : r.result;
-                htmlContent += `<tr><td>${i+1}</td><td>${r.textExpression}</td><td>${r.expression}</td><td>${resText}</td></tr>`;
+                let exprText = 
+
+r.isCalcVisible ? r.expression : '';
+                let resText = 
+
+showCurrency ? `${r.result} جنيه` : 
+
+r.result;
+                htmlContent += 
+
+`<tr><td>${i+1}</td><td>
+
+${r.textExpression}</td><td>
+
+${exprText}</td><td>${resText}
+
+</td></tr>`;
             });
             
-            htmlContent += `</table></body></html>`;
+            htmlContent += 
 
-            let blob = new Blob(['\ufeff' + htmlContent], {
-                type: 'application/msword'
+`</table></body></html>`;
+
+            let blob = new Blob
+
+(['\ufeff' + htmlContent], {
+                type: 
+
+'application/msword'
             });
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
+            let url = 
+
+URL.createObjectURL(blob);
+            let a = 
+
+document.createElement('a');
             a.href = url;
-            a.download = 'Calculator_Results.doc';
-            document.body.appendChild(a);
+            a.download = 
+
+'Calculator_Results.doc';
+            document.body.appendChild
+
+(a);
             a.click();
-            document.body.removeChild(a);
+            document.body.removeChild
+
+(a);
         }
 
         function exportToPDF() {
             const opt = {
                 margin:       10,
-                filename:     'Calculator_Results.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                filename:     
+
+'Calculator_Results.pdf',
+                image:        { type: 
+
+'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 
+
+2 },
+                jsPDF:        { unit: 
+
+'mm', format: 'a4', orientation: 
+
+'portrait' }
             };
-            html2pdf().from(calculatorContainer).set(opt).save();
+            html2pdf().from
+
+(calculatorContainer).set(opt).save();
         }
 
         function exportToImage() {
-            const dropdown = document.getElementById('exportDropdown');
-            dropdown.classList.remove('active');
-            dropdown.style.display = 'none';
+            const dropdown = 
 
-            html2canvas(calculatorContainer).then(canvas => {
-                let link = document.createElement('a');
-                link.download = 'Calculator_Results.png';
-                link.href = canvas.toDataURL('image/png');
+document.getElementById
+
+('exportDropdown');
+            dropdown.classList.remove
+
+('active');
+            dropdown.style.display = 
+
+'none';
+
+            html2canvas
+
+(calculatorContainer).then(canvas => {
+                let link = 
+
+document.createElement('a');
+                link.download = 
+
+'Calculator_Results.png';
+                link.href = 
+
+canvas.toDataURL('image/png');
                 link.click();
                 
-                dropdown.style.display = 'inline-block';
+                dropdown.style.display 
+
+= 'inline-block';
             });
         }
 
-        document.addEventListener('keydown', (event) => {
+        document.addEventListener
+
+('keydown', (event) => {
             const key = event.key;
 
             if (key === 'Enter') {
                 event.preventDefault();
-                evaluateRow(activeRowIndex);
-                rows.push({ textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0 });
+                evaluateRow
+
+(activeRowIndex);
+                rows.push({ 
+
+textExpression: '', expression: '', 
+
+result: 0, forceCalc: false, 
+
+ignoreBeforeIndex: 0, isCalcVisible: 
+
+true });
                 activeRowIndex++;
-                activeFieldIndex = 'calc';
-                renderCalculator('calc');
-                screenContainer.scrollTop = screenContainer.scrollHeight;
+                activeFieldIndex = 
+
+'calc';
+                renderCalculator
+
+('calc');
+                
+
+screenContainer.scrollTop = 
+
+screenContainer.scrollHeight;
             } 
-            else if (key === 'Escape') {
-                rows = [{ textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0 }];
+            else if (key === 'Escape') 
+
+{
+                rows = [{ 
+
+textExpression: '', expression: '', 
+
+result: 0, forceCalc: false, 
+
+ignoreBeforeIndex: 0, isCalcVisible: 
+
+true }];
                 activeRowIndex = 0;
-                activeFieldIndex = 'calc';
-                renderCalculator('calc');
+                activeFieldIndex = 
+
+'calc';
+                renderCalculator
+
+('calc');
             }
-            else if (key === 'Backspace') {
-                const activeInput = document.activeElement;
-                if (activeInput && (activeInput.classList.contains('calc-input') || activeInput.classList.contains('text-input'))) {
-                    if (activeInput.value === '' && activeRowIndex > 0) {
-                        event.preventDefault();
-                        rows.splice(activeRowIndex, 1);
-                        activeRowIndex--;
-                        activeFieldIndex = 'calc';
-                        renderCalculator('calc');
+            else if (key === 
+
+'Backspace') {
+                const activeInput = 
+
+document.activeElement;
+                if (activeInput && 
+
+(activeInput.classList.contains('calc-
+
+input') || 
+
+activeInput.classList.contains('text-
+
+input'))) {
+                    if 
+
+(activeInput.value === '' && 
+
+activeRowIndex > 0) {
+                        
+
+event.preventDefault();
+                        rows.splice
+
+(activeRowIndex, 1);
+                        
+
+activeRowIndex--;
+                        
+
+activeFieldIndex = 'calc';
+                        
+
+renderCalculator('calc');
                     }
                 }
             }
         });
 
+        function escapePreviewHtml
 
-        function escapePreviewHtml(value) {
-            return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+(value) {
+            return String(value ?? 
+
+'').replace(/[&<>"']/g, ch => 
+
+({'&':'&amp;','<':'&lt;','>':'&gt;','"'
+
+:'&quot;',"'":'&#39;'}[ch]));
         }
 
         function openPrintPreview() {
-            const showCurrency = showCurrencyCheckbox.checked;
-            const previewRows = rows.map((row, index) => {
-                const resultText = (row.result !== '' && row.result !== 0)
-                    ? formatDisplayValue(row.result).text + (showCurrency ? ' جنيه' : '') : '';
-                return `<tr><td class="number">${index + 1}</td><td class="cell text-cell">${escapePreviewHtml(row.textExpression)}</td><td class="cell expression-cell">${escapePreviewHtml(row.expression)}</td><td class="cell result-cell">${escapePreviewHtml(resultText)}</td></tr>`;
+            const showCurrency = 
+
+showCurrencyCheckbox.checked;
+            const previewRows = 
+
+rows.map((row, index) => {
+                const exprText = 
+
+row.isCalcVisible ? row.expression : 
+
+'';
+                const resultText = 
+
+(row.result !== '' && row.result !== 0)
+                    ? 
+
+formatDisplayValue(row.result).text + 
+
+(showCurrency ? ' جنيه' : '') : '';
+                return `<tr><td 
+
+class="number">${index + 1}</td><td 
+
+class="cell text-cell">
+
+${escapePreviewHtml
+
+(row.textExpression)}</td><td 
+
+class="cell expression-cell">
+
+${escapePreviewHtml(exprText)}</td><td 
+
+class="cell result-cell">
+
+${escapePreviewHtml(resultText)}
+
+</td></tr>`;
             }).join('');
-            const totalText = grandTotalEl.innerText + (showCurrency && grandTotalCurrencyEl.innerText ? ' جنيه' : '');
-            const positiveText = showPositiveCheckbox.checked ? positiveTotalValEl.innerText : '';
-            const negativeText = showNegativeCheckbox.checked ? negativeTotalValEl.innerText : '';
-            const w = window.open('', '_blank', 'width=1100,height=800');
-            if (!w) { alert('يرجى السماح بفتح النوافذ المنبثقة لعرض معاينة الطباعة.'); return; }
+            const totalText = 
+
+grandTotalEl.innerText + (showCurrency 
+
+&& grandTotalCurrencyEl.innerText ? ' 
+
+جنيه' : '');
+            const positiveText = 
+
+showPositiveCheckbox.checked ? 
+
+positiveTotalValEl.innerText : '';
+            const negativeText = 
+
+showNegativeCheckbox.checked ? 
+
+negativeTotalValEl.innerText : '';
+            const w = window.open('', 
+
+'_blank', 'width=1100,height=800');
+            if (!w) { alert('يرجى السماح 
+
+بفتح النوافذ المنبثقة لعرض معاينة الطباعة.'); return; }
             w.document.open();
-            w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>معاينة الطباعة</title>
+            w.document.write(`<!DOCTYPE 
+
+html><html lang="ar" 
+
+dir="rtl"><head><meta charset="UTF-
+
+8"><title>معاينة الطباعة</title>
 <style>
-*{box-sizing:border-box}body{font-family:Tahoma,Arial,sans-serif;color:#172033;background:#f3f7fc;margin:20px}h2{text-align:center;margin:0 0 16px;color:#174a7e;border-bottom:3px solid #25a6c7;padding:0 0 12px}.summary{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;margin-bottom:16px}.summary div{flex:1;min-width:180px;padding:12px 14px;border:1px solid #b7d8ed;border-right:5px solid #168aad;border-radius:8px;background:#e7f4fb;color:#174a7e}.summary strong{color:#0b6e99}table{width:100%;border-collapse:collapse;table-layout:fixed;background:#fff;box-shadow:0 2px 8px #17324d18}th,td{border:1px solid #b8c9d8;padding:9px;vertical-align:top;text-align:right}th{background:#176b87;color:#fff;font-weight:bold;border-color:#12566d}.number{width:7%;text-align:center;background:#eaf2f8;font-weight:bold;color:#24577a}.text-cell{width:31%;background:#fffaf0;color:#553b14}.expression-cell{width:37%;direction:ltr;text-align:left;background:#f1f7ff;color:#174a7e;font-weight:500}.result-cell{width:25%;direction:ltr;text-align:left;background:#e9f8ef;color:#087443;font-weight:bold}.cell{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}tbody tr:nth-child(even) td{filter:brightness(.975)}tbody tr:hover td{background-color:#e1f4fb}.actions{margin-bottom:16px;text-align:center}button{padding:10px 22px;font-size:16px;cursor:pointer;border:0;border-radius:6px;background:#176b87;color:#fff;margin:0 4px}button+button{background:#64748b}@page{size:A4 landscape;margin:10mm}@media print{body{margin:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}.actions{display:none!important}tr{break-inside:avoid;page-break-inside:avoid}th,td,.summary div,.number,.text-cell,.expression-cell,.result-cell{print-color-adjust:exact;-webkit-print-color-adjust:exact}h2{color:#174a7e}}
+*{box-sizing:border-box}body{font-
+
+family:Tahoma,Arial,sans-
+
+serif;color:#172033;background:#f3f7fc;
+
+margin:20px}h2{text-
+
+align:center;margin:0 0 
+
+16px;color:#174a7e;border-bottom:3px 
+
+solid #25a6c7;padding:0 0 
+
+12px}.summary{display:flex;flex-
+
+wrap:wrap;gap:12px;justify-
+
+content:space-between;margin-
+
+bottom:16px}.summary div{flex:1;min-
+
+width:180px;padding:12px 
+
+14px;border:1px solid #b7d8ed;border-
+
+right:5px solid #168aad;border-
+
+radius:8px;background:#e7f4fb;color:#17
+
+4a7e}.summary strong{color:#0b6e99}
+
+table{width:100%;border-
+
+collapse:collapse;table-
+
+layout:fixed;background:#fff;box-
+
+shadow:0 2px 8px #17324d18}th,td
+
+{border:1px solid 
+
+#b8c9d8;padding:9px;vertical-
+
+align:top;text-align:right}th
+
+{background:#176b87;color:#fff;font-
+
+weight:bold;border-
+
+color:#12566d}.number{width:7%;text-
+
+align:center;background:#eaf2f8;font-
+
+weight:bold;color:#24577a}.text-cell
+
+{width:31%;background:#fffaf0;color:#55
+
+3b14}.expression-cell
+
+{width:37%;direction:ltr;text-
+
+align:left;background:#f1f7ff;color:#17
+
+4a7e;font-weight:500}.result-cell
+
+{width:25%;direction:ltr;text-
+
+align:left;background:#e9f8ef;color:#08
+
+7443;font-weight:bold}.cell{white-
+
+space:pre-wrap;overflow-
+
+wrap:anywhere;word-break:break-word}
+
+tbody tr:nth-child(even) td
+
+{filter:brightness(.975)}tbody tr:hover 
+
+td{background-color:#e1f4fb}.actions
+
+{margin-bottom:16px;text-align:center}
+
+button{padding:10px 22px;font-
+
+size:16px;cursor:pointer;border:0;borde
+
+r-
+
+radius:6px;background:#176b87;color:#ff
+
+f;margin:0 4px}button+button
+
+{background:#64748b}@page{size:A4 
+
+landscape;margin:10mm}@media print
+
+{body{margin:0;background:#fff;-
+
+webkit-print-color-adjust:exact;print-
+
+color-adjust:exact}.actions
+
+{display:none!important}tr{break-
+
+inside:avoid;page-break-inside:avoid}
+
+th,td,.summary div,.number,.text-
+
+cell,.expression-cell,.result-cell
+
+{print-color-adjust:exact;-webkit-
+
+print-color-adjust:exact}h2
+
+{color:#174a7e}}
 </style></head><body>
-<div class="actions"><button onclick="window.print()">طباعة التقرير</button> <button onclick="window.close()">إغلاق المعاينة</button></div>
-<h2>تقرير الآلة الحاسبة متعددة الأسطر</h2><div class="summary"><div><strong>الإجمالي:</strong> ${escapePreviewHtml(totalText)}</div>
-${positiveText !== '' ? `<div><strong>مجموع الموجب:</strong> ${escapePreviewHtml(positiveText)}</div>` : ''}
-${negativeText !== '' ? `<div><strong>مجموع السالب:</strong> ${escapePreviewHtml(negativeText)}</div>` : ''}</div>
-<table><thead><tr><th class="number">السطر</th><th>النص / الملاحظات</th><th>العملية الحسابية</th><th>النتيجة</th></tr></thead><tbody>${previewRows}</tbody></table></body></html>`);
-            w.document.close(); w.focus();
+<div class="actions"><button 
+
+onclick="window.print()">طباعة 
+
+التقرير</button> <button 
+
+onclick="window.close()">إغلاق 
+
+المعاينة</button></div>
+<h2>تقرير الآلة الحاسبة متعددة الأسطر</h2><div 
+
+class="summary"><div><strong>
+
+الإجمالي:</strong> ${escapePreviewHtml
+
+(totalText)}</div>
+${positiveText !== '' ? `<div><strong>
+
+مجموع الموجب:</strong> 
+
+${escapePreviewHtml(positiveText)}
+
+</div>` : ''}
+${negativeText !== '' ? `<div><strong>
+
+مجموع السالب:</strong> 
+
+${escapePreviewHtml(negativeText)}
+
+</div>` : ''}</div>
+<table><thead><tr><th class="number">
+
+السطر</th><th>النص / الملاحظات</th><th>العملية 
+
+الحسابية</th><th>
+
+النتيجة</th></tr></thead><tbody>
+
+${previewRows}
+
+</tbody></table></body></html>`);
+            w.document.close(); 
+
+w.focus();
         }
 
-        // Ctrl+B opens a dedicated preview that includes every column and value.
-        document.addEventListener('keydown', (event) => {
-            // Use the physical B key so the shortcut also works with Arabic keyboard layouts.
-            if (event.ctrlKey && !event.altKey && !event.shiftKey &&
-                (event.code === 'KeyB' || String(event.key).toLowerCase() === 'b')) {
+        document.addEventListener
+
+('keydown', (event) => {
+            if (event.ctrlKey && !
+
+event.altKey && !event.shiftKey &&
+                (event.code === 'KeyB' 
+
+|| String(event.key).toLowerCase() === 
+
+'b')) {
                 event.preventDefault();
-                event.stopPropagation();
+                event.stopPropagation
+
+();
                 openPrintPreview();
             }
         }, true);
