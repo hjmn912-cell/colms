@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <!-- منع الزوم التلقائي عند الكتابة من الموبايل عن طريق تثبيت الـ maximum-scale -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- السماح بالزوم اليدوي بالكامل ومنع الزوم الأوتوماتيكي عبر ضبط الأحجام القياسية -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>آلة حاسبة الأسطر المتعددة</title>
     <!-- إضافة مكتبة SheetJS لتصدير ملفات Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -17,7 +17,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            -webkit-text-size-adjust: 100%; /* منع المتصفحات من تغيير حجم الخط تلقائياً */
+            -webkit-text-size-adjust: 100%;
         }
 
         body {
@@ -57,13 +57,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px;
+            padding: 10px 15px;
             border-bottom: 1px solid #1f2937;
-            gap: 15px;
+            gap: 10px;
             position: relative;
+            flex-wrap: wrap;
         }
 
-        /* الكومبو بوكس جهة اليمين فوق */
         .options-dropdown {
             position: relative;
             display: inline-block;
@@ -73,10 +73,10 @@
             background-color: #1e293b;
             color: #38bdf8;
             border: 1px solid #38bdf8;
-            padding: 6px 14px;
+            padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -132,21 +132,21 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 30px;
+            gap: 15px;
         }
 
         .summary-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 1.1rem;
+            gap: 6px;
+            font-size: 1rem;
             font-weight: 600;
             white-space: nowrap;
         }
 
         .summary-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             cursor: pointer;
             accent-color: #38bdf8;
         }
@@ -159,37 +159,31 @@
             color: #ef4444;
         }
 
+        /* تعديل الهيدر ليضمن ظهور المجموع الكلي دائماً بشكل بارز بدون اختفاء */
         .calculator-header {
             background-color: #030712;
-            padding: 15px 20px;
+            padding: 12px 15px;
             border-bottom: 2px solid #1f2937;
             display: flex;
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            flex-wrap: nowrap;
             gap: 10px;
+            position: relative;
         }
 
-        .total-label-group {
-            display: flex;
-            align-items: center;
-            flex: 1;
-        }
-
-        /* حل مشكلة نزول أرقام الإجمالي فوق بعضها عبر منع الالتفاف وتثبيت العرض الأفقي */
         .total-value-container {
             display: flex;
             align-items: baseline;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             flex: 2;
             white-space: nowrap;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .total-value {
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 700;
             color: #38bdf8;
             white-space: nowrap;
@@ -209,13 +203,12 @@
         .header-right-group {
             display: flex;
             align-items: center;
-            gap: 15px;
-            flex: 1;
+            gap: 10px;
             justify-content: flex-end;
         }
 
         .designer-credit {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: #6b7280;
             letter-spacing: 0.5px;
             white-space: nowrap;
@@ -231,13 +224,13 @@
             background-color: #1e293b;
             color: #38bdf8;
             border: 1px solid #38bdf8;
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             transition: background 0.2s;
             white-space: nowrap;
         }
@@ -284,7 +277,7 @@
 
         .calculator-screen {
             background-color: #0f172a;
-            padding: 15px 20px;
+            padding: 15px 15px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
@@ -297,7 +290,7 @@
             display: flex;
             flex-direction: column;
             background-color: #1e293b;
-            padding: 10px 15px;
+            padding: 10px 12px;
             border-radius: 8px;
             border: 1px solid transparent;
             transition: border-color 0.2s;
@@ -314,13 +307,13 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 15px;
+            gap: 10px;
             width: 100%;
         }
 
         .inputs-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-grow: 1;
             align-items: flex-start;
         }
@@ -328,14 +321,14 @@
         .text-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex: 1;
         }
 
         .calc-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex: 1;
         }
 
@@ -461,7 +454,7 @@
             color: #ffffff;
         }
 
-        /* تثبيت حجم خط الإدخال على 16px لمنع الزوم التلقائي في الموبايل */
+        /* حجم الخط ثابت 16px لمنع التكبير التلقائي عند التركيز داخل الحقل */
         .text-input {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid #334155;
@@ -504,22 +497,22 @@
         .calc-output-container {
             display: flex;
             align-items: baseline;
-            gap: 8px;
-            min-width: 140px;
+            gap: 6px;
+            min-width: 110px;
             text-align: left;
             padding-top: 4px;
             white-space: nowrap;
         }
 
         .calc-output {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #10b981;
             white-space: nowrap;
         }
 
         .row-currency {
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: #38bdf8;
             font-weight: 600;
             white-space: nowrap;
@@ -535,7 +528,7 @@
             color: #6b7280;
             font-size: 1.1rem;
             cursor: pointer;
-            padding: 4px 8px;
+            padding: 4px 6px;
             border-radius: 6px;
             transition: all 0.2s;
             white-space: nowrap;
@@ -563,9 +556,9 @@
         }
 
         .keyboard-hint {
-            padding: 12px 20px;
+            padding: 10px 15px;
             text-align: center;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #6b7280;
             background-color: #111827;
             border-top: 1px solid #1f2937;
@@ -575,6 +568,29 @@
         .keyboard-hint span {
             color: #38bdf8;
             font-weight: bold;
+        }
+
+        /* تنسيقات الشاشات الصغيرة للموبايل لضمان بقاء المجموع الكلي واضحاً */
+        @media (max-width: 600px) {
+            .calculator-header {
+                flex-direction: column;
+                gap: 5px;
+                padding: 10px;
+            }
+            .total-value-container {
+                width: 100%;
+                justify-content: center;
+            }
+            .total-value {
+                font-size: 1.8rem;
+            }
+            .header-right-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .designer-credit {
+                font-size: 0.7rem;
+            }
         }
 
         @media print {
@@ -624,12 +640,11 @@
                     </div>
                 </div>
 
-                <div style="width: 80px;"></div>
+                <div style="width: 60px;"></div>
             </div>
 
             <div class="calculator-header">
-                <div class="total-label-group"></div>
-
+                <!-- المجموع الكلي ظاهراً دائماً وبشكل واضح -->
                 <div class="total-value-container">
                     <div id="grandTotal" class="total-value">0</div>
                     <div id="grandTotalCurrency" class="total-currency">جنيه</div>
@@ -878,7 +893,6 @@
                 const inputsGroup = document.createElement('div');
                 inputsGroup.className = 'inputs-group';
 
-                // غلاف حقل الملاحظات
                 const textWrapper = document.createElement('div');
                 textWrapper.className = 'text-input-wrapper';
 
@@ -936,7 +950,6 @@
                 textWrapper.appendChild(textPadCheckbox);
                 textWrapper.appendChild(textInput);
 
-                // غلاف حقل العملية الحسابية
                 const calcWrapper = document.createElement('div');
                 calcWrapper.className = 'calc-input-wrapper';
 
@@ -1546,7 +1559,7 @@
             w.document.open();
             w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>معاينة الطباعة</title>
 <style>
-*{box-sizing:border-box}body{font-family:Tahoma,Arial,sans-serif;color:#172033;background:#f3f7fc;margin:20px}h2{text-align:center;margin:0 0 16px;color:#174a7e;border-bottom:3px solid #25a6c7;padding:0 0 12px}.summary{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;margin-bottom:16px}.summary div{flex:1;min-width:180px;padding:12px 14px;border:1px solid #b7d8ed;border-right:5px solid #168aad;border-radius:8px;background:#e7f4fb;color:#174a7e}.summary strong{color:#0b6e99}table{width:100%;border-collapse:collapse;table-layout:fixed;background:#fff;box-shadow:0 2px 8px #17324d18}th,td{border:1px solid #b8c9d8;padding:9px;vertical-align:top;text-align:right}th{background:#176b87;color:#fff;font-weight:bold;border-color:#12566d}.number{width:7%;text-align:center;background:#eaf2f8;font-weight:bold;color:#24577a}.text-cell{width:31%;background:#fffaf0;color:#553b14}.expression-cell{width:37%;direction:ltr;text-align:left;background:#f1f7ff;color:#174a7e;font-weight:500}.result-cell{width:25%;direction:ltr;text-align:left;background:#e9f8ef;color:#087443;font-weight:bold}.cell{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}tbody tr:nth-child(even) td{filter:brightness(.975)}tbody tr:hover td{background-color:#e1f4fb}.actions{motion-bottom:16px;text-align:center}button{padding:10px 22px;font-size:16px;cursor:pointer;border:0;border-radius:6px;background:#176b87;color:#fff;margin:0 4px}button+button{background:#64748b}@page{size:A4 landscape;margin:10mm}@media print{body{margin:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}.actions{display:none!important}tr{break-inside:avoid;page-break-inside:avoid}th,td,.summary div,.number,.text-cell,.expression-cell,.result-cell{print-color-adjust:exact;-webkit-print-color-adjust:exact}h2{color:#174a7e}}
+*{box-sizing:border-box}body{font-family:Tahoma,Arial,sans-serif;color:#172033;background:#f3f7fc;margin:20px}h2{text-align:center;margin:0 0 16px;color:#174a7e;border-bottom:3px solid #25a6c7;padding:0 0 12px}.summary{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;margin-bottom:16px}.summary div{flex:1;min-width:180px;padding:12px 14px;border:1px solid #b7d8ed;border-right:5px solid #168aad;border-radius:8px;background:#e7f4fb;color:#174a7e}.summary strong{color:#0b6e99}table{width:100%;border-collapse:collapse;table-layout:fixed;background:#fff;box-shadow:0 2px 8px #17324d18}th,td{border:1px solid #b8c9d8;padding:9px;vertical-align:top;text-align:right}th{background:#176b87;color:#fff;font-weight:bold;border-color:#12566d}.number{width:7%;text-align:center;background:#eaf2f8;font-weight:bold;color:#24577a}.text-cell{width:31%;background:#fffaf0;color:#553b14}.expression-cell{width:37%;direction:ltr;text-align:left;background:#f1f7ff;color:#174a7e;font-weight:500}.result-cell{width:25%;direction:ltr;text-align:left;background:#e9f8ef;color:#087443;font-weight:bold}.cell{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}tbody tr:nth-child(even) td{filter:brightness(.975)}tbody tr:hover td{background-color:#e1f4fb}.actions{margin-bottom:16px;text-align:center}button{padding:10px 22px;font-size:16px;cursor:pointer;border:0;border-radius:6px;background:#176b87;color:#fff;margin:0 4px}button+button{background:#64748b}@page{size:A4 landscape;margin:10mm}@media print{body{margin:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}.actions{display:none!important}tr{break-inside:avoid;page-break-inside:avoid}th,td,.summary div,.number,.text-cell,.expression-cell,.result-cell{print-color-adjust:exact;-webkit-print-color-adjust:exact}h2{color:#174a7e}}
 </style></head><body>
 <div class="actions"><button onclick="window.print()">طباعة التقرير</button> <button onclick="window.close()">إغلاق المعاينة</button></div>
 <h2>تقرير الآلة الحاسبة متعددة الأسطر</h2><div class="summary"><div><strong>الإجمالي:</strong> ${escapePreviewHtml(totalText)}</div>
