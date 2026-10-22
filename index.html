@@ -740,8 +740,9 @@
 
             <div class="calculator-header">
                 <div class="header-right-group">
+                    <!-- الزر العلوي الأيمن (الذي يحمل شكل ورقة بيضاء) -->
+                    <button type="button" id="topActionBtn" class="top-action-btn" title="إنشاء سطر جديد أو الانتقال للسطر التالي" onclick="handleTopActionBtnClick()">📄</button>
                     <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="التركيز على عمود الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
-                    <button type="button" id="topActionBtn" class="top-action-btn" title="الانتقال للسطر التالي أو إنشاء سطر جديد" onclick="handleTopActionBtnClick()"></button>
                     
                     <span class="designer-credit">designed by Sami Arouj</span>
                     <div class="export-dropdown" id="exportDropdown">
@@ -810,23 +811,20 @@
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
-        // وظيفة الزر العلوي: ينزل للسطر التالي، ولو في الأخير يزود سطر جديد بدون كيبورد أو آلة
+        // وظيفة الزر العلوي الأيمن (ورقة بيضاء): في المنتصف ينزل للسطر التالي، ولو في الأخير يضيف سطر جديد بدون كيبورد
         function handleTopActionBtnClick() {
+            evaluateRow(activeRowIndex);
+            rows[activeRowIndex].isCalcPadVisible = false;
+            rows[activeRowIndex].isTextPadVisible = false;
+            rows[activeRowIndex].forceKeyboardCalc = false;
+            rows[activeRowIndex].forceKeyboardText = false;
+
             if (activeRowIndex < rows.length - 1) {
-                rows[activeRowIndex].isCalcPadVisible = false;
-                rows[activeRowIndex].isTextPadVisible = false;
-                rows[activeRowIndex].forceKeyboardCalc = false;
-                rows[activeRowIndex].forceKeyboardText = false;
                 activeRowIndex++;
                 activeFieldIndex = 'calc';
                 renderCalculator('calc');
                 scrollToActiveRow();
             } else {
-                evaluateRow(activeRowIndex);
-                rows[activeRowIndex].isCalcPadVisible = false;
-                rows[activeRowIndex].isTextPadVisible = false;
-                rows[activeRowIndex].forceKeyboardCalc = false;
-                rows[activeRowIndex].forceKeyboardText = false;
                 rows.push({ 
                     textExpression: '', 
                     expression: '', 
@@ -950,16 +948,15 @@
             }
         }
 
-        // التبادل الحصري: فتح الكيبورد يغلق الآلة المصغرة والعكس صحيح
         function openKeyboardForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
             if (field === 'text') {
                 rows[index].forceKeyboardText = true;
-                rows[index].isTextPadVisible = false; // إغلاق الآلة المصغرة
+                rows[index].isTextPadVisible = false;
             } else {
                 rows[index].forceKeyboardCalc = true;
-                rows[index].isCalcPadVisible = false; // إغلاق الآلة المصغرة
+                rows[index].isCalcPadVisible = false;
             }
             renderCalculator(field);
         }
@@ -970,10 +967,10 @@
             rows.forEach(r => { r.isCalcPadVisible = false; r.isTextPadVisible = false; });
             if (field === 'text') {
                 rows[index].isTextPadVisible = true;
-                rows[index].forceKeyboardText = false; // إغلاق كيبورد الجهاز
+                rows[index].forceKeyboardText = false;
             } else {
                 rows[index].isCalcPadVisible = true;
-                rows[index].forceKeyboardCalc = false; // إغلاق كيبورد الجهاز
+                rows[index].forceKeyboardCalc = false;
             }
             renderCalculator(field);
         }
@@ -1133,7 +1130,6 @@
             return keypadDiv;
         }
 
-        // التبادل الحصري: ضغطتان للآلة (وتغلق الكيبورد) / ضغطة مطولة للكيبورد (وتغلق الآلة)
         function attachTouchListeners(element, index, field) {
             let lastTapTime = 0;
             let longPressTimer = null;
