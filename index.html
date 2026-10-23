@@ -324,6 +324,7 @@
             overflow-x: hidden;
             gap: 8px;
             width: 100%;
+            padding-bottom: 220px; /* مساحة فارغة لأسفل الشاشة لضمان عدم اختفاء آخر سطر خلف لوحة المفاتيح الثابتة */
             -webkit-overflow-scrolling: touch;
         }
 
@@ -399,30 +400,34 @@
             color: #0b0f19;
         }
 
+        /* تعديل جوهري: جعل الآلة الحاسبة المصغرة ثابتة في وجه الشاشة ولا تتأثر بزيادة الأسطر وتظل ظاهرة بالكامل */
         .row-keypad-container {
             display: flex;
             gap: 10px;
             width: 100%;
             justify-content: center;
-            padding-top: 4px;
-            position: sticky;
-            bottom: 5px;
-            z-index: 1500;
+            position: fixed;
+            bottom: 35px;
+            left: 0;
+            padding: 0 15px;
+            z-index: 9999;
+            pointer-events: none; /* للسماح بالنقر وتمرير الشاشة من خلفها */
         }
 
         .row-mini-keypad {
+            pointer-events: auto; /* لتعمل أزرار الآلة الحاسبة طبيعياً */
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            gap: 6px;
             background-color: #030712;
-            padding: 12px;
+            padding: 10px;
             border-radius: 12px;
             border: 2px solid #38bdf8;
             width: 100%;
-            max-width: 100%;
+            max-width: 420px; /* حجم مركزي متناسق ومريح للعين */
             direction: ltr;
             position: relative;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.9);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.95);
             touch-action: none;
             cursor: grab;
             user-select: none;
@@ -437,15 +442,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             background-color: #1e293b;
-            padding: 6px 10px;
+            padding: 4px 8px;
             border-radius: 6px;
         }
 
         .keypad-drag-title {
             color: #38bdf8;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -456,10 +461,10 @@
             background-color: rgba(239, 68, 68, 0.2);
             color: #ef4444;
             border: 1px solid #ef4444;
-            padding: 3px 8px;
+            padding: 2px 8px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: bold;
             transition: all 0.2s;
         }
@@ -473,10 +478,10 @@
             background-color: #1e293b;
             color: #f8fafc;
             border: 1px solid #334155;
-            padding: 14px 4px;
-            border-radius: 8px;
+            padding: 10px 4px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             text-align: center;
             transition: all 0.2s;
@@ -510,7 +515,7 @@
             background-color: #065f46;
             color: #34d399;
             border-color: #059669;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         .mini-key-btn.enter-key:hover {
@@ -522,7 +527,7 @@
             background-color: #1e1b4b;
             color: #a78bfa;
             border-color: #8b5cf6;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         .mini-key-btn.enter-open-key:hover {
@@ -534,7 +539,7 @@
             background-color: #1e1b4b;
             color: #818cf8;
             border-color: #6366f1;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .mini-key-btn.kbd-key:hover {
@@ -546,7 +551,7 @@
             background-color: #0284c7;
             color: #ffffff;
             border-color: #38bdf8;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         .mini-key-btn.nav-key:hover {
@@ -558,7 +563,7 @@
             background-color: #7f1d1d;
             color: #fca5a5;
             border-color: #ef4444;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         .mini-key-btn.clear-key:hover {
@@ -1211,7 +1216,6 @@
             let longPressTimer = null;
             let isLongPressFired = false;
 
-            // ضبط الحقول خصيصاً لتناسب الموبايل والكمبيوتر معاً
             if (isMobile) {
                 element.setAttribute('readonly', 'true');
                 element.setAttribute('inputmode', 'none');
@@ -1354,7 +1358,7 @@
                 });
 
                 textInput.addEventListener('keydown', (e) => {
-                    handleArrowNavigation(e, index, 'text');
+                    handleKeyNavigation(e, index, 'text');
                 });
 
                 setupCellGestures(textInput, index, 'text');
@@ -1469,7 +1473,7 @@
                         clearCurrentField();
                     }
                     else {
-                        handleArrowNavigation(e, index, 'calc');
+                        handleKeyNavigation(e, index, 'calc');
                     }
                 });
 
@@ -1507,6 +1511,7 @@
                 rowMain.appendChild(deleteBtn);
                 rowDiv.appendChild(rowMain);
 
+                // إظهار لوحة المفاتيح بشكل عائم وثابت أسفل الشاشة للسطر النشط
                 if (index === activeRowIndex && (row.isTextPadVisible || row.isCalcPadVisible)) {
                     const keypadContainer = document.createElement('div');
                     keypadContainer.className = 'row-keypad-container';
@@ -1518,7 +1523,7 @@
                         keypadContainer.appendChild(createMiniKeypad(index, 'calc'));
                     }
 
-                    rowDiv.appendChild(keypadContainer);
+                    screenContainer.appendChild(keypadContainer); // تظل ثابتة ومستقلة بالأسفل
                 }
 
                 screenContainer.appendChild(rowDiv);
@@ -1538,6 +1543,13 @@
                 }
             });
 
+            if (!isMobile && focusTarget) {
+                setTimeout(() => {
+                    const targetEl = screenContainer.querySelector(`.calc-row.active .${focusTarget === 'text' ? 'text-input' : 'calc-input'}`);
+                    if (targetEl) targetEl.focus();
+                }, 10);
+            }
+
             const formattedTotal = formatDisplayValue(Number.isInteger(totalSum) ? totalSum : parseFloat(totalSum.toFixed(6)));
             grandTotalEl.innerText = formattedTotal.text;
             grandTotalCurrencyEl.innerText = showCurrency ? 'جنيه' : '';
@@ -1555,10 +1567,31 @@
             negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
         }
 
-        function handleArrowNavigation(e, index, currentField) {
+        function handleKeyNavigation(e, index, currentField) {
             const key = e.key;
 
-            if (key === 'ArrowDown') {
+            if (key === 'Enter') {
+                e.preventDefault();
+                evaluateRow(index);
+                closeAllPads();
+
+                if (index < rows.length - 1) {
+                    activeRowIndex = index + 1;
+                    activeFieldIndex = currentField;
+                    renderCalculator(currentField);
+                    scrollToActiveRow();
+                } else {
+                    rows.push({ 
+                        textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                        isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    });
+                    activeRowIndex = rows.length - 1;
+                    activeFieldIndex = currentField;
+                    renderCalculator(currentField);
+                    screenContainer.scrollTop = screenContainer.scrollHeight;
+                }
+            }
+            else if (key === 'ArrowDown') {
                 if (index < rows.length - 1) {
                     e.preventDefault();
                     closeAllPads();
@@ -1640,13 +1673,13 @@
         }
 
         function updateActiveRowClasses() {
-            const rowDivs = screenContainer.children;
-            for (let i = 0; i < rowDivs.length; i++) {
-                const textInput = rowDivs[i].querySelector('.text-input');
-                const calcInput = rowDivs[i].querySelector('.calc-input');
+            const rowDivs = screenContainer.querySelectorAll('.calc-row');
+            rowDivs.forEach((rowDiv, i) => {
+                const textInput = rowDiv.querySelector('.text-input');
+                const calcInput = rowDiv.querySelector('.calc-input');
 
                 if (i === activeRowIndex) {
-                    rowDivs[i].classList.add('active');
+                    rowDiv.classList.add('active');
                     if (activeFieldIndex === 'text' && textInput) {
                         textInput.classList.add('text-border-active');
                         if (calcInput) calcInput.classList.remove('calc-border-active');
@@ -1655,11 +1688,11 @@
                         if (textInput) textInput.classList.remove('text-border-active');
                     }
                 } else {
-                    rowDivs[i].classList.remove('active');
+                    rowDiv.classList.remove('active');
                     if (textInput) textInput.classList.remove('text-border-active');
                     if (calcInput) calcInput.classList.remove('calc-border-active');
                 }
-            }
+            });
         }
 
         function deleteRow(index) {
@@ -1775,7 +1808,7 @@
             const showCurrency = showCurrencyCheckbox.checked;
 
             rows.forEach((row, index) => {
-                const rowDivs = screenContainer.children;
+                const rowDivs = screenContainer.querySelectorAll('.calc-row');
                 if (rowDivs[index]) {
                     const outputDiv = rowDivs[index].querySelector('.calc-output');
                     const currencySpan = rowDivs[index].querySelector('.row-currency');
@@ -1892,29 +1925,7 @@
         document.addEventListener('keydown', (event) => {
             const key = event.key;
 
-            if (key === 'Enter') {
-                event.preventDefault();
-                evaluateRow(activeRowIndex);
-                closeAllPads();
-
-                if (activeRowIndex < rows.length - 1) {
-                    activeRowIndex++;
-                    activeFieldIndex = 'calc';
-                    renderCalculator('calc');
-                    scrollToActiveRow();
-                } 
-                else {
-                    rows.push({ 
-                        textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                        isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                    });
-                    activeRowIndex = rows.length - 1;
-                    activeFieldIndex = 'calc';
-                    renderCalculator('calc');
-                    screenContainer.scrollTop = screenContainer.scrollHeight;
-                }
-            } 
-            else if (key === 'Escape') {
+            if (key === 'Escape') {
                 rows = [{ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
                     isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false
