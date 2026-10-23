@@ -559,7 +559,7 @@
             color: #ffffff;
         }
 
-        /* التصميم الأساسي للخلية الإدخالية */
+        /* المظهر الأساسي للخلايا */
         .text-input, .calc-input {
             background: rgba(255, 255, 255, 0.03);
             border: 2px solid #334155;
@@ -590,21 +590,21 @@
         }
 
         /* 1️⃣ الضغطة الواحدة (Single Tap): أزرق سماوي */
-        .text-input:focus, .calc-input:focus, .border-single-tap {
+        .text-border-single, .calc-border-single {
             border-color: #38bdf8 !important;
             background: rgba(56, 189, 248, 0.08) !important;
             box-shadow: 0 0 8px rgba(56, 189, 248, 0.3) !important;
         }
 
-        /* 2️⃣ الضغطتان المتتاليتان (Double Tap): أخضر زمردي */
-        .border-double-tap {
+        /* 2️⃣ الضغطتان المتتاليتان (Double Tap): أخضر زمردي ثابت طوال تواجدك بالخلية */
+        .text-border-double, .calc-border-double {
             border-color: #10b981 !important;
             background: rgba(16, 185, 129, 0.12) !important;
             box-shadow: 0 0 10px rgba(16, 185, 129, 0.4) !important;
         }
 
-        /* 3️⃣ الضغطة المطولة (Long Press): بنفسجي ساطع */
-        .border-long-press {
+        /* 3️⃣ الضغطة المطولة (Long Press): بنفسجي ساطع ثابت طوال تواجدك بالخلية */
+        .text-border-long, .calc-border-long {
             border-color: #a855f7 !important;
             background: rgba(168, 85, 247, 0.12) !important;
             box-shadow: 0 0 10px rgba(168, 85, 247, 0.4) !important;
@@ -845,19 +845,26 @@
                 isTextPadVisible: false,
                 forceKeyboardText: false,
                 forceKeyboardCalc: false,
-                textTapState: 'single', // 'single' (أزرق) | 'double' (أخضر) | 'long' (بنفسجي)
-                calcTapState: 'single'  // 'single' (أزرق) | 'double' (أخضر) | 'long' (بنفسجي)
+                textTapState: 'single', 
+                calcTapState: 'single'  
             }
         ];
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
+        // دالة لغلق جميع اللوحات في كل السطور (لضمان ظهور آلة حاسبة واحدة فقط في الشاشة)
+        function closeAllPads() {
+            rows.forEach(r => {
+                r.isCalcPadVisible = false;
+                r.isTextPadVisible = false;
+                r.forceKeyboardCalc = false;
+                r.forceKeyboardText = false;
+            });
+        }
+
         function handleTopActionBtnClick() {
             evaluateRow(activeRowIndex);
-            rows[activeRowIndex].isCalcPadVisible = false;
-            rows[activeRowIndex].isTextPadVisible = false;
-            rows[activeRowIndex].forceKeyboardCalc = false;
-            rows[activeRowIndex].forceKeyboardText = false;
+            closeAllPads();
 
             if (activeRowIndex < rows.length - 1) {
                 activeRowIndex++;
@@ -866,18 +873,10 @@
                 scrollToActiveRow();
             } else {
                 rows.push({ 
-                    textExpression: '', 
-                    expression: '', 
-                    result: 0, 
-                    forceCalc: false, 
-                    ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, 
-                    isCalcPadVisible: false, 
-                    isTextPadVisible: false,
-                    forceKeyboardText: false,
-                    forceKeyboardCalc: false,
-                    textTapState: 'single',
-                    calcTapState: 'single'
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false,
+                    forceKeyboardText: false, forceKeyboardCalc: false,
+                    textTapState: 'single', calcTapState: 'single'
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = 'calc';
@@ -888,10 +887,7 @@
 
         function handleTopNotesFocusClick() {
             evaluateRow(activeRowIndex);
-            rows[activeRowIndex].isCalcPadVisible = false;
-            rows[activeRowIndex].isTextPadVisible = false;
-            rows[activeRowIndex].forceKeyboardCalc = false;
-            rows[activeRowIndex].forceKeyboardText = false;
+            closeAllPads();
 
             if (activeRowIndex < rows.length - 1) {
                 activeRowIndex++;
@@ -900,18 +896,10 @@
                 scrollToActiveRow();
             } else {
                 rows.push({ 
-                    textExpression: '', 
-                    expression: '', 
-                    result: 0, 
-                    forceCalc: false, 
-                    ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, 
-                    isCalcPadVisible: false, 
-                    isTextPadVisible: false,
-                    forceKeyboardText: false,
-                    forceKeyboardCalc: false,
-                    textTapState: 'single',
-                    calcTapState: 'single'
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false,
+                    forceKeyboardText: false, forceKeyboardCalc: false,
+                    textTapState: 'single', calcTapState: 'single'
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = 'text';
@@ -1022,14 +1010,14 @@
         function openKeyboardForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
+            closeAllPads(); // غلق أي آلة أخرى لتكون آلة واحدة فقط على الشاشة
+
             if (field === 'text') {
                 rows[index].textTapState = 'long'; // لون أرجواني ساطع
                 rows[index].forceKeyboardText = true;
-                rows[index].isTextPadVisible = false;
             } else {
                 rows[index].calcTapState = 'long'; // لون أرجواني ساطع
                 rows[index].forceKeyboardCalc = true;
-                rows[index].isCalcPadVisible = false;
             }
             renderCalculator(field);
         }
@@ -1037,30 +1025,21 @@
         function openCalcPadForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
-            rows.forEach((r, idx) => { 
-                if (idx !== index) {
-                    r.isCalcPadVisible = false; 
-                    r.isTextPadVisible = false; 
-                }
-            });
+            closeAllPads(); // غلق أي آلة أخرى لتكون آلة واحدة فقط على الشاشة
+
             if (field === 'text') {
                 rows[index].textTapState = 'double'; // لون أخضر زمردي
                 rows[index].isTextPadVisible = true;
-                rows[index].forceKeyboardText = false;
             } else {
                 rows[index].calcTapState = 'double'; // لون أخضر زمردي
                 rows[index].isCalcPadVisible = true;
-                rows[index].forceKeyboardCalc = false;
             }
             renderCalculator(field);
         }
 
         function addNewRowFromPad(index, field) {
             evaluateRow(index);
-            rows[index].isCalcPadVisible = false;
-            rows[index].isTextPadVisible = false;
-            rows[index].forceKeyboardCalc = false;
-            rows[index].forceKeyboardText = false;
+            closeAllPads();
             rows[index].textTapState = 'single';
             rows[index].calcTapState = 'single';
 
@@ -1071,18 +1050,10 @@
                 scrollToActiveRow();
             } else {
                 rows.push({ 
-                    textExpression: '', 
-                    expression: '', 
-                    result: 0, 
-                    forceCalc: false, 
-                    ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, 
-                    isCalcPadVisible: false, 
-                    isTextPadVisible: false,
-                    forceKeyboardText: false,
-                    forceKeyboardCalc: false,
-                    textTapState: 'single',
-                    calcTapState: 'single'
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false,
+                    forceKeyboardText: false, forceKeyboardCalc: false,
+                    textTapState: 'single', calcTapState: 'single'
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = field;
@@ -1093,10 +1064,7 @@
 
         function addNewRowAndOpenTool(index, field) {
             evaluateRow(index);
-            rows[index].isCalcPadVisible = false;
-            rows[index].isTextPadVisible = false;
-            rows[index].forceKeyboardCalc = false;
-            rows[index].forceKeyboardText = false;
+            closeAllPads();
             rows[index].textTapState = 'single';
             rows[index].calcTapState = 'single';
 
@@ -1105,18 +1073,10 @@
                 targetIndex = index + 1;
             } else {
                 rows.push({ 
-                    textExpression: '', 
-                    expression: '', 
-                    result: 0, 
-                    forceCalc: false, 
-                    ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, 
-                    isCalcPadVisible: false, 
-                    isTextPadVisible: false,
-                    forceKeyboardText: false,
-                    forceKeyboardCalc: false,
-                    textTapState: 'single',
-                    calcTapState: 'single'
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false,
+                    forceKeyboardText: false, forceKeyboardCalc: false,
+                    textTapState: 'single', calcTapState: 'single'
                 });
                 targetIndex = rows.length - 1;
             }
@@ -1126,11 +1086,9 @@
 
             if (field === 'text') {
                 rows[targetIndex].forceKeyboardText = true;
-                rows[targetIndex].isTextPadVisible = false;
                 rows[targetIndex].textTapState = 'long';
             } else {
                 rows[targetIndex].isCalcPadVisible = true;
-                rows[targetIndex].forceKeyboardCalc = false;
                 rows[targetIndex].calcTapState = 'double';
             }
 
@@ -1269,7 +1227,6 @@
             return keypadDiv;
         }
 
-        // التعامل الدقيق مع اللمس: ضغطة واحدة، ضغطتان، وضغطة مطولة
         function attachTouchListeners(element, index, field) {
             let lastTapTime = 0;
             let longPressTimer = null;
@@ -1344,23 +1301,14 @@
                         scrollToActiveRow();
                     } else {
                         evaluateRow(index);
-                        rows[index].isTextPadVisible = false;
-                        rows[index].forceKeyboardText = false;
+                        closeAllPads();
                         rows[index].textTapState = 'single';
                         rows[index].calcTapState = 'single';
                         rows.push({ 
-                            textExpression: '', 
-                            expression: '', 
-                            result: 0, 
-                            forceCalc: false, 
-                            ignoreBeforeIndex: 0, 
-                            isCalcVisible: true, 
-                            isCalcPadVisible: false, 
-                            isTextPadVisible: false,
-                            forceKeyboardText: false,
-                            forceKeyboardCalc: false,
-                            textTapState: 'single',
-                            calcTapState: 'single'
+                            textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                            isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false,
+                            forceKeyboardText: false, forceKeyboardCalc: false,
+                            textTapState: 'single', calcTapState: 'single'
                         });
                         activeRowIndex = rows.length - 1;
                         activeFieldIndex = 'text';
@@ -1374,14 +1322,14 @@
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
 
-                // تطبيق الفئة المناسبة بناءً على حالة الضغطة طالما التحديد قائم على الخلية
+                // تطبيق الفئة اللونية للإطار طالما الخلية نشطة
                 if (index === activeRowIndex && activeFieldIndex === 'text') {
                     if (row.textTapState === 'double') {
-                        textInput.classList.add('border-double-tap');
+                        textInput.classList.add('text-border-double');
                     } else if (row.textTapState === 'long') {
-                        textInput.classList.add('border-long-press');
+                        textInput.classList.add('text-border-long');
                     } else {
-                        textInput.classList.add('border-single-tap');
+                        textInput.classList.add('text-border-single');
                     }
                 }
 
@@ -1412,10 +1360,10 @@
                     }
                 });
 
-                // عند الخروج ومغادرة الخلية (Blur)، يُرجع اللون للوضع الافتراضي العادي
+                // عند مغادرة الخلية (Blur)، يُعاد تعيين الحالة للأزرق الافتراضي وتتم إزالة الإطار الملون
                 textInput.addEventListener('blur', () => {
                     rows[index].textTapState = 'single';
-                    textInput.classList.remove('border-single-tap', 'border-double-tap', 'border-long-press');
+                    textInput.classList.remove('text-border-single', 'text-border-double', 'text-border-long');
                 });
 
                 textInput.addEventListener('keydown', (e) => {
@@ -1459,14 +1407,14 @@
                 inputField.className = 'calc-input';
                 inputField.value = row.expression;
 
-                // تطبيق الفئة المناسبة بناءً على حالة الضغطة طالما التحديد قائم على الخلية
+                // تطبيق الفئة اللونية للإطار طالما الخلية نشطة
                 if (index === activeRowIndex && activeFieldIndex === 'calc') {
                     if (row.calcTapState === 'double') {
-                        inputField.classList.add('border-double-tap');
+                        inputField.classList.add('calc-border-double');
                     } else if (row.calcTapState === 'long') {
-                        inputField.classList.add('border-long-press');
+                        inputField.classList.add('calc-border-long');
                     } else {
-                        inputField.classList.add('border-single-tap');
+                        inputField.classList.add('calc-border-single');
                     }
                 }
 
@@ -1500,10 +1448,10 @@
                     }
                 });
 
-                // عند الخروج ومغادرة الخلية (Blur)، يُرجع اللون للوضع الافتراضي العادي
+                // عند مغادرة الخلية (Blur)، يُعاد تعيين الحالة للأزرق الافتراضي وتتم إزالة الإطار الملون
                 inputField.addEventListener('blur', () => {
                     rows[index].calcTapState = 'single';
-                    inputField.classList.remove('border-single-tap', 'border-double-tap', 'border-long-press');
+                    inputField.classList.remove('calc-border-single', 'calc-border-double', 'calc-border-long');
                 });
 
                 inputField.addEventListener('keydown', (e) => {
@@ -1631,8 +1579,7 @@
             if (key === 'ArrowDown') {
                 if (index < rows.length - 1) {
                     e.preventDefault();
-                    rows[index].isCalcPadVisible = false;
-                    rows[index].isTextPadVisible = false;
+                    closeAllPads();
                     activeRowIndex = index + 1;
                     activeFieldIndex = currentField;
                     renderCalculator(currentField);
@@ -1642,8 +1589,7 @@
             else if (key === 'ArrowUp') {
                 if (index > 0) {
                     e.preventDefault();
-                    rows[index].isCalcPadVisible = false;
-                    rows[index].isTextPadVisible = false;
+                    closeAllPads();
                     activeRowIndex = index - 1;
                     activeFieldIndex = currentField;
                     renderCalculator(currentField);
@@ -1739,7 +1685,7 @@
                 if (activeRowIndex >= rows.length) {
                     activeRowIndex = rows.length - 1;
                 }
-                rows.forEach(r => { r.isCalcPadVisible = false; r.isTextPadVisible = false; });
+                closeAllPads();
             }
             renderCalculator('calc');
         }
@@ -1957,10 +1903,7 @@
             if (key === 'Enter') {
                 event.preventDefault();
                 evaluateRow(activeRowIndex);
-                rows[activeRowIndex].isCalcPadVisible = false;
-                rows[activeRowIndex].isTextPadVisible = false;
-                rows[activeRowIndex].forceKeyboardCalc = false;
-                rows[activeRowIndex].forceKeyboardText = false;
+                closeAllPads();
                 rows[activeRowIndex].textTapState = 'single';
                 rows[activeRowIndex].calcTapState = 'single';
 
@@ -1972,18 +1915,10 @@
                 } 
                 else {
                     rows.push({ 
-                        textExpression: '', 
-                        expression: '', 
-                        result: 0, 
-                        forceCalc: false, 
-                        ignoreBeforeIndex: 0, 
-                        isCalcVisible: true, 
-                        isCalcPadVisible: false, 
-                        isTextPadVisible: false,
-                        forceKeyboardText: false,
-                        forceKeyboardCalc: false,
-                        textTapState: 'single',
-                        calcTapState: 'single'
+                        textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                        isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false,
+                        forceKeyboardText: false, forceKeyboardCalc: false,
+                        textTapState: 'single', calcTapState: 'single'
                     });
                     activeRowIndex = rows.length - 1;
                     activeFieldIndex = 'calc';
@@ -1993,18 +1928,10 @@
             } 
             else if (key === 'Escape') {
                 rows = [{ 
-                    textExpression: '', 
-                    expression: '', 
-                    result: 0, 
-                    forceCalc: false, 
-                    ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, 
-                    isCalcPadVisible: false,
-                    isTextPadVisible: false,
-                    forceKeyboardText: false,
-                    forceKeyboardCalc: false,
-                    textTapState: 'single',
-                    calcTapState: 'single'
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false,
+                    forceKeyboardText: false, forceKeyboardCalc: false,
+                    textTapState: 'single', calcTapState: 'single'
                 }];
                 activeRowIndex = 0;
                 activeFieldIndex = 'calc';
@@ -2017,7 +1944,7 @@
                         event.preventDefault();
                         rows.splice(activeRowIndex, 1);
                         activeRowIndex--;
-                        rows.forEach(r => { r.isCalcPadVisible = false; r.isTextPadVisible = false; });
+                        closeAllPads();
                         activeFieldIndex = 'calc';
                         renderCalculator('calc');
                     }
