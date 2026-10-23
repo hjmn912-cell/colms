@@ -62,12 +62,18 @@
             flex-wrap: wrap;
         }
 
+        .left-controls-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .options-dropdown {
             position: relative;
             display: inline-block;
         }
 
-        .options-btn {
+        .options-btn, .refresh-btn {
             background-color: #1e293b;
             color: #38bdf8;
             border: 1px solid #38bdf8;
@@ -82,7 +88,12 @@
             transition: all 0.2s;
         }
 
-        .options-btn:hover {
+        .refresh-btn {
+            padding: 6px 10px;
+            font-size: 1.1rem;
+        }
+
+        .options-btn:hover, .refresh-btn:hover {
             background-color: #38bdf8;
             color: #0b0f19;
         }
@@ -706,16 +717,23 @@
         
         <div class="sticky-top-section">
             <div class="top-controls-wrapper">
-                <div class="options-dropdown" id="optionsDropdown">
-                    <button class="options-btn" type="button" onclick="toggleOptionsMenu(event)">
-                        الخيارات <span>▼</span>
-                    </button>
-                    <div class="options-dropdown-content" id="optionsDropdownContent">
-                        <label class="option-toggle-label">
-                            <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
-                            إظهار كلمة جنيه
-                        </label>
+                <div class="left-controls-group">
+                    <div class="options-dropdown" id="optionsDropdown">
+                        <button class="options-btn" type="button" onclick="toggleOptionsMenu(event)">
+                            الخيارات <span>▼</span>
+                        </button>
+                        <div class="options-dropdown-content" id="optionsDropdownContent">
+                            <label class="option-toggle-label">
+                                <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
+                                إظهار كلمة جنيه
+                            </label>
+                        </div>
                     </div>
+
+                    <!-- زر الريفريش لإعادة تحميل الصفحة -->
+                    <button class="refresh-btn" type="button" title="إعادة تحميل الصفحة" onclick="location.reload()">
+                        🔄
+                    </button>
                 </div>
 
                 <div class="totals-summary-bar">
@@ -740,10 +758,10 @@
 
             <div class="calculator-header">
                 <div class="header-right-group">
-                    <!-- الزر الأيمن الأقصى: ينزل سطر أو يضيف سطر جديد ويرمي التركيز في الملاحظات -->
+                    <!-- الزر الأيمن الأقصى: ينزل سطر أو يضيف جديد ويكون التركيز في الملاحظات -->
                     <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
                     
-                    <!-- الزر الأيسر منه: ينزل سطر أو يضيف سطر جديد ويرمي التركيز في العملية الحسابية -->
+                    <!-- الزر الأيسر منه: ينزل سطر أو يضيف جديد ويكون التركيز في العملية الحسابية -->
                     <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
                     
                     <span class="designer-credit">designed by Sami Arouj</span>
