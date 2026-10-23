@@ -587,7 +587,7 @@
             text-align: right;
         }
 
-        /* الإطار الأزرق المضيء لتحديد الخلية لللمس أو المايك دون إظهار كيبورد تلقائي */
+        /* الإطار الأزرق المضيء عند التأشير على الخلية لمسة واحدة */
         .text-border-active, .calc-border-active {
             border-color: #38bdf8 !important;
             background: rgba(56, 189, 248, 0.1) !important;
@@ -980,11 +980,11 @@
             }
         }
 
-        // فتح كيبورد الموبايل وإغلاق الآلة الحاسبة المصغرة تماماً (عدم ظهورهما معاً)
+        // فتح كيبورد الموبايل وإغلاق الآلة الحاسبة المصغرة تماماً
         function openSystemKeyboard(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
-            closeAllPads(); // إغلاق أي آلة حاسبة مصغرة مفتوحة
+            closeAllPads(); 
             renderCalculator(field);
 
             setTimeout(() => {
@@ -1193,41 +1193,63 @@
             return keypadDiv;
         }
 
-        // إدارة اللمسة الواحدة (تحديد الخلية فقط دون فتح كيبورد) والضغط المطول (فتح كيبورد الموبايل للحقلين)
-        function setupCellInteractions(element, index, field) {
+        // نظام احترافي للتحكم الدقيق: لمسة واحدة (تأشير فقط)، ضغطتان (آلة حاسبة)، ضغطة مطولة (كيبورد)
+        function setupCellGestures(element, index, field) {
+            let tapCount = 0;
+            let tapTimer = null;
             let longPressTimer = null;
-            let isLongPressTriggered = false;
+            let isLongPressFired = false;
 
             element.addEventListener('touchstart', (e) => {
+                isLongPressFired = false;
+                
+                // تحديد الخلية وتفعيل إطارها الأزرق فوراً
                 activeRowIndex = index;
                 activeFieldIndex = field;
                 updateActiveRowClasses();
 
-                isLongPressTriggered = false;
+                // ضبط مؤقت الضغطة المطولة (600 مللي ثانية -> كيبورد الموبايل)
                 longPressTimer = setTimeout(() => {
-                    isLongPressTriggered = true;
-                    // الضغطة المطولة في كلا الحقلين تفتح كيبورد الموبايل
+                    isLongPressFired = true;
                     openSystemKeyboard(index, field);
-                }, 600); // 600 ميللي ثانية للضغط المطول
+                }, 600);
+
             }, { passive: true });
 
-            element.addEventListener('touchend', () => {
+            element.addEventListener('touchend', (e) => {
                 clearTimeout(longPressTimer);
+
+                if (isLongPressFired) return;
+
+                tapCount++;
+                clearTimeout(tapTimer);
+
+                if (tapCount === 1) {
+                    tapTimer = setTimeout(() => {
+                        // لمسة واحدة فقط: تأشير وتحديد الخلية دون أي كيبورد
+                        tapCount = 0;
+                    }, 300);
+                } else if (tapCount === 2) {
+                    // ضغطتان متتاليتان: فتح الآلة الحاسبة المصغرة للحقلين معاً
+                    tapCount = 0;
+                    openCalcPadForField(index, field);
+                }
             });
 
             element.addEventListener('touchmove', () => {
                 clearTimeout(longPressTimer);
+                clearTimeout(tapTimer);
             });
 
-            // دعم الماوس لأجهزة الكمبيوتر (الضغط المطول بالماوس)
-            element.addEventListener('mousedown', () => {
+            // دعم ماوس الكمبيوتر بنفس القواعد
+            element.addEventListener('mousedown', (e) => {
+                isLongPressFired = false;
                 activeRowIndex = index;
                 activeFieldIndex = field;
                 updateActiveRowClasses();
 
-                isLongPressTriggered = false;
                 longPressTimer = setTimeout(() => {
-                    isLongPressTriggered = true;
+                    isLongPressFired = true;
                     openSystemKeyboard(index, field);
                 }, 600);
             });
@@ -1237,7 +1259,7 @@
             });
 
             element.addEventListener('click', (e) => {
-                if (isLongPressTriggered) {
+                if (isLongPressFired) {
                     e.preventDefault();
                     e.stopPropagation();
                 }
@@ -1337,7 +1359,7 @@
                     handleArrowNavigation(e, index, 'text');
                 });
 
-                setupCellInteractions(textInput, index, 'text');
+                setupCellGestures(textInput, index, 'text');
 
                 textWrapper.appendChild(mobileArrowBtn);
                 textWrapper.appendChild(mobileKbdArrowBtn);
@@ -1455,7 +1477,7 @@
                     }
                 });
 
-                setupCellInteractions(inputField, index, 'calc');
+                setupCellGestures(inputField, index, 'calc');
 
                 calcWrapper.appendChild(calcArrowBtn);
                 calcWrapper.appendChild(inputField);
