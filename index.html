@@ -575,6 +575,7 @@
             min-height: 42px;
             line-height: 1.3;
             user-select: none;
+            transition: border-color 0.2s, background-color 0.2s;
         }
 
         .calc-input {
@@ -592,11 +593,23 @@
             direction: ltr;
             text-align: right;
             user-select: none;
+            transition: border-color 0.2s, background-color 0.2s;
         }
 
         .calc-input:focus, .text-input:focus {
             border-color: #38bdf8;
             background: rgba(56, 189, 248, 0.05);
+        }
+
+        /* فئات الوميض اللوني المؤقت كدليل تفاعلي */
+        .flash-highlight-calc {
+            border-color: #10b981 !important;
+            background-color: rgba(16, 185, 129, 0.15) !important;
+        }
+
+        .flash-highlight-kbd {
+            border-color: #8b5cf6 !important;
+            background-color: rgba(139, 92, 246, 0.15) !important;
         }
 
         .calc-row.hidden-calc .calc-input {
@@ -1061,7 +1074,6 @@
             }
         }
 
-        // الوظيفة الخاصة بالإنتر الثاني الذكي (Enter + Open)
         function addNewRowAndOpenTool(index, field) {
             evaluateRow(index);
             rows[index].isCalcPadVisible = false;
@@ -1091,12 +1103,11 @@
             activeRowIndex = targetIndex;
             activeFieldIndex = field;
 
-            // فتح الأداة المناسبة في السطر الجديد حسب العمود
             if (field === 'text') {
-                rows[targetIndex].forceKeyboardText = true; // فتح كيبورد الموبايل للملاحظات
+                rows[targetIndex].forceKeyboardText = true;
                 rows[targetIndex].isTextPadVisible = false;
             } else {
-                rows[targetIndex].isCalcPadVisible = true; // فتح الآلة الحاسبة المصغرة للحسابات
+                rows[targetIndex].isCalcPadVisible = true;
                 rows[targetIndex].forceKeyboardCalc = false;
             }
 
@@ -1235,6 +1246,14 @@
             return keypadDiv;
         }
 
+        // دالة لعرض تأثير وميض اللون على الإطار عند الضغط المزدوج أو الطويل
+        function triggerVisualFlash(element, className) {
+            element.classList.add(className);
+            setTimeout(() => {
+                element.classList.remove(className);
+            }, 350);
+        }
+
         function attachTouchListeners(element, index, field) {
             let lastTapTime = 0;
             let longPressTimer = null;
@@ -1248,13 +1267,21 @@
                 if (tapLength < 300 && tapLength > 0) {
                     e.preventDefault();
                     clearTimeout(longPressTimer);
-                    openCalcPadForField(index, field);
+                    // ضغطتين ورا بعض -> وميض أخضر للإطار (دليل فتح الآلة الحاسبة المصغرة)
+                    triggerVisualFlash(element, 'flash-highlight-calc');
+                    setTimeout(() => {
+                        openCalcPadForField(index, field);
+                    }, 120);
                     return;
                 }
                 lastTapTime = currentTime;
 
                 longPressTimer = setTimeout(() => {
-                    openKeyboardForField(index, field);
+                    // ضغطة مطولة -> وميض بنفسجي للإطار (دليل فتح كيبورد الموبايل)
+                    triggerVisualFlash(element, 'flash-highlight-kbd');
+                    setTimeout(() => {
+                        openKeyboardForField(index, field);
+                    }, 120);
                 }, 600);
             }, { passive: false });
 
