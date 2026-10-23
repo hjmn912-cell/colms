@@ -362,24 +362,25 @@
         .text-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             flex: 1;
         }
 
         .calc-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             flex: 1;
         }
 
-        .row-mobile-arrow-btn {
+        /* أسهم الأجهزة اللوحية والمحمولة (منفصلة ومتباعدة للمس السهل) */
+        .row-mobile-arrow-btn, .row-calc-arrow-btn {
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid #38bdf8;
             color: #38bdf8;
             font-size: 0.9rem;
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             display: none;
             align-items: center;
@@ -389,7 +390,7 @@
             transition: all 0.2s;
         }
 
-        .row-mobile-arrow-btn:active {
+        .row-mobile-arrow-btn:active, .row-calc-arrow-btn:active {
             background-color: #38bdf8;
             color: #0b0f19;
         }
@@ -559,7 +560,6 @@
             color: #ffffff;
         }
 
-        /* المظهر الأساسي للخلايا */
         .text-input, .calc-input {
             background: rgba(255, 255, 255, 0.03);
             border: 2px solid #334155;
@@ -596,14 +596,14 @@
             box-shadow: 0 0 8px rgba(56, 189, 248, 0.3) !important;
         }
 
-        /* 2️⃣ الضغطتان المتتاليتان (Double Tap): أخضر زمردي ثابت طوال تواجدك بالخلية */
+        /* 2️⃣ الضغطتان المتتاليتان (Double Tap): أخضر زمردي */
         .text-border-double, .calc-border-double {
             border-color: #10b981 !important;
             background: rgba(16, 185, 129, 0.12) !important;
             box-shadow: 0 0 10px rgba(16, 185, 129, 0.4) !important;
         }
 
-        /* 3️⃣ الضغطة المطولة (Long Press): بنفسجي ساطع ثابت طوال تواجدك بالخلية */
+        /* 3️⃣ الضغطة المطولة (Long Press): بنفسجي ساطع */
         .text-border-long, .calc-border-long {
             border-color: #a855f7 !important;
             background: rgba(168, 85, 247, 0.12) !important;
@@ -726,7 +726,7 @@
             .calculator-screen { display:block !important; height:auto !important; max-height:none !important; overflow:visible !important; padding:0 !important; background:#fff !important; }
             .calc-row { display:flex !important; width:100% !important; break-inside:avoid !important; page-break-inside:avoid !important; background:#fff !important; color:#000 !important; border:1px solid #bbb !important; }
             .inputs-group { display:flex !important; min-width:0 !important; }
-            .row-mobile-arrow-btn, .row-keypad-container { display:none !important; }
+            .row-mobile-arrow-btn, .row-calc-arrow-btn, .row-keypad-container { display:none !important; }
             .text-input, .calc-input { height:auto !important; min-height:34px !important; overflow:visible !important; white-space:pre-wrap !important; overflow-wrap:anywhere !important; color:#000 !important; background:#fff !important; border:1px solid #bbb !important; -webkit-text-fill-color:#000 !important; visibility:visible !important; font-size:16px !important; }
             .calc-output-container, .calc-output, .row-currency, .total-value, .total-currency, .summary-item, .positive-sum, .negative-sum { color:#000 !important; overflow-wrap:anywhere !important; word-break:break-word !important; }
             .top-controls-wrapper, .export-dropdown, .mic-btn, .delete-row-btn, .keyboard-hint { display:none !important; }
@@ -852,7 +852,6 @@
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
-        // دالة لغلق جميع اللوحات في كل السطور (لضمان ظهور آلة حاسبة واحدة فقط في الشاشة)
         function closeAllPads() {
             rows.forEach(r => {
                 r.isCalcPadVisible = false;
@@ -929,6 +928,7 @@
                 if (activeFieldIndex === 'text') {
                     rows[activeRowIndex].textExpression = '';
                 } else {
+                    rows[index].expression = '';
                     rows[activeRowIndex].expression = '';
                     rows[activeRowIndex].result = 0;
                     rows[activeRowIndex].forceCalc = false;
@@ -1010,13 +1010,13 @@
         function openKeyboardForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
-            closeAllPads(); // غلق أي آلة أخرى لتكون آلة واحدة فقط على الشاشة
+            closeAllPads();
 
             if (field === 'text') {
-                rows[index].textTapState = 'long'; // لون أرجواني ساطع
+                rows[index].textTapState = 'long';
                 rows[index].forceKeyboardText = true;
             } else {
-                rows[index].calcTapState = 'long'; // لون أرجواني ساطع
+                rows[index].calcTapState = 'long';
                 rows[index].forceKeyboardCalc = true;
             }
             renderCalculator(field);
@@ -1025,13 +1025,13 @@
         function openCalcPadForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
-            closeAllPads(); // غلق أي آلة أخرى لتكون آلة واحدة فقط على الشاشة
+            closeAllPads();
 
             if (field === 'text') {
-                rows[index].textTapState = 'double'; // لون أخضر زمردي
+                rows[index].textTapState = 'double';
                 rows[index].isTextPadVisible = true;
             } else {
-                rows[index].calcTapState = 'double'; // لون أخضر زمردي
+                rows[index].calcTapState = 'double';
                 rows[index].isCalcPadVisible = true;
             }
             renderCalculator(field);
@@ -1237,7 +1237,6 @@
                 const currentTime = new Date().getTime();
                 const tapLength = currentTime - lastTapTime;
 
-                // 2️⃣ الضغطتان المتتاليتان (Double Tap): لون إطار أخضر زمردي
                 if (tapLength < 300 && tapLength > 0) {
                     e.preventDefault();
                     clearTimeout(longPressTimer);
@@ -1246,7 +1245,6 @@
                 }
                 lastTapTime = currentTime;
 
-                // 3️⃣ الضغطة المطولة (Long Press): لون إطار أرجواني/بنفسجي
                 longPressTimer = setTimeout(() => {
                     openKeyboardForField(index, field);
                 }, 600);
@@ -1279,9 +1277,11 @@
                 const inputsGroup = document.createElement('div');
                 inputsGroup.className = 'inputs-group';
 
+                /* ==================== عمود الملاحظات (النصي) ==================== */
                 const textWrapper = document.createElement('div');
                 textWrapper.className = 'text-input-wrapper';
 
+                // سهم الانتقال للسطر التالي (القديم)
                 const mobileArrowBtn = document.createElement('button');
                 mobileArrowBtn.type = 'button';
                 mobileArrowBtn.className = 'row-mobile-arrow-btn';
@@ -1317,20 +1317,31 @@
                     }
                 });
 
+                // السهم الجديد: لإضافة سطر جديد وفتح كيبورد الموبايل عند الضغط في السطر الأخير
+                const mobileKbdArrowBtn = document.createElement('button');
+                mobileKbdArrowBtn.type = 'button';
+                mobileKbdArrowBtn.className = 'row-mobile-arrow-btn';
+                mobileKbdArrowBtn.innerHTML = '⌨️';
+                mobileKbdArrowBtn.title = 'إضافة سطر جديد وفتح الكيبورد';
+
+                if (isMobile) {
+                    mobileKbdArrowBtn.style.display = 'flex';
+                }
+
+                mobileKbdArrowBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    addNewRowAndOpenTool(index, 'text');
+                });
+
                 const textInput = document.createElement('textarea');
                 textInput.className = 'text-input';
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
 
-                // تطبيق الفئة اللونية للإطار طالما الخلية نشطة
                 if (index === activeRowIndex && activeFieldIndex === 'text') {
-                    if (row.textTapState === 'double') {
-                        textInput.classList.add('text-border-double');
-                    } else if (row.textTapState === 'long') {
-                        textInput.classList.add('text-border-long');
-                    } else {
-                        textInput.classList.add('text-border-single');
-                    }
+                    if (row.textTapState === 'double') textInput.classList.add('text-border-double');
+                    else if (row.textTapState === 'long') textInput.classList.add('text-border-long');
+                    else textInput.classList.add('text-border-single');
                 }
 
                 if (isMobile && !row.forceKeyboardText) {
@@ -1360,7 +1371,6 @@
                     }
                 });
 
-                // عند مغادرة الخلية (Blur)، يُعاد تعيين الحالة للأزرق الافتراضي وتتم إزالة الإطار الملون
                 textInput.addEventListener('blur', () => {
                     rows[index].textTapState = 'single';
                     textInput.classList.remove('text-border-single', 'text-border-double', 'text-border-long');
@@ -1371,8 +1381,10 @@
                 });
 
                 textWrapper.appendChild(mobileArrowBtn);
+                textWrapper.appendChild(mobileKbdArrowBtn);
                 textWrapper.appendChild(textInput);
 
+                /* ==================== الناتج ==================== */
                 const outputContainer = document.createElement('div');
                 outputContainer.className = 'calc-output-container';
 
@@ -1399,23 +1411,57 @@
                 outputContainer.appendChild(outputDiv);
                 outputContainer.appendChild(currencySpan);
 
+                /* ==================== عمود العملية الحسابية ==================== */
                 const calcWrapper = document.createElement('div');
                 calcWrapper.className = 'calc-input-wrapper';
+
+                // السهم المخصص لعمود العملية الحسابية: يضيف سطر وينزل ويفتح الآلة المصغرة
+                const calcArrowBtn = document.createElement('button');
+                calcArrowBtn.type = 'button';
+                calcArrowBtn.className = 'row-calc-arrow-btn';
+                calcArrowBtn.innerHTML = '🧮';
+                calcArrowBtn.title = 'إضافة سطر جديد وفتح الآلة الحاسبة المصغرة';
+
+                if (isMobile) {
+                    calcArrowBtn.style.display = 'flex';
+                }
+
+                calcArrowBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    evaluateRow(index);
+                    closeAllPads();
+                    
+                    let targetIndex;
+                    if (index < rows.length - 1) {
+                        targetIndex = index + 1;
+                    } else {
+                        rows.push({ 
+                            textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                            isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false,
+                            forceKeyboardText: false, forceKeyboardCalc: false,
+                            textTapState: 'single', calcTapState: 'single'
+                        });
+                        targetIndex = rows.length - 1;
+                    }
+
+                    activeRowIndex = targetIndex;
+                    activeFieldIndex = 'calc';
+                    rows[targetIndex].isCalcPadVisible = true;
+                    rows[targetIndex].calcTapState = 'double';
+
+                    renderCalculator('calc');
+                    scrollToActiveRow();
+                });
 
                 const inputField = document.createElement('input');
                 inputField.type = 'text';
                 inputField.className = 'calc-input';
                 inputField.value = row.expression;
 
-                // تطبيق الفئة اللونية للإطار طالما الخلية نشطة
                 if (index === activeRowIndex && activeFieldIndex === 'calc') {
-                    if (row.calcTapState === 'double') {
-                        inputField.classList.add('calc-border-double');
-                    } else if (row.calcTapState === 'long') {
-                        inputField.classList.add('calc-border-long');
-                    } else {
-                        inputField.classList.add('calc-border-single');
-                    }
+                    if (row.calcTapState === 'double') inputField.classList.add('calc-border-double');
+                    else if (row.calcTapState === 'long') inputField.classList.add('calc-border-long');
+                    else inputField.classList.add('calc-border-single');
                 }
 
                 if (isMobile && !row.forceKeyboardCalc) {
@@ -1448,7 +1494,6 @@
                     }
                 });
 
-                // عند مغادرة الخلية (Blur)، يُعاد تعيين الحالة للأزرق الافتراضي وتتم إزالة الإطار الملون
                 inputField.addEventListener('blur', () => {
                     rows[index].calcTapState = 'single';
                     inputField.classList.remove('calc-border-single', 'calc-border-double', 'calc-border-long');
@@ -1478,6 +1523,7 @@
                 });
 
                 calcWrapper.appendChild(inputField);
+                calcWrapper.appendChild(calcArrowBtn);
 
                 inputsGroup.appendChild(textWrapper);
                 inputsGroup.appendChild(outputContainer);
