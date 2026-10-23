@@ -928,7 +928,6 @@
                 if (activeFieldIndex === 'text') {
                     rows[activeRowIndex].textExpression = '';
                 } else {
-                    rows[index].expression = '';
                     rows[activeRowIndex].expression = '';
                     rows[activeRowIndex].result = 0;
                     rows[activeRowIndex].forceCalc = false;
@@ -1415,7 +1414,7 @@
                 const calcWrapper = document.createElement('div');
                 calcWrapper.className = 'calc-input-wrapper';
 
-                // السهم المخصص لعمود العملية الحسابية: يضيف سطر وينزل ويفتح الآلة المصغرة
+                // السهم المخصص لعمود العملية الحسابية: يضيف سطر وينزل ويفتح الآلة المصغرة (تم تحريكه لليمين)
                 const calcArrowBtn = document.createElement('button');
                 calcArrowBtn.type = 'button';
                 calcArrowBtn.className = 'row-calc-arrow-btn';
@@ -1522,8 +1521,9 @@
                     }
                 });
 
-                calcWrapper.appendChild(inputField);
+                // إضافة الزر أولاً على اليمين ثم الخلية على اليسار
                 calcWrapper.appendChild(calcArrowBtn);
+                calcWrapper.appendChild(inputField);
 
                 inputsGroup.appendChild(textWrapper);
                 inputsGroup.appendChild(outputContainer);
