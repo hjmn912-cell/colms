@@ -503,11 +503,23 @@
             background-color: #065f46;
             color: #34d399;
             border-color: #059669;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
         }
 
         .mini-key-btn.enter-key:hover {
             background-color: #10b981;
+            color: #ffffff;
+        }
+
+        .mini-key-btn.enter-open-key {
+            background-color: #1e1b4b;
+            color: #a78bfa;
+            border-color: #8b5cf6;
+            font-size: 0.95rem;
+        }
+
+        .mini-key-btn.enter-open-key:hover {
+            background-color: #8b5cf6;
             color: #ffffff;
         }
 
@@ -730,7 +742,6 @@
                         </div>
                     </div>
 
-                    <!-- زر الريفريش لإعادة تحميل الصفحة -->
                     <button class="refresh-btn" type="button" title="إعادة تحميل الصفحة" onclick="location.reload()">
                         🔄
                     </button>
@@ -758,10 +769,7 @@
 
             <div class="calculator-header">
                 <div class="header-right-group">
-                    <!-- الزر الأيمن الأقصى: ينزل سطر أو يضيف جديد ويكون التركيز في الملاحظات -->
                     <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
-                    
-                    <!-- الزر الأيسر منه: ينزل سطر أو يضيف جديد ويكون التركيز في العملية الحسابية -->
                     <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
                     
                     <span class="designer-credit">designed by Sami Arouj</span>
@@ -831,7 +839,6 @@
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
-        // 1. الزر الأيسر (📄): ينزل سطر أو يضيف سطر جديد ويركز على العملية الحسابية
         function handleTopActionBtnClick() {
             evaluateRow(activeRowIndex);
             rows[activeRowIndex].isCalcPadVisible = false;
@@ -864,7 +871,6 @@
             }
         }
 
-        // 2. الزر الأيمن الأقصى (📝): ينزل سطر أو يضيف سطر جديد ويركز على الملاحظات
         function handleTopNotesFocusClick() {
             evaluateRow(activeRowIndex);
             rows[activeRowIndex].isCalcPadVisible = false;
@@ -1055,6 +1061,49 @@
             }
         }
 
+        // الوظيفة الخاصة بالإنتر الثاني الذكي (Enter + Open)
+        function addNewRowAndOpenTool(index, field) {
+            evaluateRow(index);
+            rows[index].isCalcPadVisible = false;
+            rows[index].isTextPadVisible = false;
+            rows[index].forceKeyboardCalc = false;
+            rows[index].forceKeyboardText = false;
+
+            let targetIndex;
+            if (index < rows.length - 1) {
+                targetIndex = index + 1;
+            } else {
+                rows.push({ 
+                    textExpression: '', 
+                    expression: '', 
+                    result: 0, 
+                    forceCalc: false, 
+                    ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, 
+                    isCalcPadVisible: false, 
+                    isTextPadVisible: false,
+                    forceKeyboardText: false,
+                    forceKeyboardCalc: false
+                });
+                targetIndex = rows.length - 1;
+            }
+
+            activeRowIndex = targetIndex;
+            activeFieldIndex = field;
+
+            // فتح الأداة المناسبة في السطر الجديد حسب العمود
+            if (field === 'text') {
+                rows[targetIndex].forceKeyboardText = true; // فتح كيبورد الموبايل للملاحظات
+                rows[targetIndex].isTextPadVisible = false;
+            } else {
+                rows[targetIndex].isCalcPadVisible = true; // فتح الآلة الحاسبة المصغرة للحسابات
+                rows[targetIndex].forceKeyboardCalc = false;
+            }
+
+            renderCalculator(field);
+            scrollToActiveRow();
+        }
+
         function formatDisplayValue(val) {
             if (typeof val === 'number') {
                 if (val < 0) {
@@ -1133,7 +1182,7 @@
                 '4', '5', '6', '*',
                 '1', '2', '3', '-',
                 '0', '.', '%', '+',
-                '⌨ Keyboard', 'Enter'
+                '⌨ Keyboard', 'Enter', 'Enter+Open'
             ];
 
             keys.forEach(k => {
@@ -1150,10 +1199,16 @@
                 if (k === '🗑 Del') btn.classList.add('clear-key');
                 if (k === 'Enter') {
                     btn.classList.add('enter-key');
-                    btn.style.gridColumn = 'span 3';
+                    btn.style.gridColumn = 'span 1';
+                }
+                if (k === 'Enter+Open') {
+                    btn.classList.add('enter-open-key');
+                    btn.style.gridColumn = 'span 2';
                 }
 
-                btn.innerText = k === 'Enter' ? 'Enter ↵' : k;
+                if (k === 'Enter') btn.innerText = 'Enter ↵';
+                else if (k === 'Enter+Open') btn.innerText = 'Enter + Open 🚀';
+                else btn.innerText = k;
                 
                 btn.addEventListener('click', () => {
                     if (k === '⌫') {
@@ -1168,6 +1223,8 @@
                         clearCurrentField();
                     } else if (k === 'Enter') {
                         addNewRowFromPad(index, field);
+                    } else if (k === 'Enter+Open') {
+                        addNewRowAndOpenTool(index, field);
                     } else {
                         insertValueForField(index, field, k);
                     }
