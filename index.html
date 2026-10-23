@@ -373,7 +373,6 @@
             flex: 1;
         }
 
-        /* أسهم الأجهزة اللوحية والمحمولة (منفصلة ومتباعدة للمس السهل) */
         .row-mobile-arrow-btn, .row-calc-arrow-btn {
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid #38bdf8;
@@ -589,11 +588,11 @@
             text-align: right;
         }
 
-        /* 1️⃣ الضغطة الواحدة (Single Tap): أزرق سماوي */
+        /* 1️⃣ الضغطة الواحدة (Single Tap): إطار أزرق سماوي مضيء ومستمر طالما الخلية نشطة */
         .text-border-single, .calc-border-single {
             border-color: #38bdf8 !important;
-            background: rgba(56, 189, 248, 0.08) !important;
-            box-shadow: 0 0 8px rgba(56, 189, 248, 0.3) !important;
+            background: rgba(56, 189, 248, 0.1) !important;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4) !important;
         }
 
         /* 2️⃣ الضغطتان المتتاليتان (Double Tap): أخضر زمردي */
@@ -1236,6 +1235,7 @@
                 const currentTime = new Date().getTime();
                 const tapLength = currentTime - lastTapTime;
 
+                // 2️⃣ الضغطتان المتتاليتان (Double Tap)
                 if (tapLength < 300 && tapLength > 0) {
                     e.preventDefault();
                     clearTimeout(longPressTimer);
@@ -1244,6 +1244,7 @@
                 }
                 lastTapTime = currentTime;
 
+                // 3️⃣ الضغطة المطولة (Long Press)
                 longPressTimer = setTimeout(() => {
                     openKeyboardForField(index, field);
                 }, 600);
@@ -1280,7 +1281,6 @@
                 const textWrapper = document.createElement('div');
                 textWrapper.className = 'text-input-wrapper';
 
-                // سهم الانتقال للسطر التالي (القديم)
                 const mobileArrowBtn = document.createElement('button');
                 mobileArrowBtn.type = 'button';
                 mobileArrowBtn.className = 'row-mobile-arrow-btn';
@@ -1316,7 +1316,6 @@
                     }
                 });
 
-                // السهم الجديد: لإضافة سطر جديد وفتح كيبورد الموبايل عند الضغط في السطر الأخير
                 const mobileKbdArrowBtn = document.createElement('button');
                 mobileKbdArrowBtn.type = 'button';
                 mobileKbdArrowBtn.className = 'row-mobile-arrow-btn';
@@ -1337,6 +1336,7 @@
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
 
+                // 1️⃣ تطبيق إطار الضغطة الواحدة فوراً طالما الخلية نشطة وتعمل باللمس العادي
                 if (index === activeRowIndex && activeFieldIndex === 'text') {
                     if (row.textTapState === 'double') textInput.classList.add('text-border-double');
                     else if (row.textTapState === 'long') textInput.classList.add('text-border-long');
@@ -1359,13 +1359,13 @@
                     e.target.style.height = (e.target.scrollHeight) + 'px';
                 });
 
+                // عند لمس أو النقر على الخلية يتم تفعيلها ليعرف المايك أنها المستهدفة
                 textInput.addEventListener('focus', () => {
-                    if (activeRowIndex !== index) {
+                    if (activeRowIndex !== index || activeFieldIndex !== 'text') {
                         activeRowIndex = index;
                         activeFieldIndex = 'text';
                         renderCalculator('text');
                     } else {
-                        activeFieldIndex = 'text';
                         updateActiveRowClasses();
                     }
                 });
@@ -1414,7 +1414,6 @@
                 const calcWrapper = document.createElement('div');
                 calcWrapper.className = 'calc-input-wrapper';
 
-                // السهم المخصص لعمود العملية الحسابية: يضيف سطر وينزل ويفتح الآلة المصغرة (تم تحريكه لليمين)
                 const calcArrowBtn = document.createElement('button');
                 calcArrowBtn.type = 'button';
                 calcArrowBtn.className = 'row-calc-arrow-btn';
@@ -1457,6 +1456,7 @@
                 inputField.className = 'calc-input';
                 inputField.value = row.expression;
 
+                // 1️⃣ تطبيق إطار الضغطة الواحدة فوراً طالما الخلية نشطة وتعمل باللمس العادي
                 if (index === activeRowIndex && activeFieldIndex === 'calc') {
                     if (row.calcTapState === 'double') inputField.classList.add('calc-border-double');
                     else if (row.calcTapState === 'long') inputField.classList.add('calc-border-long');
@@ -1482,13 +1482,13 @@
                     evaluateRow(index);
                 });
 
+                // عند لمس أو النقر على الخلية يتم تفعيلها ليعرف المايك أنها المستهدفة
                 inputField.addEventListener('focus', () => {
-                    if (activeRowIndex !== index) {
+                    if (activeRowIndex !== index || activeFieldIndex !== 'calc') {
                         activeRowIndex = index;
                         activeFieldIndex = 'calc';
                         renderCalculator('calc');
                     } else {
-                        activeFieldIndex = 'calc';
                         updateActiveRowClasses();
                     }
                 });
@@ -1521,7 +1521,6 @@
                     }
                 });
 
-                // إضافة الزر أولاً على اليمين ثم الخلية على اليسار
                 calcWrapper.appendChild(calcArrowBtn);
                 calcWrapper.appendChild(inputField);
 
@@ -1537,6 +1536,7 @@
                     }
                 }
 
+                // زر المايك: يوجه الكلام الصوتي تلقائياً للخلية النشطة الحالية
                 const micBtn = document.createElement('button');
                 micBtn.className = 'mic-btn';
                 micBtn.innerHTML = '🎤';
@@ -1658,8 +1658,9 @@
             }
         }
 
+        // تم ربط المايك بالخلية النشطة الحالية (activeRowIndex و activeFieldIndex) تلقائياً
         function startSpeechRecognition(index, micBtn) {
-            if (activeFieldIndex === 'calc' && !rows[index].isCalcVisible) return;
+            activeRowIndex = index;
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
                 alert('متصفحك لا يدعم خاصية التعرف على الصوت.');
@@ -1678,12 +1679,12 @@
                 const speechToText = event.results[0][0].transcript;
                 
                 if (activeFieldIndex === 'text') {
-                    rows[index].textExpression = rows[index].textExpression ? rows[index].textExpression + ' ' + speechToText : speechToText;
+                    rows[activeRowIndex].textExpression = rows[activeRowIndex].textExpression ? rows[activeRowIndex].textExpression + ' ' + speechToText : speechToText;
                     renderCalculator('text');
                 } else {
-                    rows[index].expression = rows[index].expression ? rows[index].expression + ' ' + speechToText : speechToText;
-                    rows[index].forceCalc = false;
-                    evaluateRow(index);
+                    rows[activeRowIndex].expression = rows[activeRowIndex].expression ? rows[activeRowIndex].expression + ' ' + speechToText : speechToText;
+                    rows[activeRowIndex].forceCalc = false;
+                    evaluateRow(activeRowIndex);
                     renderCalculator('calc');
                 }
             };
@@ -2030,7 +2031,7 @@ ${negativeText !== '' ? `<div><strong>مجموع السالب:</strong> ${escape
 
         document.addEventListener('keydown', (event) => {
             if (event.ctrlKey && !event.altKey && !event.shiftKey &&
-                (event.code === 'KeyB' || String(event.key).toLowerCase() === 'b')) {
+                (event.code === 'KeyB' ||String(event.key).toLowerCase() === 'b')) {
                 event.preventDefault();
                 event.stopPropagation();
                 openPrintPreview();
