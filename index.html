@@ -22,23 +22,29 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 5px;
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
         }
 
         .calculator-container {
-            width: 100%;
-            height: 95vh;
-            max-width: 100%;
+            width: 100vw;
+            height: 100vh;
+            max-width: 100vw;
+            max-height: 100vh;
             background-color: #111827;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-            border: 1px solid #1f2937;
+            border-radius: 0;
+            box-shadow: none;
+            border: none;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
         }
 
         .sticky-top-section {
@@ -55,7 +61,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 15px;
+            padding: 12px 20px;
             border-bottom: 1px solid #1f2937;
             gap: 10px;
             position: relative;
@@ -65,7 +71,7 @@
         .left-controls-group {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .options-dropdown {
@@ -77,10 +83,10 @@
             background-color: #1e293b;
             color: #38bdf8;
             border: 1px solid #38bdf8;
-            padding: 6px 12px;
+            padding: 8px 14px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -89,8 +95,8 @@
         }
 
         .refresh-btn {
-            padding: 6px 10px;
-            font-size: 1.1rem;
+            padding: 8px 12px;
+            font-size: 1.2rem;
         }
 
         .options-btn:hover, .refresh-btn:hover {
@@ -124,7 +130,7 @@
             gap: 8px;
             cursor: pointer;
             user-select: none;
-            font-size: 0.95rem;
+            font-size: 1rem;
             color: #f8fafc;
             white-space: nowrap;
         }
@@ -154,33 +160,33 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: bold;
             white-space: nowrap;
         }
 
         .summary-item input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
             accent-color: #38bdf8;
         }
 
         .positive-sum {
             color: #10b981;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: bold;
         }
 
         .negative-sum {
             color: #ef4444;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: bold;
         }
 
         .calculator-header {
             background-color: #030712;
-            padding: 12px 15px;
+            padding: 14px 20px;
             border-bottom: 2px solid #1f2937;
             display: flex;
             justify-content: space-between;
@@ -194,21 +200,21 @@
             display: flex;
             align-items: baseline;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
             flex: 2;
             white-space: nowrap;
             overflow: visible;
         }
 
         .total-value {
-            font-size: 2rem;
+            font-size: 2.4rem;
             font-weight: 700;
             color: #38bdf8;
             white-space: nowrap;
         }
 
         .total-currency {
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             color: #38bdf8;
             font-weight: 600;
             white-space: nowrap;
@@ -221,12 +227,12 @@
         .header-right-group {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             justify-content: flex-end;
         }
 
         .designer-credit {
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             color: #6b7280;
             letter-spacing: 0.5px;
             white-space: nowrap;
@@ -236,15 +242,15 @@
             background-color: #1e293b;
             border: 1px solid #38bdf8;
             color: #38bdf8;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 6px;
             cursor: pointer;
             display: none;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
 
         .top-action-btn:active, .top-notes-focus-btn:active {
@@ -262,13 +268,13 @@
             background-color: #1e293b;
             color: #38bdf8;
             border: 1px solid #38bdf8;
-            padding: 6px 12px;
+            padding: 8px 14px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 1rem;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             transition: background 0.2s;
             white-space: nowrap;
         }
@@ -283,7 +289,7 @@
             position: absolute;
             left: 0;
             background-color: #1e293b;
-            min-width: 140px;
+            min-width: 150px;
             box-shadow: 0px 8px 16px rgba(0,0,0,0.5);
             border-radius: 6px;
             z-index: 2000;
@@ -293,7 +299,7 @@
 
         .dropdown-content button {
             color: #f8fafc;
-            padding: 10px 14px;
+            padding: 12px 16px;
             text-decoration: none;
             display: block;
             width: 100%;
@@ -301,7 +307,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
 
         .dropdown-content button:hover {
@@ -315,13 +321,13 @@
 
         .calculator-screen {
             background-color: #0f172a;
-            padding: 15px 15px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
             overflow-y: auto;
             overflow-x: auto;
-            gap: 12px;
+            gap: 15px;
             width: 100%;
             -webkit-overflow-scrolling: touch;
         }
@@ -330,13 +336,13 @@
             display: flex;
             flex-direction: column;
             background-color: #1e293b;
-            padding: 10px 12px;
-            border-radius: 8px;
+            padding: 14px 16px;
+            border-radius: 10px;
             border: 1px solid transparent;
             transition: border-color 0.2s;
-            gap: 10px;
+            gap: 12px;
             width: 100%;
-            min-width: 500px;
+            min-width: 600px;
         }
 
         .calc-row.active {
@@ -348,13 +354,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             width: 100%;
         }
 
         .inputs-group {
             display: flex;
-            gap: 8px;
+            gap: 12px;
             flex-grow: 1;
             align-items: center;
         }
@@ -362,14 +368,14 @@
         .text-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             flex: 1;
         }
 
         .calc-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             flex: 1;
         }
 
@@ -377,9 +383,9 @@
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid #38bdf8;
             color: #38bdf8;
-            font-size: 0.9rem;
-            width: 28px;
-            height: 28px;
+            font-size: 1.1rem;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             display: none;
             align-items: center;
@@ -406,16 +412,16 @@
         .row-mini-keypad {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            gap: 12px;
             background-color: #030712;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #38bdf8;
+            padding: 18px;
+            border-radius: 14px;
+            border: 2px solid #38bdf8;
             width: 100%;
-            max-width: 380px;
+            max-width: 500px;
             direction: ltr;
             position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
             touch-action: none;
             cursor: grab;
             user-select: none;
@@ -432,13 +438,13 @@
             align-items: center;
             margin-bottom: 5px;
             background-color: #1e293b;
-            padding: 6px 10px;
+            padding: 8px 12px;
             border-radius: 6px;
         }
 
         .keypad-drag-title {
             color: #38bdf8;
-            font-size: 0.8rem;
+            font-size: 0.95rem;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -449,10 +455,10 @@
             background-color: rgba(239, 68, 68, 0.2);
             color: #ef4444;
             border: 1px solid #ef4444;
-            padding: 2px 8px;
+            padding: 4px 10px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             font-weight: bold;
             transition: all 0.2s;
         }
@@ -466,11 +472,11 @@
             background-color: #1e293b;
             color: #f8fafc;
             border: 1px solid #334155;
-            padding: 10px 4px;
-            border-radius: 8px;
+            padding: 16px 8px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 1.05rem;
-            font-weight: 600;
+            font-size: 1.25rem;
+            font-weight: bold;
             text-align: center;
             transition: all 0.2s;
             user-select: none;
@@ -503,7 +509,7 @@
             background-color: #065f46;
             color: #34d399;
             border-color: #059669;
-            font-size: 0.95rem;
+            font-size: 1.1rem;
         }
 
         .mini-key-btn.enter-key:hover {
@@ -515,7 +521,7 @@
             background-color: #1e1b4b;
             color: #a78bfa;
             border-color: #8b5cf6;
-            font-size: 0.95rem;
+            font-size: 1.1rem;
         }
 
         .mini-key-btn.enter-open-key:hover {
@@ -527,7 +533,7 @@
             background-color: #1e1b4b;
             color: #818cf8;
             border-color: #6366f1;
-            font-size: 0.85rem;
+            font-size: 1rem;
         }
 
         .mini-key-btn.kbd-key:hover {
@@ -539,7 +545,7 @@
             background-color: #0284c7;
             color: #ffffff;
             border-color: #38bdf8;
-            font-size: 0.9rem;
+            font-size: 1.05rem;
         }
 
         .mini-key-btn.nav-key:hover {
@@ -551,7 +557,7 @@
             background-color: #7f1d1d;
             color: #fca5a5;
             border-color: #ef4444;
-            font-size: 0.9rem;
+            font-size: 1.05rem;
         }
 
         .mini-key-btn.clear-key:hover {
@@ -562,10 +568,10 @@
         .text-input, .calc-input {
             background: rgba(255, 255, 255, 0.03);
             border: 2px solid #334155;
-            border-radius: 6px;
-            padding: 6px 10px;
+            border-radius: 8px;
+            padding: 10px 14px;
             color: #38bdf8;
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: bold;
             outline: none;
             font-family: inherit;
@@ -576,18 +582,17 @@
             flex: 1;
             resize: none;
             overflow-y: hidden;
-            min-height: 42px;
+            min-height: 50px;
             line-height: 1.3;
         }
 
         .calc-input {
             width: 100%;
-            height: 42px;
+            height: 50px;
             direction: ltr;
             text-align: right;
         }
 
-        /* الإطار الأزرق المضيء للتأشير على الخلية */
         .text-border-active, .calc-border-active {
             border-color: #38bdf8 !important;
             background: rgba(56, 189, 248, 0.1) !important;
@@ -602,21 +607,21 @@
         .calc-output-container {
             display: flex;
             align-items: baseline;
-            gap: 6px;
-            min-width: 120px;
+            gap: 8px;
+            min-width: 140px;
             text-align: left;
             white-space: nowrap;
         }
 
         .calc-output {
-            font-size: 1.3rem;
+            font-size: 1.6rem;
             font-weight: 700;
             color: #10b981;
             white-space: nowrap;
         }
 
         .row-currency {
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             color: #38bdf8;
             font-weight: 600;
             white-space: nowrap;
@@ -630,9 +635,9 @@
             background: transparent;
             border: none;
             color: #6b7280;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             cursor: pointer;
-            padding: 4px 6px;
+            padding: 6px 10px;
             border-radius: 6px;
             transition: all 0.2s;
             white-space: nowrap;
@@ -660,9 +665,9 @@
         }
 
         .keyboard-hint {
-            padding: 8px 15px;
+            padding: 10px 20px;
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: #6b7280;
             background-color: #111827;
             border-top: 1px solid #1f2937;
@@ -686,26 +691,26 @@
                 justify-content: center;
             }
             .total-value {
-                font-size: 1.8rem;
+                font-size: 2rem;
             }
             .text-input, .calc-input, .calc-output, .summary-item, .positive-sum, .negative-sum {
-                font-size: 1.1rem;
-                height: 38px;
-                min-height: 38px;
+                font-size: 1.3rem;
+                height: 44px;
+                min-height: 44px;
             }
             .header-right-group {
                 width: 100%;
                 justify-content: space-between;
             }
             .designer-credit {
-                font-size: 0.7rem;
+                font-size: 0.75rem;
             }
         }
 
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             html, body { display:block !important; min-height:0 !important; height:auto !important; margin:0 !important; padding:0 !important; overflow:visible !important; background:#fff !important; color:#000 !important; }
-            .calculator-container { width:100% !important; height:auto !important; max-width:none !important; overflow:visible !important; box-shadow:none !important; border:0 !important; background:#fff !important; }
+            .calculator-container { width:100% !important; height:auto !important; max-width:none !important; overflow:visible !important; box-shadow:none !important; border:0 !important; background:#fff !important; position:static !important; }
             .sticky-top-section { position:static !important; overflow:visible !important; background:#fff !important; }
             .calculator-screen { display:block !important; height:auto !important; max-height:none !important; overflow:visible !important; padding:0 !important; background:#fff !important; }
             .calc-row { display:flex !important; width:100% !important; break-inside:avoid !important; page-break-inside:avoid !important; background:#fff !important; color:#000 !important; border:1px solid #bbb !important; }
@@ -715,7 +720,6 @@
             .calc-output-container, .calc-output, .row-currency, .total-value, .total-currency, .summary-item, .positive-sum, .negative-sum { color:#000 !important; overflow-wrap:anywhere !important; word-break:break-word !important; }
             .top-controls-wrapper, .export-dropdown, .mic-btn, .delete-row-btn, .keyboard-hint { display:none !important; }
         }
-
     </style>
 </head>
 <body>
@@ -980,7 +984,6 @@
             }
         }
 
-        // فتح كيبورد الموبايل عند الضغط المطول فقط
         function openSystemKeyboard(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
@@ -997,7 +1000,6 @@
             }, 30);
         }
 
-        // فتح الآلة الحاسبة المصغرة
         function openCalcPadForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
@@ -1199,7 +1201,6 @@
             return keypadDiv;
         }
 
-        // إيماءات فائقة السرعة والاستجابة (Long press = 350ms, Double tap = 180ms)
         function setupCellGestures(element, index, field) {
             let tapCount = 0;
             let tapTimer = null;
@@ -1211,12 +1212,10 @@
 
             element.addEventListener('touchstart', (e) => {
                 isLongPressFired = false;
-                
                 activeRowIndex = index;
                 activeFieldIndex = field;
                 updateActiveRowClasses();
 
-                // تقليل زمن الاستجابة للضغط المطول إلى 350 مللي ثانية فقط لسرعة فائقة
                 longPressTimer = setTimeout(() => {
                     isLongPressFired = true;
                     openSystemKeyboard(index, field);
@@ -1226,14 +1225,12 @@
 
             element.addEventListener('touchend', (e) => {
                 clearTimeout(longPressTimer);
-
                 if (isLongPressFired) return;
 
                 tapCount++;
                 clearTimeout(tapTimer);
 
                 if (tapCount === 1) {
-                    // تقليل زمن الانتظار للمسة المزدوجة إلى 180 مللي ثانية فقط لسرعة اللمسة الواحدة
                     tapTimer = setTimeout(() => {
                         element.setAttribute('readonly', 'true');
                         element.setAttribute('inputmode', 'none');
@@ -1297,7 +1294,6 @@
                 const inputsGroup = document.createElement('div');
                 inputsGroup.className = 'inputs-group';
 
-                /* ==================== عمود الملاحظات (النصي) ==================== */
                 const textWrapper = document.createElement('div');
                 textWrapper.className = 'text-input-wrapper';
 
@@ -1378,7 +1374,6 @@
                 textWrapper.appendChild(mobileKbdArrowBtn);
                 textWrapper.appendChild(textInput);
 
-                /* ==================== الناتج ==================== */
                 const outputContainer = document.createElement('div');
                 outputContainer.className = 'calc-output-container';
 
@@ -1405,7 +1400,6 @@
                 outputContainer.appendChild(outputDiv);
                 outputContainer.appendChild(currencySpan);
 
-                /* ==================== عمود العملية الحسابية ==================== */
                 const calcWrapper = document.createElement('div');
                 calcWrapper.className = 'calc-input-wrapper';
 
