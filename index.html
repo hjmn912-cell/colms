@@ -321,13 +321,12 @@
             flex-direction: column;
             flex-grow: 1;
             overflow-y: auto;
-            overflow-x: hidden; /* منع السكرول الأفقي بالشاشة تماماً */
+            overflow-x: hidden;
             gap: 8px;
             width: 100%;
             -webkit-overflow-scrolling: touch;
         }
 
-        /* السطر مرن بنسبة 100% ومناسب تماماً لمقاس التابلت والموبايل */
         .calc-row {
             display: flex;
             flex-direction: column;
@@ -338,7 +337,7 @@
             transition: border-color 0.2s;
             gap: 8px;
             width: 100%;
-            min-width: 0 !important; /* إلغاء الحد الأدنى للسطر لمنع التمرير الأفقي */
+            min-width: 0 !important;
         }
 
         .calc-row.active {
@@ -371,7 +370,6 @@
             min-width: 0;
         }
 
-        /* خلية العملية الحسابية تمتد بمرونة بعرض عريض ومريح */
         .calc-input-wrapper {
             display: flex;
             align-items: center;
@@ -687,7 +685,6 @@
             font-weight: bold;
         }
 
-        /* تنسيق تجاوبي كامل عند الاستخدام من الشاشات الصغيرة (الموبايل) */
         @media (max-width: 600px) {
             .calculator-header {
                 flex-direction: column;
@@ -1214,8 +1211,11 @@
             let longPressTimer = null;
             let isLongPressFired = false;
 
-            element.setAttribute('readonly', 'true');
-            element.setAttribute('inputmode', 'none');
+            // ضبط الحقول خصيصاً لتناسب الموبايل والكمبيوتر معاً
+            if (isMobile) {
+                element.setAttribute('readonly', 'true');
+                element.setAttribute('inputmode', 'none');
+            }
 
             element.addEventListener('touchstart', (e) => {
                 isLongPressFired = false;
@@ -1239,8 +1239,10 @@
 
                 if (tapLength < 350 && tapLength > 0) {
                     e.preventDefault();
-                    element.setAttribute('readonly', 'true');
-                    element.setAttribute('inputmode', 'none');
+                    if (isMobile) {
+                        element.setAttribute('readonly', 'true');
+                        element.setAttribute('inputmode', 'none');
+                    }
                     openCalcPadForField(index, field);
                     lastTapTime = 0;
                 } else {
@@ -1253,19 +1255,9 @@
             });
 
             element.addEventListener('mousedown', (e) => {
-                isLongPressFired = false;
                 activeRowIndex = index;
                 activeFieldIndex = field;
                 updateActiveRowClasses();
-
-                longPressTimer = setTimeout(() => {
-                    isLongPressFired = true;
-                    openSystemKeyboard(index, field);
-                }, 400);
-            });
-
-            element.addEventListener('mouseup', () => {
-                clearTimeout(longPressTimer);
             });
 
             element.addEventListener('dblclick', (e) => {
