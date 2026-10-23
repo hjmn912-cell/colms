@@ -980,7 +980,7 @@
             }
         }
 
-        // فتح كيبورد الموبايل عند الضغط المطول فقط
+        // فتح كيبورد الموبايل عند الضغط المطول فقط مع الحفاظ الدائم على حظر اللمسة الواحدة
         function openSystemKeyboard(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
@@ -1199,26 +1199,26 @@
             return keypadDiv;
         }
 
-        // إدارة الإيماءات بكل صرامة ودقة
+        // إدارة الإيماءات بصرامة: ضمان عدم ظهور الكيبورد أبداً باللمسة العادية، حتى في الأسطر القديمة
         function setupCellGestures(element, index, field) {
             let tapCount = 0;
             let tapTimer = null;
             let longPressTimer = null;
             let isLongPressFired = false;
 
-            // حظر ظهور كيبورد النظام الافتراضي عند اللمسة العادية
+            // فرض حظر الكيبورد (readonly و inputmode=none) في كل لحظة بناء للخلية
             element.setAttribute('readonly', 'true');
             element.setAttribute('inputmode', 'none');
 
             element.addEventListener('touchstart', (e) => {
                 isLongPressFired = false;
                 
-                // تحديد الخلية فوراً وإبراز إطارها الأزرق
+                // تحديد الخلية وتفعيل إطارها الأزرق فقط
                 activeRowIndex = index;
                 activeFieldIndex = field;
                 updateActiveRowClasses();
 
-                // بدء حساب وقت الضغط المطول (600 مللي ثانية)
+                // بدء مؤقت الضغطة المطولة (600 مللي ثانية)
                 longPressTimer = setTimeout(() => {
                     isLongPressFired = true;
                     openSystemKeyboard(index, field);
@@ -1236,11 +1236,15 @@
 
                 if (tapCount === 1) {
                     tapTimer = setTimeout(() => {
-                        // لمسة واحدة فقط -> التأشير على الخلية فقط، ولا يفتح أي كيبورد
+                        // لمسة واحدة -> تأشير فقط، وإعادة تأكيد الحظر الدائم للكيبورد
+                        element.setAttribute('readonly', 'true');
+                        element.setAttribute('inputmode', 'none');
                         tapCount = 0;
                     }, 300);
                 } else if (tapCount === 2) {
                     // لمستان متتاليتان -> فتح الآلة الحاسبة المصغرة
+                    element.setAttribute('readonly', 'true');
+                    element.setAttribute('inputmode', 'none');
                     tapCount = 0;
                     openCalcPadForField(index, field);
                 }
@@ -1251,7 +1255,7 @@
                 clearTimeout(tapTimer);
             });
 
-            // دعم تجربة الماوس للكمبيوتر بنفس النظام بالضبط
+            // دعم تجربة الماوس للكمبيوتر
             element.addEventListener('mousedown', (e) => {
                 isLongPressFired = false;
                 activeRowIndex = index;
@@ -1272,6 +1276,10 @@
                 if (isLongPressFired) {
                     e.preventDefault();
                     e.stopPropagation();
+                } else {
+                    // حماية إضافية ضد أي تركيز افتراضي قد يفتحه المتصفح
+                    element.setAttribute('readonly', 'true');
+                    element.setAttribute('inputmode', 'none');
                 }
             });
         }
