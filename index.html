@@ -327,7 +327,6 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* تقليل ارتفاع السطر ككل لتوفير مساحة أفضل */
         .calc-row {
             display: flex;
             flex-direction: column;
@@ -338,7 +337,7 @@
             transition: border-color 0.2s;
             gap: 8px;
             width: 100%;
-            min-width: 750px;
+            min-width: 950px; /* توسيع العرض الأدنى للسطر ليستوعب العرض الجديد لخلية العملية */
         }
 
         .calc-row.active {
@@ -368,12 +367,12 @@
             flex: 1; 
         }
 
-        /* تكبير وتوسيع عمود العملية الحسابية ليغطي مساحة أوسع لرؤية الأرقام بوضوح */
+        /* مضاعفة عرض خلية العملية الحسابية إلى الضعف (من flex: 3 إلى flex: 6) */
         .calc-input-wrapper {
             display: flex;
             align-items: center;
             gap: 8px;
-            flex: 3; 
+            flex: 6; 
         }
 
         .row-mobile-arrow-btn, .row-calc-arrow-btn {
@@ -1193,7 +1192,6 @@
             return keypadDiv;
         }
 
-        // تم إصلاح إيماءات اللمس بحيث يستجيب النقر المزدوج (Double Tap) بفتح الآلة الحاسبة فوراً وبكل سهولة
         function setupCellGestures(element, index, field) {
             let lastTapTime = 0;
             let longPressTimer = null;
@@ -1223,7 +1221,6 @@
                 const tapLength = currentTime - lastTapTime;
 
                 if (tapLength < 350 && tapLength > 0) {
-                    // تم الكشف عن نقر مزدوج سريعين ناجحين
                     e.preventDefault();
                     element.setAttribute('readonly', 'true');
                     element.setAttribute('inputmode', 'none');
@@ -1254,7 +1251,6 @@
                 clearTimeout(longPressTimer);
             });
 
-            // دعم النقر المزدوج عبر الماوس للكمبيوتر أيضاً
             element.addEventListener('dblclick', (e) => {
                 e.preventDefault();
                 openCalcPadForField(index, field);
