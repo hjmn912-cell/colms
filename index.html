@@ -740,9 +740,11 @@
 
             <div class="calculator-header">
                 <div class="header-right-group">
-                    <!-- الزر العلوي الأيمن (الذي يحمل شكل ورقة بيضاء) -->
-                    <button type="button" id="topActionBtn" class="top-action-btn" title="إنشاء سطر جديد أو الانتقال للسطر التالي" onclick="handleTopActionBtnClick()">📄</button>
-                    <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="التركيز على عمود الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
+                    <!-- الزر الأيمن الأقصى: ينزل سطر أو يضيف سطر جديد ويرمي التركيز في الملاحظات -->
+                    <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
+                    
+                    <!-- الزر الأيسر منه: ينزل سطر أو يضيف سطر جديد ويرمي التركيز في العملية الحسابية -->
+                    <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
                     
                     <span class="designer-credit">designed by Sami Arouj</span>
                     <div class="export-dropdown" id="exportDropdown">
@@ -811,7 +813,7 @@
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
-        // وظيفة الزر العلوي الأيمن (ورقة بيضاء): في المنتصف ينزل للسطر التالي، ولو في الأخير يضيف سطر جديد بدون كيبورد
+        // 1. الزر الأيسر (📄): ينزل سطر أو يضيف سطر جديد ويركز على العملية الحسابية
         function handleTopActionBtnClick() {
             evaluateRow(activeRowIndex);
             rows[activeRowIndex].isCalcPadVisible = false;
@@ -844,9 +846,37 @@
             }
         }
 
+        // 2. الزر الأيمن الأقصى (📝): ينزل سطر أو يضيف سطر جديد ويركز على الملاحظات
         function handleTopNotesFocusClick() {
-            activeFieldIndex = 'text';
-            renderCalculator('text');
+            evaluateRow(activeRowIndex);
+            rows[activeRowIndex].isCalcPadVisible = false;
+            rows[activeRowIndex].isTextPadVisible = false;
+            rows[activeRowIndex].forceKeyboardCalc = false;
+            rows[activeRowIndex].forceKeyboardText = false;
+
+            if (activeRowIndex < rows.length - 1) {
+                activeRowIndex++;
+                activeFieldIndex = 'text';
+                renderCalculator('text');
+                scrollToActiveRow();
+            } else {
+                rows.push({ 
+                    textExpression: '', 
+                    expression: '', 
+                    result: 0, 
+                    forceCalc: false, 
+                    ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, 
+                    isCalcPadVisible: false, 
+                    isTextPadVisible: false,
+                    forceKeyboardText: false,
+                    forceKeyboardCalc: false
+                });
+                activeRowIndex = rows.length - 1;
+                activeFieldIndex = 'text';
+                renderCalculator('text');
+                screenContainer.scrollTop = screenContainer.scrollHeight;
+            }
         }
 
         function goToFirstRow() {
