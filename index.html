@@ -587,7 +587,7 @@
             text-align: right;
         }
 
-        /* الإطار الأزرق المضيء عند التأشير على الخلية لمسة واحدة */
+        /* الإطار الأزرق المضيء للتأشير على الخلية */
         .text-border-active, .calc-border-active {
             border-color: #38bdf8 !important;
             background: rgba(56, 189, 248, 0.1) !important;
@@ -980,7 +980,7 @@
             }
         }
 
-        // فتح كيبورد الموبايل وإغلاق الآلة الحاسبة المصغرة تماماً
+        // فتح كيبورد الموبايل عند الضغط المطول فقط
         function openSystemKeyboard(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
@@ -990,12 +990,14 @@
             setTimeout(() => {
                 const activeEl = screenContainer.querySelector(`.calc-row.active .${field === 'text' ? 'text-input' : 'calc-input'}`);
                 if (activeEl) {
+                    activeEl.removeAttribute('readonly');
+                    activeEl.removeAttribute('inputmode');
                     activeEl.focus();
                 }
             }, 50);
         }
 
-        // فتح الآلة الحاسبة المصغرة وإغلاق الكيبورد
+        // فتح الآلة الحاسبة المصغرة
         function openCalcPadForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
@@ -1052,7 +1054,11 @@
                 renderCalculator(field);
                 setTimeout(() => {
                     const activeText = screenContainer.querySelector('.calc-row.active .text-input');
-                    if (activeText) activeText.focus();
+                    if (activeText) {
+                        activeText.removeAttribute('readonly');
+                        activeText.removeAttribute('inputmode');
+                        activeText.focus();
+                    }
                 }, 50);
             } else {
                 rows[targetIndex].isCalcPadVisible = true;
@@ -1193,22 +1199,26 @@
             return keypadDiv;
         }
 
-        // نظام احترافي للتحكم الدقيق: لمسة واحدة (تأشير فقط)، ضغطتان (آلة حاسبة)، ضغطة مطولة (كيبورد)
+        // إدارة الإيماءات بكل صرامة ودقة
         function setupCellGestures(element, index, field) {
             let tapCount = 0;
             let tapTimer = null;
             let longPressTimer = null;
             let isLongPressFired = false;
 
+            // حظر ظهور كيبورد النظام الافتراضي عند اللمسة العادية
+            element.setAttribute('readonly', 'true');
+            element.setAttribute('inputmode', 'none');
+
             element.addEventListener('touchstart', (e) => {
                 isLongPressFired = false;
                 
-                // تحديد الخلية وتفعيل إطارها الأزرق فوراً
+                // تحديد الخلية فوراً وإبراز إطارها الأزرق
                 activeRowIndex = index;
                 activeFieldIndex = field;
                 updateActiveRowClasses();
 
-                // ضبط مؤقت الضغطة المطولة (600 مللي ثانية -> كيبورد الموبايل)
+                // بدء حساب وقت الضغط المطول (600 مللي ثانية)
                 longPressTimer = setTimeout(() => {
                     isLongPressFired = true;
                     openSystemKeyboard(index, field);
@@ -1226,11 +1236,11 @@
 
                 if (tapCount === 1) {
                     tapTimer = setTimeout(() => {
-                        // لمسة واحدة فقط: تأشير وتحديد الخلية دون أي كيبورد
+                        // لمسة واحدة فقط -> التأشير على الخلية فقط، ولا يفتح أي كيبورد
                         tapCount = 0;
                     }, 300);
                 } else if (tapCount === 2) {
-                    // ضغطتان متتاليتان: فتح الآلة الحاسبة المصغرة للحقلين معاً
+                    // لمستان متتاليتان -> فتح الآلة الحاسبة المصغرة
                     tapCount = 0;
                     openCalcPadForField(index, field);
                 }
@@ -1241,7 +1251,7 @@
                 clearTimeout(tapTimer);
             });
 
-            // دعم ماوس الكمبيوتر بنفس القواعد
+            // دعم تجربة الماوس للكمبيوتر بنفس النظام بالضبط
             element.addEventListener('mousedown', (e) => {
                 isLongPressFired = false;
                 activeRowIndex = index;
