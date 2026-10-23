@@ -337,7 +337,7 @@
             transition: border-color 0.2s;
             gap: 12px;
             width: 100%;
-            min-width: 650px;
+            min-width: 700px;
         }
 
         .calc-row.active {
@@ -364,14 +364,15 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            flex: 1.2; /* مساحة مرنة للملاحظات */
+            flex: 1; /* حقل الملاحظات */
         }
 
+        /* جعل خلية العملية الحسابية عريضة وواسعة جداً برؤية ممتازة */
         .calc-input-wrapper {
             display: flex;
             align-items: center;
             gap: 10px;
-            flex: 1.8; /* جعل عمود العملية الحسابية أعرض وأكبر */
+            flex: 2.5; 
         }
 
         .row-mobile-arrow-btn, .row-calc-arrow-btn {
@@ -395,16 +396,18 @@
             color: #0b0f19;
         }
 
+        /* تثبيت حاوية الآلة الحاسبة المصغرة حتى لا تتحرك مع كثرة الأسطر */
         .row-keypad-container {
             display: flex;
             gap: 15px;
             width: 100%;
             justify-content: center;
             padding-top: 5px;
-            position: relative;
+            position: sticky;
+            bottom: 10px;
+            z-index: 1500;
         }
 
-        /* جعل لوحة الأزرار المصغرة تملأ كامل عرض الإطار الأفقي */
         .row-mini-keypad {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -414,10 +417,10 @@
             border-radius: 14px;
             border: 2px solid #38bdf8;
             width: 100%;
-            max-width: 100%; /* تأخذ كامل المساحة الأفقية المتاحة */
+            max-width: 100%;
             direction: ltr;
             position: relative;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.9);
             touch-action: none;
             cursor: grab;
             user-select: none;
@@ -464,15 +467,14 @@
             color: #fff;
         }
 
-        /* تكبير الأزرار لتكون ضخمة وواسعة بالكامل */
         .mini-key-btn {
             background-color: #1e293b;
             color: #f8fafc;
             border: 1px solid #334155;
-            padding: 22px 10px; /* زيادة الطول والعرض للأزرار لتشغل المساحة بالكامل */
+            padding: 22px 10px;
             border-radius: 12px;
             cursor: pointer;
-            font-size: 1.5rem; /* تكبير خط الأزرار */
+            font-size: 1.5rem;
             font-weight: bold;
             text-align: center;
             transition: all 0.2s;
@@ -588,6 +590,7 @@
             height: 54px;
             direction: ltr;
             text-align: right;
+            font-size: 1.7rem; /* تكبير خط الأرقام لرؤية أفضل */
         }
 
         .text-border-active, .calc-border-active {
@@ -718,8 +721,7 @@
             .top-controls-wrapper, .export-dropdown, .mic-btn, .delete-row-btn, .keyboard-hint { display:none !important; }
         }
     </style>
-</head>
-<body>
+</head><body>
 
     <div class="calculator-container" id="calculatorContainer">
         
