@@ -588,7 +588,7 @@
             text-align: right;
         }
 
-        /* 1️⃣ الضغطة الواحدة (Single Tap): إطار أزرق سماوي مضيء ومستمر طالما الخلية نشطة */
+        /* 1️⃣ بمجرد لمس الخلية (TouchStart): إطار أزرق سماوي مضيء وفوري */
         .text-border-single, .calc-border-single {
             border-color: #38bdf8 !important;
             background: rgba(56, 189, 248, 0.1) !important;
@@ -1225,6 +1225,7 @@
             return keypadDiv;
         }
 
+        // بمجرد مجيء الإصبع على الخلية (TouchStart)، يتم تعيينها فوراً كخلية نشطة وظهور الإطار الأزرق المضيء
         function attachTouchListeners(element, index, field) {
             let lastTapTime = 0;
             let longPressTimer = null;
@@ -1232,6 +1233,8 @@
             element.addEventListener('touchstart', (e) => {
                 activeRowIndex = index;
                 activeFieldIndex = field;
+                renderCalculator(field); // تحديث فوري لرسم الإطار حول الخلية
+
                 const currentTime = new Date().getTime();
                 const tapLength = currentTime - lastTapTime;
 
@@ -1336,7 +1339,7 @@
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
 
-                // 1️⃣ تطبيق إطار الضغطة الواحدة فوراً طالما الخلية نشطة وتعمل باللمس العادي
+                // 1️⃣ إظهار إطار الضغطة الواحدة فوراً طالما الخلية نشطة
                 if (index === activeRowIndex && activeFieldIndex === 'text') {
                     if (row.textTapState === 'double') textInput.classList.add('text-border-double');
                     else if (row.textTapState === 'long') textInput.classList.add('text-border-long');
@@ -1359,7 +1362,6 @@
                     e.target.style.height = (e.target.scrollHeight) + 'px';
                 });
 
-                // عند لمس أو النقر على الخلية يتم تفعيلها ليعرف المايك أنها المستهدفة
                 textInput.addEventListener('focus', () => {
                     if (activeRowIndex !== index || activeFieldIndex !== 'text') {
                         activeRowIndex = index;
@@ -1456,7 +1458,7 @@
                 inputField.className = 'calc-input';
                 inputField.value = row.expression;
 
-                // 1️⃣ تطبيق إطار الضغطة الواحدة فوراً طالما الخلية نشطة وتعمل باللمس العادي
+                // 1️⃣ إظهار إطار الضغطة الواحدة فوراً طالما الخلية نشطة
                 if (index === activeRowIndex && activeFieldIndex === 'calc') {
                     if (row.calcTapState === 'double') inputField.classList.add('calc-border-double');
                     else if (row.calcTapState === 'long') inputField.classList.add('calc-border-long');
@@ -1482,7 +1484,6 @@
                     evaluateRow(index);
                 });
 
-                // عند لمس أو النقر على الخلية يتم تفعيلها ليعرف المايك أنها المستهدفة
                 inputField.addEventListener('focus', () => {
                     if (activeRowIndex !== index || activeFieldIndex !== 'calc') {
                         activeRowIndex = index;
@@ -1536,7 +1537,7 @@
                     }
                 }
 
-                // زر المايك: يوجه الكلام الصوتي تلقائياً للخلية النشطة الحالية
+                // زر المايك: يتعرف فوراً على الخلية النشطة الحالية (التي تم لمسها مؤخراً)
                 const micBtn = document.createElement('button');
                 micBtn.className = 'mic-btn';
                 micBtn.innerHTML = '🎤';
@@ -1658,9 +1659,11 @@
             }
         }
 
-        // تم ربط المايك بالخلية النشطة الحالية (activeRowIndex و activeFieldIndex) تلقائياً
         function startSpeechRecognition(index, micBtn) {
-            activeRowIndex = index;
+            // يستخدم الخلية النشطة الحالية التي حددها الإصبع مؤخراً
+            const targetRow = activeRowIndex;
+            const targetField = activeFieldIndex;
+
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
                 alert('متصفحك لا يدعم خاصية التعرف على الصوت.');
@@ -1678,13 +1681,13 @@
             recognition.onresult = (event) => {
                 const speechToText = event.results[0][0].transcript;
                 
-                if (activeFieldIndex === 'text') {
-                    rows[activeRowIndex].textExpression = rows[activeRowIndex].textExpression ? rows[activeRowIndex].textExpression + ' ' + speechToText : speechToText;
+                if (targetField === 'text') {
+                    rows[targetRow].textExpression = rows[targetRow].textExpression ? rows[targetRow].textExpression + ' ' + speechToText : speechToText;
                     renderCalculator('text');
                 } else {
-                    rows[activeRowIndex].expression = rows[activeRowIndex].expression ? rows[activeRowIndex].expression + ' ' + speechToText : speechToText;
-                    rows[activeRowIndex].forceCalc = false;
-                    evaluateRow(activeRowIndex);
+                    rows[targetRow].expression = rows[targetRow].expression ? rows[targetRow].expression + ' ' + speechToText : speechToText;
+                    rows[targetRow].forceCalc = false;
+                    evaluateRow(targetRow);
                     renderCalculator('calc');
                 }
             };
@@ -2031,7 +2034,7 @@ ${negativeText !== '' ? `<div><strong>مجموع السالب:</strong> ${escape
 
         document.addEventListener('keydown', (event) => {
             if (event.ctrlKey && !event.altKey && !event.shiftKey &&
-                (event.code === 'KeyB' ||String(event.key).toLowerCase() === 'b')) {
+                (event.code === 'KeyB' || String(event.key).toLowerCase() === 'b')) {
                 event.preventDefault();
                 event.stopPropagation();
                 openPrintPreview();
