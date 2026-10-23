@@ -980,7 +980,7 @@
             }
         }
 
-        // فتح كيبورد الموبايل عند الضغط المطول فقط مع الحفاظ الدائم على حظر اللمسة الواحدة
+        // فتح كيبورد الموبايل عند الضغط المطول فقط
         function openSystemKeyboard(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
@@ -994,7 +994,7 @@
                     activeEl.removeAttribute('inputmode');
                     activeEl.focus();
                 }
-            }, 50);
+            }, 30);
         }
 
         // فتح الآلة الحاسبة المصغرة
@@ -1059,7 +1059,7 @@
                         activeText.removeAttribute('inputmode');
                         activeText.focus();
                     }
-                }, 50);
+                }, 30);
             } else {
                 rows[targetIndex].isCalcPadVisible = true;
                 renderCalculator(field);
@@ -1199,30 +1199,28 @@
             return keypadDiv;
         }
 
-        // إدارة الإيماءات بصرامة: ضمان عدم ظهور الكيبورد أبداً باللمسة العادية، حتى في الأسطر القديمة
+        // إيماءات فائقة السرعة والاستجابة (Long press = 350ms, Double tap = 180ms)
         function setupCellGestures(element, index, field) {
             let tapCount = 0;
             let tapTimer = null;
             let longPressTimer = null;
             let isLongPressFired = false;
 
-            // فرض حظر الكيبورد (readonly و inputmode=none) في كل لحظة بناء للخلية
             element.setAttribute('readonly', 'true');
             element.setAttribute('inputmode', 'none');
 
             element.addEventListener('touchstart', (e) => {
                 isLongPressFired = false;
                 
-                // تحديد الخلية وتفعيل إطارها الأزرق فقط
                 activeRowIndex = index;
                 activeFieldIndex = field;
                 updateActiveRowClasses();
 
-                // بدء مؤقت الضغطة المطولة (600 مللي ثانية)
+                // تقليل زمن الاستجابة للضغط المطول إلى 350 مللي ثانية فقط لسرعة فائقة
                 longPressTimer = setTimeout(() => {
                     isLongPressFired = true;
                     openSystemKeyboard(index, field);
-                }, 600);
+                }, 350);
 
             }, { passive: true });
 
@@ -1235,14 +1233,13 @@
                 clearTimeout(tapTimer);
 
                 if (tapCount === 1) {
+                    // تقليل زمن الانتظار للمسة المزدوجة إلى 180 مللي ثانية فقط لسرعة اللمسة الواحدة
                     tapTimer = setTimeout(() => {
-                        // لمسة واحدة -> تأشير فقط، وإعادة تأكيد الحظر الدائم للكيبورد
                         element.setAttribute('readonly', 'true');
                         element.setAttribute('inputmode', 'none');
                         tapCount = 0;
-                    }, 300);
+                    }, 180);
                 } else if (tapCount === 2) {
-                    // لمستان متتاليتان -> فتح الآلة الحاسبة المصغرة
                     element.setAttribute('readonly', 'true');
                     element.setAttribute('inputmode', 'none');
                     tapCount = 0;
@@ -1255,7 +1252,6 @@
                 clearTimeout(tapTimer);
             });
 
-            // دعم تجربة الماوس للكمبيوتر
             element.addEventListener('mousedown', (e) => {
                 isLongPressFired = false;
                 activeRowIndex = index;
@@ -1265,7 +1261,7 @@
                 longPressTimer = setTimeout(() => {
                     isLongPressFired = true;
                     openSystemKeyboard(index, field);
-                }, 600);
+                }, 350);
             });
 
             element.addEventListener('mouseup', () => {
@@ -1277,7 +1273,6 @@
                     e.preventDefault();
                     e.stopPropagation();
                 } else {
-                    // حماية إضافية ضد أي تركيز افتراضي قد يفتحه المتصفح
                     element.setAttribute('readonly', 'true');
                     element.setAttribute('inputmode', 'none');
                 }
