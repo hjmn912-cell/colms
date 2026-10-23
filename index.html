@@ -253,11 +253,6 @@
             font-size: 1rem;
         }
 
-        .top-action-btn:active, .top-notes-focus-btn:active {
-            background-color: #38bdf8;
-            color: #0b0f19;
-        }
-
         .export-dropdown {
             position: relative;
             display: inline-block;
@@ -342,7 +337,7 @@
             transition: border-color 0.2s;
             gap: 12px;
             width: 100%;
-            min-width: 600px;
+            min-width: 650px;
         }
 
         .calc-row.active {
@@ -354,13 +349,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
             width: 100%;
         }
 
         .inputs-group {
             display: flex;
-            gap: 12px;
+            gap: 15px;
             flex-grow: 1;
             align-items: center;
         }
@@ -369,14 +364,14 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            flex: 1;
+            flex: 1.2; /* مساحة مرنة للملاحظات */
         }
 
         .calc-input-wrapper {
             display: flex;
             align-items: center;
             gap: 10px;
-            flex: 1;
+            flex: 1.8; /* جعل عمود العملية الحسابية أعرض وأكبر */
         }
 
         .row-mobile-arrow-btn, .row-calc-arrow-btn {
@@ -409,16 +404,17 @@
             position: relative;
         }
 
+        /* جعل لوحة الأزرار المصغرة تملأ كامل عرض الإطار الأفقي */
         .row-mini-keypad {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
             background-color: #030712;
-            padding: 18px;
+            padding: 20px;
             border-radius: 14px;
             border: 2px solid #38bdf8;
             width: 100%;
-            max-width: 500px;
+            max-width: 100%; /* تأخذ كامل المساحة الأفقية المتاحة */
             direction: ltr;
             position: relative;
             box-shadow: 0 15px 35px rgba(0,0,0,0.8);
@@ -438,13 +434,13 @@
             align-items: center;
             margin-bottom: 5px;
             background-color: #1e293b;
-            padding: 8px 12px;
+            padding: 10px 14px;
             border-radius: 6px;
         }
 
         .keypad-drag-title {
             color: #38bdf8;
-            font-size: 0.95rem;
+            font-size: 1.1rem;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -455,10 +451,10 @@
             background-color: rgba(239, 68, 68, 0.2);
             color: #ef4444;
             border: 1px solid #ef4444;
-            padding: 4px 10px;
+            padding: 6px 12px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             font-weight: bold;
             transition: all 0.2s;
         }
@@ -468,14 +464,15 @@
             color: #fff;
         }
 
+        /* تكبير الأزرار لتكون ضخمة وواسعة بالكامل */
         .mini-key-btn {
             background-color: #1e293b;
             color: #f8fafc;
             border: 1px solid #334155;
-            padding: 16px 8px;
-            border-radius: 10px;
+            padding: 22px 10px; /* زيادة الطول والعرض للأزرار لتشغل المساحة بالكامل */
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 1.25rem;
+            font-size: 1.5rem; /* تكبير خط الأزرار */
             font-weight: bold;
             text-align: center;
             transition: all 0.2s;
@@ -509,7 +506,7 @@
             background-color: #065f46;
             color: #34d399;
             border-color: #059669;
-            font-size: 1.1rem;
+            font-size: 1.25rem;
         }
 
         .mini-key-btn.enter-key:hover {
@@ -521,7 +518,7 @@
             background-color: #1e1b4b;
             color: #a78bfa;
             border-color: #8b5cf6;
-            font-size: 1.1rem;
+            font-size: 1.25rem;
         }
 
         .mini-key-btn.enter-open-key:hover {
@@ -533,7 +530,7 @@
             background-color: #1e1b4b;
             color: #818cf8;
             border-color: #6366f1;
-            font-size: 1rem;
+            font-size: 1.15rem;
         }
 
         .mini-key-btn.kbd-key:hover {
@@ -545,7 +542,7 @@
             background-color: #0284c7;
             color: #ffffff;
             border-color: #38bdf8;
-            font-size: 1.05rem;
+            font-size: 1.2rem;
         }
 
         .mini-key-btn.nav-key:hover {
@@ -557,7 +554,7 @@
             background-color: #7f1d1d;
             color: #fca5a5;
             border-color: #ef4444;
-            font-size: 1.05rem;
+            font-size: 1.2rem;
         }
 
         .mini-key-btn.clear-key:hover {
@@ -569,9 +566,9 @@
             background: rgba(255, 255, 255, 0.03);
             border: 2px solid #334155;
             border-radius: 8px;
-            padding: 10px 14px;
+            padding: 12px 16px;
             color: #38bdf8;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: bold;
             outline: none;
             font-family: inherit;
@@ -582,13 +579,13 @@
             flex: 1;
             resize: none;
             overflow-y: hidden;
-            min-height: 50px;
+            min-height: 54px;
             line-height: 1.3;
         }
 
         .calc-input {
             width: 100%;
-            height: 50px;
+            height: 54px;
             direction: ltr;
             text-align: right;
         }
@@ -608,13 +605,13 @@
             display: flex;
             align-items: baseline;
             gap: 8px;
-            min-width: 140px;
+            min-width: 150px;
             text-align: left;
             white-space: nowrap;
         }
 
         .calc-output {
-            font-size: 1.6rem;
+            font-size: 1.7rem;
             font-weight: 700;
             color: #10b981;
             white-space: nowrap;
@@ -635,7 +632,7 @@
             background: transparent;
             border: none;
             color: #6b7280;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             cursor: pointer;
             padding: 6px 10px;
             border-radius: 6px;
