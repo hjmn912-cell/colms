@@ -588,21 +588,14 @@
             text-align: right;
         }
 
-        /* 1️⃣ بمجرد لمس الخلية (TouchStart): إطار أزرق سماوي مضيء وفوري */
+        /* 1️⃣ لمسة واحدة: إطار أزرق سماوي نشط */
         .text-border-single, .calc-border-single {
             border-color: #38bdf8 !important;
             background: rgba(56, 189, 248, 0.1) !important;
             box-shadow: 0 0 10px rgba(56, 189, 248, 0.4) !important;
         }
 
-        /* 2️⃣ الضغطتان المتتاليتان (Double Tap): أخضر زمردي */
-        .text-border-double, .calc-border-double {
-            border-color: #10b981 !important;
-            background: rgba(16, 185, 129, 0.12) !important;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.4) !important;
-        }
-
-        /* 3️⃣ الضغطة المطولة (Long Press): بنفسجي ساطع */
+        /* 2️⃣ الإيماءات المتقدمة (مرتين، ثلاث مرات، أو لمسة ثم انتظار ثم لمستين): إطار بنفسجي ساطع لفتح الأدوات */
         .text-border-long, .calc-border-long {
             border-color: #a855f7 !important;
             background: rgba(168, 85, 247, 0.12) !important;
@@ -1225,41 +1218,71 @@
             return keypadDiv;
         }
 
-        // بمجرد مجيء الإصبع على الخلية (TouchStart)، يتم تعيينها فوراً كخلية نشطة وظهور الإطار الأزرق المضيء
+        // نظام متطور لعد اللمسات (يدعم: لمسة واحدة، مرتين، ثلاث مرات، أو لمسة مفردة يتبعها انتظار ثم مرتين)
         function attachTouchListeners(element, index, field) {
-            let lastTapTime = 0;
-            let longPressTimer = null;
+            let tapCount = 0;
+            let tapTimer = null;
+            let pauseTimer = null;
+            let firstTapTime = 0;
 
             element.addEventListener('touchstart', (e) => {
+                const currentTime = new Date().getTime();
                 activeRowIndex = index;
                 activeFieldIndex = field;
-                renderCalculator(field); // تحديث فوري لرسم الإطار حول الخلية
+                renderCalculator(field); // تحديد الخلية فوراً وإظهار إطارها الأزرق
 
-                const currentTime = new Date().getTime();
-                const tapLength = currentTime - lastTapTime;
+                if (firstTapTime === 0) {
+                    firstTapTime = currentTime;
+                }
 
-                // 2️⃣ الضغطتان المتتاليتان (Double Tap)
-                if (tapLength < 300 && tapLength > 0) {
+                tapCount++;
+
+                clearTimeout(tapTimer);
+                clearTimeout(pauseTimer);
+
+                // إذا تمت 2 أو 3 نقرات سريعة
+                if (tapCount >= 2 && tapCount <= 3 && (currentTime - firstTapTime < 600)) {
                     e.preventDefault();
-                    clearTimeout(longPressTimer);
-                    openCalcPadForField(index, field);
+                    triggerAction(index, field);
+                    resetTaps();
                     return;
                 }
-                lastTapTime = currentTime;
 
-                // 3️⃣ الضغطة المطولة (Long Press)
-                longPressTimer = setTimeout(() => {
-                    openKeyboardForField(index, field);
-                }, 600);
+                // لو حصلت لمسة مفردة، ننتظر لنرى هل سيفعل "لمسة ثم انتظار ثم لمستين"
+                tapTimer = setTimeout(() => {
+                    if (tapCount === 1) {
+                        // مجرد لمسة واحدة عادية (تم تحديد الخلية)
+                        resetTaps();
+                    }
+                }, 300);
+
+                // نافذة زمنية أوسع لدعم (لمسة ثم انتظار شوية ثم لمستين ورا بعض)
+                pauseTimer = setTimeout(() => {
+                    if (tapCount >= 3) {
+                        e.preventDefault();
+                        triggerAction(index, field);
+                    }
+                    resetTaps();
+                }, 700);
+
             }, { passive: false });
 
-            element.addEventListener('touchend', () => {
-                clearTimeout(longPressTimer);
-            });
+            function resetTaps() {
+                tapCount = 0;
+                firstTapTime = 0;
+                clearTimeout(tapTimer);
+                clearTimeout(pauseTimer);
+            }
+        }
 
-            element.addEventListener('touchmove', () => {
-                clearTimeout(longPressTimer);
-            });
+        function triggerAction(index, field) {
+            if (field === 'text') {
+                // في عمود الملاحظات: فتح كيبورد الموبايل
+                openKeyboardForField(index, 'text');
+            } else {
+                // في عمود العملية الحسابية: فتح الآلة الحاسبة المصغرة
+                openCalcPadForField(index, 'calc');
+            }
         }
 
         function renderCalculator(focusTarget = null) {
@@ -1339,10 +1362,8 @@
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
 
-                // 1️⃣ إظهار إطار الضغطة الواحدة فوراً طالما الخلية نشطة
                 if (index === activeRowIndex && activeFieldIndex === 'text') {
-                    if (row.textTapState === 'double') textInput.classList.add('text-border-double');
-                    else if (row.textTapState === 'long') textInput.classList.add('text-border-long');
+                    if (row.textTapState === 'double' || row.textTapState === 'long') textInput.classList.add('text-border-long');
                     else textInput.classList.add('text-border-single');
                 }
 
@@ -1374,7 +1395,7 @@
 
                 textInput.addEventListener('blur', () => {
                     rows[index].textTapState = 'single';
-                    textInput.classList.remove('text-border-single', 'text-border-double', 'text-border-long');
+                    textInput.classList.remove('text-border-single', 'text-border-long');
                 });
 
                 textInput.addEventListener('keydown', (e) => {
@@ -1458,10 +1479,8 @@
                 inputField.className = 'calc-input';
                 inputField.value = row.expression;
 
-                // 1️⃣ إظهار إطار الضغطة الواحدة فوراً طالما الخلية نشطة
                 if (index === activeRowIndex && activeFieldIndex === 'calc') {
-                    if (row.calcTapState === 'double') inputField.classList.add('calc-border-double');
-                    else if (row.calcTapState === 'long') inputField.classList.add('calc-border-long');
+                    if (row.calcTapState === 'double' || row.calcTapState === 'long') inputField.classList.add('calc-border-long');
                     else inputField.classList.add('calc-border-single');
                 }
 
@@ -1496,7 +1515,7 @@
 
                 inputField.addEventListener('blur', () => {
                     rows[index].calcTapState = 'single';
-                    inputField.classList.remove('calc-border-single', 'calc-border-double', 'calc-border-long');
+                    inputField.classList.remove('calc-border-single', 'calc-border-long');
                 });
 
                 inputField.addEventListener('keydown', (e) => {
@@ -1537,7 +1556,7 @@
                     }
                 }
 
-                // زر المايك: يتعرف فوراً على الخلية النشطة الحالية (التي تم لمسها مؤخراً)
+                // زر المايك يعمل بكل دقة مع الخلية التي حددها الإصبع مؤخراً
                 const micBtn = document.createElement('button');
                 micBtn.className = 'mic-btn';
                 micBtn.innerHTML = '🎤';
@@ -1650,8 +1669,8 @@
                     renderCalculator('text');
                 }
             } 
-            else if (key === 'ArrowLeft') {
-                if (currentField === 'text') {
+            else if (currentField === 'text') {
+                if (key === 'ArrowLeft') {
                     e.preventDefault();
                     activeFieldIndex = 'calc';
                     renderCalculator('calc');
@@ -1660,7 +1679,6 @@
         }
 
         function startSpeechRecognition(index, micBtn) {
-            // يستخدم الخلية النشطة الحالية التي حددها الإصبع مؤخراً
             const targetRow = activeRowIndex;
             const targetField = activeFieldIndex;
 
