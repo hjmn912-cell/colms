@@ -601,15 +601,15 @@
             background: rgba(56, 189, 248, 0.05);
         }
 
-        /* فئات الوميض اللوني المؤقت كدليل تفاعلي */
-        .flash-highlight-calc {
+        /* الألوان الثابتة طوال فترة تواجد المستخدم داخل الخلية */
+        .persistent-green-border {
             border-color: #10b981 !important;
-            background-color: rgba(16, 185, 129, 0.15) !important;
+            background-color: rgba(16, 185, 129, 0.08) !important;
         }
 
-        .flash-highlight-kbd {
+        .persistent-purple-border {
             border-color: #8b5cf6 !important;
-            background-color: rgba(139, 92, 246, 0.15) !important;
+            background-color: rgba(139, 92, 246, 0.08) !important;
         }
 
         .calc-row.hidden-calc .calc-input {
@@ -846,7 +846,8 @@
                 isCalcPadVisible: false, 
                 isTextPadVisible: false,
                 forceKeyboardText: false,
-                forceKeyboardCalc: false
+                forceKeyboardCalc: false,
+                cellState: null // لتتبع نوع التفاعل الحالي للخلية: 'calc' أو 'kbd'
             }
         ];
         let activeRowIndex = 0;
@@ -875,7 +876,8 @@
                     isCalcPadVisible: false, 
                     isTextPadVisible: false,
                     forceKeyboardText: false,
-                    forceKeyboardCalc: false
+                    forceKeyboardCalc: false,
+                    cellState: null
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = 'calc';
@@ -907,7 +909,8 @@
                     isCalcPadVisible: false, 
                     isTextPadVisible: false,
                     forceKeyboardText: false,
-                    forceKeyboardCalc: false
+                    forceKeyboardCalc: false,
+                    cellState: null
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = 'text';
@@ -1018,6 +1021,7 @@
         function openKeyboardForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
+            rows[index].cellState = 'kbd'; // تثبيت حالة اللون البنفسجي طوال البقاء في الخلية
             if (field === 'text') {
                 rows[index].forceKeyboardText = true;
                 rows[index].isTextPadVisible = false;
@@ -1031,7 +1035,13 @@
         function openCalcPadForField(index, field) {
             activeRowIndex = index;
             activeFieldIndex = field;
-            rows.forEach(r => { r.isCalcPadVisible = false; r.isTextPadVisible = false; });
+            rows[index].cellState = 'calc'; // تثبيت حالة اللون الأخضر طوال البقاء في الخلية
+            rows.forEach((r, idx) => { 
+                if (idx !== index) {
+                    r.isCalcPadVisible = false; 
+                    r.isTextPadVisible = false; 
+                }
+            });
             if (field === 'text') {
                 rows[index].isTextPadVisible = true;
                 rows[index].forceKeyboardText = false;
@@ -1048,6 +1058,7 @@
             rows[index].isTextPadVisible = false;
             rows[index].forceKeyboardCalc = false;
             rows[index].forceKeyboardText = false;
+            rows[index].cellState = null;
 
             if (index < rows.length - 1) {
                 activeRowIndex = index + 1;
@@ -1065,7 +1076,8 @@
                     isCalcPadVisible: false, 
                     isTextPadVisible: false,
                     forceKeyboardText: false,
-                    forceKeyboardCalc: false
+                    forceKeyboardCalc: false,
+                    cellState: null
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = field;
@@ -1080,6 +1092,7 @@
             rows[index].isTextPadVisible = false;
             rows[index].forceKeyboardCalc = false;
             rows[index].forceKeyboardText = false;
+            rows[index].cellState = null;
 
             let targetIndex;
             if (index < rows.length - 1) {
@@ -1095,7 +1108,8 @@
                     isCalcPadVisible: false, 
                     isTextPadVisible: false,
                     forceKeyboardText: false,
-                    forceKeyboardCalc: false
+                    forceKeyboardCalc: false,
+                    cellState: null
                 });
                 targetIndex = rows.length - 1;
             }
@@ -1106,9 +1120,11 @@
             if (field === 'text') {
                 rows[targetIndex].forceKeyboardText = true;
                 rows[targetIndex].isTextPadVisible = false;
+                rows[targetIndex].cellState = 'kbd';
             } else {
                 rows[targetIndex].isCalcPadVisible = true;
                 rows[targetIndex].forceKeyboardCalc = false;
+                rows[targetIndex].cellState = 'calc';
             }
 
             renderCalculator(field);
@@ -1246,14 +1262,6 @@
             return keypadDiv;
         }
 
-        // دالة لعرض تأثير وميض اللون على الإطار عند الضغط المزدوج أو الطويل
-        function triggerVisualFlash(element, className) {
-            element.classList.add(className);
-            setTimeout(() => {
-                element.classList.remove(className);
-            }, 350);
-        }
-
         function attachTouchListeners(element, index, field) {
             let lastTapTime = 0;
             let longPressTimer = null;
@@ -1267,21 +1275,15 @@
                 if (tapLength < 300 && tapLength > 0) {
                     e.preventDefault();
                     clearTimeout(longPressTimer);
-                    // ضغطتين ورا بعض -> وميض أخضر للإطار (دليل فتح الآلة الحاسبة المصغرة)
-                    triggerVisualFlash(element, 'flash-highlight-calc');
-                    setTimeout(() => {
-                        openCalcPadForField(index, field);
-                    }, 120);
+                    // ضغطتين ورا بعض -> فتح الآلة الحاسبة وتثبيت اللون الأخضر طوال البقاء في الخلية
+                    openCalcPadForField(index, field);
                     return;
                 }
                 lastTapTime = currentTime;
 
                 longPressTimer = setTimeout(() => {
-                    // ضغطة مطولة -> وميض بنفسجي للإطار (دليل فتح كيبورد الموبايل)
-                    triggerVisualFlash(element, 'flash-highlight-kbd');
-                    setTimeout(() => {
-                        openKeyboardForField(index, field);
-                    }, 120);
+                    // ضغطة مطولة -> فتح الكيبورد وتثبيت اللون البنفسجي طوال البقاء في الخلية
+                    openKeyboardForField(index, field);
                 }, 600);
             }, { passive: false });
 
@@ -1336,6 +1338,7 @@
                         evaluateRow(index);
                         rows[index].isTextPadVisible = false;
                         rows[index].forceKeyboardText = false;
+                        rows[index].cellState = null;
                         rows.push({ 
                             textExpression: '', 
                             expression: '', 
@@ -1346,7 +1349,8 @@
                             isCalcPadVisible: false, 
                             isTextPadVisible: false,
                             forceKeyboardText: false,
-                            forceKeyboardCalc: false
+                            forceKeyboardCalc: false,
+                            cellState: null
                         });
                         activeRowIndex = rows.length - 1;
                         activeFieldIndex = 'text';
@@ -1359,6 +1363,12 @@
                 textInput.className = 'text-input';
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
+
+                // تطبيق اللون المستمر إذا كانت الحالة مفعلة خصيصاً لهذا العمود عند التركيز
+                if (index === activeRowIndex && activeFieldIndex === 'text') {
+                    if (row.cellState === 'calc') textInput.classList.add('persistent-green-border');
+                    else if (row.cellState === 'kbd') textInput.classList.add('persistent-purple-border');
+                }
 
                 if (isMobile && !row.forceKeyboardText) {
                     textInput.setAttribute('readonly', 'true');
@@ -1385,6 +1395,12 @@
                         activeFieldIndex = 'text';
                         updateActiveRowClasses();
                     }
+                });
+
+                // عند مغادرة الخلية (Blur)، يُزال اللون الثابت ويرجع اللون طبيعياً
+                textInput.addEventListener('blur', () => {
+                    rows[index].cellState = null;
+                    textInput.classList.remove('persistent-green-border', 'persistent-purple-border');
                 });
 
                 textInput.addEventListener('keydown', (e) => {
@@ -1428,6 +1444,12 @@
                 inputField.className = 'calc-input';
                 inputField.value = row.expression;
 
+                // تطبيق اللون المستمر إذا كانت الحالة مفعلة خصيصاً لهذا العمود عند التركيز
+                if (index === activeRowIndex && activeFieldIndex === 'calc') {
+                    if (row.cellState === 'calc') inputField.classList.add('persistent-green-border');
+                    else if (row.cellState === 'kbd') inputField.classList.add('persistent-purple-border');
+                }
+
                 if (isMobile && !row.forceKeyboardCalc) {
                     inputField.setAttribute('readonly', 'true');
                     inputField.setAttribute('inputmode', 'none');
@@ -1456,6 +1478,12 @@
                         activeFieldIndex = 'calc';
                         updateActiveRowClasses();
                     }
+                });
+
+                // عند مغادرة الخلية (Blur)، يُزال اللون الثابت ويرجع اللون طبيعياً
+                inputField.addEventListener('blur', () => {
+                    rows[index].cellState = null;
+                    inputField.classList.remove('persistent-green-border', 'persistent-purple-border');
                 });
 
                 inputField.addEventListener('keydown', (e) => {
@@ -1684,6 +1712,7 @@
                 rows[0].isTextPadVisible = false;
                 rows[0].forceKeyboardText = false;
                 rows[0].forceKeyboardCalc = false;
+                rows[0].cellState = null;
             } else {
                 rows.splice(index, 1);
                 if (activeRowIndex >= rows.length) {
@@ -1911,6 +1940,7 @@
                 rows[activeRowIndex].isTextPadVisible = false;
                 rows[activeRowIndex].forceKeyboardCalc = false;
                 rows[activeRowIndex].forceKeyboardText = false;
+                rows[activeRowIndex].cellState = null;
 
                 if (activeRowIndex < rows.length - 1) {
                     activeRowIndex++;
@@ -1929,7 +1959,8 @@
                         isCalcPadVisible: false, 
                         isTextPadVisible: false,
                         forceKeyboardText: false,
-                        forceKeyboardCalc: false
+                        forceKeyboardCalc: false,
+                        cellState: null
                     });
                     activeRowIndex = rows.length - 1;
                     activeFieldIndex = 'calc';
@@ -1948,7 +1979,8 @@
                     isCalcPadVisible: false,
                     isTextPadVisible: false,
                     forceKeyboardText: false,
-                    forceKeyboardCalc: false
+                    forceKeyboardCalc: false,
+                    cellState: null
                 }];
                 activeRowIndex = 0;
                 activeFieldIndex = 'calc';
