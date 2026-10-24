@@ -303,7 +303,7 @@
             position: absolute;
             left: 0;
             background-color: #1e293b;
-            min-width: 210px;
+            min-width: 220px;
             box-shadow: 0px 8px 16px rgba(0,0,0,0.5);
             border-radius: 6px;
             z-index: 2000;
@@ -870,6 +870,12 @@
                                 
                                 <div class="dropdown-divider"></div>
                                 
+                                <button onclick="openPhoneWhatsApp()">📱 فتح واتساب الهاتف</button>
+                                <button onclick="openPhoneMessenger()">💬 فتح ماسنجر الهاتف</button>
+                                <button onclick="copyReportTextOnly()">📋 نسخ التقرير نصياً</button>
+
+                                <div class="dropdown-divider"></div>
+
                                 <button onclick="shareLinkToWhatsApp()">💬 إرسال التقرير للواتساب</button>
                                 <button onclick="shareLinkToMessenger()">⚡ إرسال التقرير للماسنجر</button>
                                 <button onclick="shareLinkToSMS()">📱 إرسال التقرير عبر رسالة نصية (SMS)</button>
@@ -2024,7 +2030,6 @@
             negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
         }
 
-        // --- دالة تجهيز نص التقرير للظاهر فقط (بدون أي عنوان علوي) ---
         function generateShareSummaryText() {
             const showCurrency = showCurrencyCheckbox.checked;
             let text = "";
@@ -2064,6 +2069,20 @@
             document.execCommand("copy");
             document.body.removeChild(dummy);
             if (successMessage) alert(successMessage);
+        }
+
+        // الوظائف الجديدة والقديمة للتصدير والمشاركة
+        function openPhoneWhatsApp() {
+            window.location.href = "whatsapp://";
+        }
+
+        function openPhoneMessenger() {
+            window.location.href = "fb-messenger://";
+        }
+
+        function copyReportTextOnly() {
+            const text = generateShareSummaryText();
+            copyTextToClipboard(text, "تم نسخ التقرير نصياً بنجاح! يمكنك لصقه في أي مكان الآن.");
         }
 
         function shareLinkToWhatsApp() {
