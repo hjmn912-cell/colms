@@ -155,6 +155,7 @@
             display: flex;
             gap: 12px;
             justify-content: center;
+            align-items: center;
         }
 
         .summary-item {
@@ -239,7 +240,6 @@
             white-space: nowrap;
         }
 
-        /* زر إخفاء العمليات الصغير مع بقية الأزرار */
         .top-action-btn, .top-notes-focus-btn, .toggle-hide-btn {
             background-color: #1e293b;
             border: 1px solid #38bdf8;
@@ -257,7 +257,7 @@
         }
 
         .top-action-btn, .top-notes-focus-btn {
-            display: none; /* يظهر للموبايل فقط حسب الكود الأصلي */
+            display: none;
         }
 
         .toggle-hide-btn:hover {
@@ -411,7 +411,7 @@
             min-width: 0;
         }
 
-        .calc-select-checkbox {
+        .global-select-checkbox, .calc-select-checkbox {
             width: 18px;
             height: 18px;
             cursor: pointer;
@@ -651,6 +651,11 @@
             pointer-events: none !important;
         }
 
+        .calc-row.hidden-text .text-input {
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
         .calc-output-container {
             display: flex;
             align-items: baseline;
@@ -755,20 +760,6 @@
                 min-height: 36px;
             }
         }
-
-        @media print {
-            @page { size: A4 landscape; margin: 10mm; }
-            html, body { display:block !important; min-height:0 !important; height:auto !important; margin:0 !important; padding:0 !important; overflow:visible !important; background:#fff !important; color:#000 !important; }
-            .calculator-container { width:100% !important; height:auto !important; max-width:none !important; overflow:visible !important; box-shadow:none !important; border:0 !important; background:#fff !important; position:static !important; }
-            .sticky-top-section { position:static !important; overflow:visible !important; background:#fff !important; }
-            .calculator-screen { display:block !important; height:auto !important; max-height:none !important; overflow:visible !important; padding:0 !important; background:#fff !important; }
-            .calc-row { display:flex !important; width:100% !important; break-inside:avoid !important; page-break-inside:avoid !important; background:#fff !important; color:#000 !important; border:1px solid #bbb !important; }
-            .inputs-group { display:flex !important; min-width:0 !important; }
-            .row-mobile-arrow-btn, .row-calc-arrow-btn, .row-keypad-container, .calc-select-checkbox { display:none !important; }
-            .text-input, .calc-input { height:auto !important; min-height:34px !important; overflow:visible !important; white-space:pre-wrap !important; overflow-wrap:anywhere !important; color:#000 !important; background:#fff !important; border:1px solid #bbb !important; -webkit-text-fill-color:#000 !important; visibility:visible !important; font-size:16px !important; }
-            .calc-output-container, .calc-output, .row-currency, .total-value, .total-currency, .summary-item, .positive-sum, .negative-sum { color:#000 !important; overflow-wrap:anywhere !important; word-break:break-word !important; }
-            .top-controls-wrapper, .export-dropdown, .mic-btn, .delete-row-btn, .keyboard-hint, .toggle-hide-btn { display:none !important; }
-        }
     </style>
 </head>
 <body>
@@ -778,37 +769,63 @@
         <div class="sticky-top-section">
             <div class="top-controls-wrapper">
                 <div class="left-controls-group">
-                    <div class="options-dropdown" id="optionsDropdown">
-                        <button class="options-btn" type="button" onclick="toggleOptionsMenu(event)">
-                            الخيارات <span>▼</span>
-                        </button>
-                        <div class="options-dropdown-content" id="optionsDropdownContent">
-                            <label class="option-toggle-label">
-                                <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
-                                إظهار كلمة جنيه
-                            </label>
+                    <!-- الخيارات -->
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <input type="checkbox" id="hideOptionsCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                        <div class="options-dropdown" id="optionsDropdown">
+                            <button class="options-btn" type="button" onclick="toggleOptionsMenu(event)">
+                                الخيارات <span>▼</span>
+                            </button>
+                            <div class="options-dropdown-content" id="optionsDropdownContent">
+                                <label class="option-toggle-label">
+                                    <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
+                                    إظهار كلمة جنيه
+                                </label>
+                            </div>
                         </div>
                     </div>
 
-                    <button class="refresh-btn" type="button" title="إعادة تحميل الصفحة" onclick="location.reload()">
-                        🔄
-                    </button>
+                    <!-- زر إعادة التحميل -->
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <input type="checkbox" id="hideRefreshCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                        <button class="refresh-btn" id="refreshBtnEl" type="button" title="إعادة تحميل الصفحة" onclick="location.reload()">
+                            🔄
+                        </button>
+                    </div>
                 </div>
 
                 <div class="totals-summary-bar">
                     <div class="sub-totals-row">
-                        <div class="summary-item">
-                            <input type="checkbox" id="showPositiveCheckbox" onchange="renderCalculator()">
-                            <span id="positiveTotalVal" class="positive-sum"></span>
+                        <!-- مجموع العمليات الموجبة -->
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="hidePositiveCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                            <div class="summary-item">
+                                <input type="checkbox" id="showPositiveCheckbox" onchange="renderCalculator()">
+                                <span id="positiveTotalVal" class="positive-sum"></span>
+                            </div>
                         </div>
-                        <div class="summary-item">
-                            <input type="checkbox" id="showNegativeCheckbox" onchange="renderCalculator()">
-                            <span id="negativeTotalVal" class="negative-sum"></span>
+
+                        <!-- مجموع العمليات السالبة -->
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="hideNegativeCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                            <div class="summary-item">
+                                <input type="checkbox" id="showNegativeCheckbox" onchange="renderCalculator()">
+                                <span id="negativeTotalVal" class="negative-sum"></span>
+                            </div>
                         </div>
                     </div>
+
                     <div class="total-value-container">
-                        <div id="grandTotal" class="total-value">0</div>
-                        <div id="grandTotalCurrency" class="total-currency">جنيه</div>
+                        <!-- الإجمالي النهائي -->
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="hideGrandTotalCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                            <div id="grandTotal" class="total-value">0</div>
+                        </div>
+                        <!-- كلمة جنيه المجاورة للإجمالي النهائي -->
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="hideGrandCurrencyCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                            <div id="grandTotalCurrency" class="total-currency">جنيه</div>
+                        </div>
                     </div>
                 </div>
 
@@ -822,25 +839,29 @@
                     
                     <span class="designer-credit">designed by Sami Arouj</span>
                     
-                    <!-- زر إخفاء/إظهار العمليات (زر صغير بأيقونة فقط) -->
-                    <button type="button" id="toggleHideBtn" class="toggle-hide-btn" title="تحديد وإخفاء العمليات الحسابية" onclick="toggleHideSelectionMode()">
+                    <!-- زر إخفاء/إظهار الشامل -->
+                    <button type="button" id="toggleHideBtn" class="toggle-hide-btn" title="تحديد العناصر المراد إخفاؤها" onclick="toggleHideSelectionMode()">
                         👁️
                     </button>
 
-                    <div class="export-dropdown" id="exportDropdown">
-                        <button class="export-btn" onclick="toggleExportMenu(event)">
-                            تصدير ومشاركة <span>▼</span>
-                        </button>
-                        <div class="dropdown-content">
-                            <button onclick="exportToExcel()">📊 إكسيل (Excel)</button>
-                            <button onclick="exportToWord()">📝 وورد (Word)</button>
-                            <button onclick="exportToPDF()">📄 بي دي إف (PDF)</button>
-                            <button onclick="exportToImage()">🖼️ تنزيل صورة</button>
-                            
-                            <div class="dropdown-divider"></div>
-                            
-                            <button onclick="shareLinkToWhatsApp()">💬 إرسال التقرير للواتساب</button>
-                            <button onclick="shareLinkToMessenger()">⚡ إرسال التقرير للماسنجر</button>
+                    <!-- زر التصدير ومشاركة -->
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <input type="checkbox" id="hideExportCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                        <div class="export-dropdown" id="exportDropdown">
+                            <button class="export-btn" onclick="toggleExportMenu(event)">
+                                تصدير ومشاركة <span>▼</span>
+                            </button>
+                            <div class="dropdown-content">
+                                <button onclick="exportToExcel()">📊 إكسيل (Excel)</button>
+                                <button onclick="exportToWord()">📝 وورد (Word)</button>
+                                <button onclick="exportToPDF()">📄 بي دي إف (PDF)</button>
+                                <button onclick="exportToImage()">🖼️ تنزيل صورة</button>
+                                
+                                <div class="dropdown-divider"></div>
+                                
+                                <button onclick="shareLinkToWhatsApp()">💬 إرسال التقرير للواتساب</button>
+                                <button onclick="shareLinkToMessenger()">⚡ إرسال التقرير للماسنجر</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -868,6 +889,10 @@
         const topNotesFocusBtn = document.getElementById('topNotesFocusBtn');
         const toggleHideBtn = document.getElementById('toggleHideBtn');
 
+        const optionsDropdownEl = document.getElementById('optionsDropdown');
+        const refreshBtnEl = document.getElementById('refreshBtnEl');
+        const exportDropdownEl = document.getElementById('exportDropdown');
+
         let isSelectionModeActive = false;
 
         function isMobileDevice() {
@@ -892,6 +917,7 @@
                 forceCalc: false, 
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
+                isTextVisible: true,
                 isCalcPadVisible: false, 
                 isTextPadVisible: false
             }
@@ -902,6 +928,11 @@
         function toggleHideSelectionMode() {
             isSelectionModeActive = !isSelectionModeActive;
             
+            const checkboxes = document.querySelectorAll('.global-select-checkbox');
+            checkboxes.forEach(cb => {
+                cb.style.display = isSelectionModeActive ? 'inline-block' : 'none';
+            });
+
             if (isSelectionModeActive) {
                 toggleHideBtn.classList.add('active-mode');
             } else {
@@ -909,6 +940,19 @@
             }
             
             renderCalculator();
+        }
+
+        function updateGlobalHides() {
+            // تحديث إخفاء العناصر العامة بناءً على الـ Checkboxes الخاصة بها
+            optionsDropdownEl.style.display = document.getElementById('hideOptionsCheckbox').checked ? 'none' : 'inline-block';
+            refreshBtnEl.style.display = document.getElementById('hideRefreshCheckbox').checked ? 'none' : 'inline-flex';
+            exportDropdownEl.style.display = document.getElementById('hideExportCheckbox').checked ? 'none' : 'inline-block';
+            
+            document.getElementById('positiveTotalVal').parentElement.parentElement.style.display = document.getElementById('hidePositiveCheckbox').checked ? 'none' : 'flex';
+            document.getElementById('negativeTotalVal').parentElement.parentElement.style.display = document.getElementById('hideNegativeCheckbox').checked ? 'none' : 'flex';
+            
+            grandTotalEl.style.display = document.getElementById('hideGrandTotalCheckbox').checked ? 'none' : 'block';
+            grandTotalCurrencyEl.style.display = document.getElementById('hideGrandCurrencyCheckbox').checked ? 'none' : 'block';
         }
 
         function closeAllPads() {
@@ -930,7 +974,7 @@
             } else {
                 rows.push({ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = 'calc';
@@ -951,7 +995,7 @@
             } else {
                 rows.push({ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = 'text';
@@ -1100,7 +1144,7 @@
             } else {
                 rows.push({ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = field;
@@ -1119,7 +1163,7 @@
             } else {
                 rows.push({ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                 });
                 targetIndex = rows.length - 1;
             }
@@ -1344,7 +1388,7 @@
 
             rows.forEach((row, index) => {
                 const rowDiv = document.createElement('div');
-                rowDiv.className = `calc-row ${index === activeRowIndex ? 'active' : ''} ${!row.isCalcVisible ? 'hidden-calc' : ''}`;
+                rowDiv.className = `calc-row ${index === activeRowIndex ? 'active' : ''} ${!row.isCalcVisible ? 'hidden-calc' : ''} ${!row.isTextVisible ? 'hidden-text' : ''}`;
 
                 const rowMain = document.createElement('div');
                 rowMain.className = 'calc-row-main';
@@ -1354,6 +1398,21 @@
 
                 const textWrapper = document.createElement('div');
                 textWrapper.className = 'text-input-wrapper';
+
+                // Checkbox لإخفاء الملاحظات لكل سطر
+                if (isSelectionModeActive) {
+                    const selectTextCheckbox = document.createElement('input');
+                    selectTextCheckbox.type = 'checkbox';
+                    selectTextCheckbox.className = 'calc-select-checkbox';
+                    selectTextCheckbox.checked = !row.isTextVisible;
+                    selectTextCheckbox.title = 'علم هنا لإخفاء ملاحظات هذا السطر';
+                    
+                    selectTextCheckbox.addEventListener('change', (e) => {
+                        row.isTextVisible = !e.target.checked;
+                    });
+                    
+                    textWrapper.appendChild(selectTextCheckbox);
+                }
 
                 const mobileArrowBtn = document.createElement('button');
                 mobileArrowBtn.type = 'button';
@@ -1377,7 +1436,7 @@
                         closeAllPads();
                         rows.push({ 
                             textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                            isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                            isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                         });
                         activeRowIndex = rows.length - 1;
                         activeFieldIndex = 'text';
@@ -1461,6 +1520,7 @@
                 const calcWrapper = document.createElement('div');
                 calcWrapper.className = 'calc-input-wrapper';
 
+                // Checkbox لإخفاء العملية الحسابية لكل سطر
                 if (isSelectionModeActive) {
                     const selectCheckbox = document.createElement('input');
                     selectCheckbox.type = 'checkbox';
@@ -1496,7 +1556,7 @@
                     } else {
                         rows.push({ 
                             textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                            isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                            isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                         });
                         targetIndex = rows.length - 1;
                     }
@@ -1643,6 +1703,9 @@
 
             positiveTotalValEl.innerText = showPositiveCheckbox.checked ? posFormatted.text : '';
             negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
+            
+            // تطبيق حالة الإخفاء العامة لضمان استمراريتها بعد التحديث
+            updateGlobalHides();
         }
 
         function handleKeyNavigation(e, index, currentField) {
@@ -1661,7 +1724,7 @@
                 } else {
                     rows.push({ 
                         textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                        isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                        isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                     });
                     activeRowIndex = rows.length - 1;
                     activeFieldIndex = currentField;
@@ -1781,6 +1844,7 @@
                 rows[0].forceCalc = false;
                 rows[0].ignoreBeforeIndex = 0;
                 rows[0].isCalcVisible = true;
+                rows[0].isTextVisible = true;
                 rows[0].isCalcPadVisible = false;
                 rows[0].isTextPadVisible = false;
             } else {
@@ -1939,9 +2003,7 @@
             text += "-------------------------\n";
 
             rows.forEach((r, i) => {
-                let note = r.textExpression ? `[${r.textExpression}]` : `[سطر ${i+1}]`;
-                
-                // هنا التأكد: لو السطر ظاهرياً لم يُخفَ العملية يأخذها، ولو كانت مخفية لا يأخذها
+                let note = (r.isTextVisible && r.textExpression) ? `[${r.textExpression}]` : `[سطر ${i+1}]`;
                 let calc = (r.isCalcVisible && r.expression) ? `= ${r.expression}` : '';
                 let res = r.result !== 0 ? `← ${r.result} ${showCurrency ? 'جنيه' : ''}` : '';
                 
@@ -1989,7 +2051,7 @@
             const showCurrency = showCurrencyCheckbox.checked;
             let dataToExport = rows.map((r, i) => ({
                 "السطر": i + 1,
-                "العمود النصي / الملاحظات (اليمين)": r.textExpression,
+                "العمود النصي / الملاحظات (اليمين)": r.isTextVisible ? r.textExpression : '',
                 "النتيجة (الوسط)": showCurrency ? `${r.result} جنيه` : r.result,
                 "العملية الحسابية (اليسار)": r.isCalcVisible ? r.expression : ''
             }));
@@ -2008,9 +2070,10 @@
             htmlContent += `<tr><th>السطر</th><th>الملاحظات (اليمين)</th><th>النتيجة (الوسط)</th><th>العملية الحسابية (اليسار)</th></tr>`;
             
             rows.forEach((r, i) => {
+                let textText = r.isTextVisible ? r.textExpression : '';
                 let exprText = r.isCalcVisible ? r.expression : '';
                 let resText = showCurrency ? `${r.result} جنيه` : r.result;
-                htmlContent += `<tr><td>${i+1}</td><td>${r.textExpression}</td><td>${resText}</td><td>${exprText}</td></tr>`;
+                htmlContent += `<tr><td>${i+1}</td><td>${textText}</td><td>${resText}</td><td>${exprText}</td></tr>`;
             });
             
             htmlContent += `</table></body></html>`;
@@ -2059,7 +2122,7 @@
             if (key === 'Escape') {
                 rows = [{ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                 }];
                 activeRowIndex = 0;
                 activeFieldIndex = 'calc';
@@ -2079,45 +2142,6 @@
                 }
             }
         });
-
-        function escapePreviewHtml(value) {
-            return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-        }
-
-        function openPrintPreview() {
-            const showCurrency = showCurrencyCheckbox.checked;
-            const previewRows = rows.map((row, index) => {
-                const exprText = row.isCalcVisible ? row.expression : '';
-                const resultText = (row.result !== '' && row.result !== 0)
-                    ? formatDisplayValue(row.result).text + (showCurrency ? ' جنيه' : '') : '';
-                return `<tr><td class="number">${index + 1}</td><td class="cell text-cell">${escapePreviewHtml(row.textExpression)}</td><td class="cell result-cell">${escapePreviewHtml(resultText)}</td><td class="cell expression-cell">${escapePreviewHtml(exprText)}</td></tr>`;
-            }).join('');
-            const totalText = grandTotalEl.innerText + (showCurrency && grandTotalCurrencyEl.innerText ? ' جنيه' : '');
-            const positiveText = showPositiveCheckbox.checked ? positiveTotalValEl.innerText : '';
-            const negativeText = showNegativeCheckbox.checked ? negativeTotalValEl.innerText : '';
-            const w = window.open('', '_blank', 'width=1100,height=800');
-            if (!w) { alert('يرجى السماح بفتح النوافذ المنبثقة لعرض معاينة الطباعة.'); return; }
-            w.document.open();
-            w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>معاينة الطباعة</title>
-<style>
-*{box-sizing:border-box}body{font-family:Tahoma,Arial,sans-serif;color:#172033;background:#f3f7fc;margin:20px}h2{text-align:center;margin:0 0 16px;color:#174a7e;border-bottom:3px solid #25a6c7;padding:0 0 12px}.summary{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;margin-bottom:16px}.summary div{flex:1;min-width:180px;padding:12px 14px;border:1px solid #b7d8ed;border-right:5px solid #168aad;border-radius:8px;background:#e7f4fb;color:#174a7e}.summary strong{color:#0b6e99}table{width:100%;border-collapse:collapse;table-layout:fixed;background:#fff;box-shadow:0 2px 8px #17324d18}th,td{border:1px solid #b8c9d8;padding:9px;vertical-align:top;text-align:right}th{background:#176b87;color:#fff;font-weight:bold;border-color:#12566d}.number{width:7%;text-align:center;background:#eaf2f8;font-weight:bold;color:#24577a}.text-cell{width:31%;background:#fffaf0;color:#553b14;font-size:16px}.result-cell{width:25%;direction:ltr;text-align:left;background:#e9f8ef;color:#087443;font-weight:bold;font-size:16px}.expression-cell{width:37%;direction:ltr;text-align:left;background:#f1f7ff;color:#174a7e;font-weight:500;font-size:16px}.cell{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}tbody tr:nth-child(even) td{filter:brightness(.975)}tbody tr:hover td{background-color:#e1f4fb}.actions{margin-bottom:16px;text-align:center}button{padding:10px 22px;font-size:16px;cursor:pointer;border:0;border-radius:6px;background:#176b87;color:#fff;margin:0 4px}button+button{background:#64748b}@page{size:A4 landscape;margin:10mm}@media print{body{margin:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}.actions{display:none!important}tr{break-inside:avoid;page-break-inside:avoid}th,td,.summary div,.number,.text-cell,.result-cell,.expression-cell{print-color-adjust:exact;-webkit-print-color-adjust:exact}h2{color:#174a7e}}
-</style></head><body>
-<div class="actions"><button onclick="window.print()">طباعة التقرير</button> <button onclick="window.close()">إغلاق المعاينة</button></div>
-<h2>تقرير الآلة الحاسبة متعددة الأسطر</h2><div class="summary"><div><strong>الإجمالي:</strong> ${escapePreviewHtml(totalText)}</div>
-${positiveText !== '' ? `<div><strong>مجموع الموجب:</strong> ${escapePreviewHtml(positiveText)}</div>` : ''}
-${negativeText !== '' ? `<div><strong>مجموع السالب:</strong> ${escapePreviewHtml(negativeText)}</div>` : ''}</div>
-<table><thead><tr><th class="number">السطر</th><th>الملاحظات / النص</th><th>النتيجة</th><th>العملية الحسابية</th></tr></thead><tbody>${previewRows}</tbody></table></body></html>`);
-            w.document.close(); w.focus();
-        }
-
-        document.addEventListener('keydown', (event) => {
-            if (event.ctrlKey && !event.altKey && !event.shiftKey &&
-                (event.code === 'KeyB' || String(event.key).toLowerCase() === 'b')) {
-                event.preventDefault();
-                event.stopPropagation();
-                openPrintPreview();
-            }
-        }, true);
 
         renderCalculator('calc');
     </script>
