@@ -1094,7 +1094,9 @@
                 rows[index].textExpression += val;
                 renderCalculator('text');
             } else {
-                rows[index].expression += val;
+                // إذا كتب النجمة من اللوحة المصغرة، تتحول إلى * برمجياً لتخزينها
+                let actualVal = (val === 'x') ? '*' : val;
+                rows[index].expression += actualVal;
                 rows[index].forceCalc = false;
                 evaluateRow(index);
                 renderCalculator('calc');
@@ -1279,10 +1281,11 @@
                 isDraggingKeypad = false;
             }
 
+            // عرض حرف x في اللوحة المصغرة للضرب
             const keys = [
                 '⬆ Up', '⬇ Down', '🗑 Del', '⌫',
                 '7', '8', '9', '/',
-                '4', '5', '6', '*',
+                '4', '5', '6', 'x',
                 '1', '2', '3', '-',
                 '0', '.', '%', '+',
                 '⌨ Keyboard', 'Enter', 'Enter+Open'
@@ -1292,7 +1295,7 @@
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'mini-key-btn';
-                if (['+', '-', '*', '/', '%'].includes(k)) btn.classList.add('op');
+                if (['+', '-', 'x', 'X', '*', '/', '%'].includes(k)) btn.classList.add('op');
                 if (k === '⌫') btn.classList.add('backspace');
                 if (k === '⌨ Keyboard') {
                     btn.classList.add('kbd-key');
@@ -1588,14 +1591,21 @@
                 const inputField = document.createElement('input');
                 inputField.type = 'text';
                 inputField.className = 'calc-input';
-                inputField.value = row.expression;
+                // استبدال علامة الضرب * بـ x في العرض المرئي للمستخدم
+                inputField.value = row.expression.replace(/\*/g, 'x');
 
                 if (index === activeRowIndex && activeFieldIndex === 'calc') {
                     inputField.classList.add('calc-border-active');
                 }
 
                 inputField.addEventListener('input', (e) => {
-                    rows[index].expression = e.target.value;
+                    // تحويل أي نجمة * تضاف من لوحة المفاتيح إلى حرف x في العرض، وحفظها كـ * في التعبير
+                    let rawVal = e.target.value.replace(/x|X|×/g, '*');
+                    let displayVal = rawVal.replace(/\*/g, 'x');
+                    
+                    e.target.value = displayVal;
+                    rows[index].expression = rawVal;
+
                     rows[index].forceCalc = false;
                     if (e.target.value.length < rows[index].ignoreBeforeIndex) {
                         rows[index].ignoreBeforeIndex = 0;
@@ -1912,7 +1922,13 @@
                 return;
             }
 
-            let hasAttachedTextBeforeOrAfter = /(\d+[a-zA-Zأ-ي\u0600-\u06FF])|([a-zA-Zأ-ي\u0600-\u06FF]\d+)/.test(expr);
+            // 1. استبدال x أو X أو × أو * بـ * برمجياً أولاً قبل أي فحص للنصوص
+            let sanitizedExpr = expr
+                .replace(/x|X|×|\*/g, '*')
+                .replace(/÷/g, '/');
+
+            // 2. التحقق من وجود نصوص ملتصقة بعد تحويل رموز الضرب
+            let hasAttachedTextBeforeOrAfter = /(\d+[a-zA-Zأ-ي\u0600-\u06FF])|([a-zA-Zأ-ي\u0600-\u06FF]\d+)/.test(sanitizedExpr);
 
             if (hasAttachedTextBeforeOrAfter && !currentRow.forceCalc) {
                 currentRow.result = 0;
@@ -1920,7 +1936,7 @@
                 return;
             }
 
-            let percentMatch = expr.match(/^([\d.]+)\s*([\+\-\*\/])\s*([\d.]+)%$/);
+            let percentMatch = sanitizedExpr.match(/^([\d.]+)\s*([\+\-\*\/])\s*([\d.]+)%$/);
             if (percentMatch) {
                 let baseNum = parseFloat(percentMatch[1]);
                 let operator = percentMatch[2];
@@ -1943,15 +1959,11 @@
                 return;
             }
 
-            let sanitizedExpr = expr
-                .replace(/×/g, '*')
-                .replace(/÷/g, '/');
-
             let validMathPattern = /^[0-9+\-*/.\s()a-zA-Zأ-ي\u0600-\u06FF%]+$/;
 
             if (validMathPattern.test(sanitizedExpr)) {
                 try {
-                    let singleNegativeMatch = expr.match(/^-\s*([\d.]+)$/);
+                    let singleNegativeMatch = sanitizedExpr.match(/^-\s*([\d.]+)$/);
                     if (singleNegativeMatch) {
                         let res = -parseFloat(singleNegativeMatch[1]);
                         currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
@@ -2036,7 +2048,7 @@
 
             rows.forEach((r, i) => {
                 let note = (r.isTextVisible && r.textExpression) ? `[${r.textExpression}]` : `[سطر ${i+1}]`;
-                let calc = (r.isCalcVisible && r.expression) ? `= ${r.expression}` : '';
+                let calc = (r.isCalcVisible && r.expression) ? `= ${r.expression.replace(/\*/g, 'x')}` : '';
                 let res = r.result !== 0 ? `← ${r.result} ${showCurrency ? 'جنيه' : ''}` : '';
                 
                 text += `${i + 1}. ${note} ${calc} ${res}\n`;
@@ -2071,7 +2083,6 @@
             if (successMessage) alert(successMessage);
         }
 
-        // الوظائف الجديدة والقديمة للتصدير والمشاركة
         function openPhoneWhatsApp() {
             window.location.href = "whatsapp://";
         }
@@ -2123,7 +2134,7 @@
                 "السطر": i + 1,
                 "العمود النصي / الملاحظات (اليمين)": r.isTextVisible ? r.textExpression : '',
                 "النتيجة (الوسط)": showCurrency ? `${r.result} جنيه` : r.result,
-                "العملية الحسابية (اليسار)": r.isCalcVisible ? r.expression : ''
+                "العملية الحسابية (اليسار)": r.isCalcVisible ? r.expression.replace(/\*/g, 'x') : ''
             }));
             
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -2140,7 +2151,7 @@
             
             rows.forEach((r, i) => {
                 let textText = r.isTextVisible ? r.textExpression : '';
-                let exprText = r.isCalcVisible ? r.expression : '';
+                let exprText = r.isCalcVisible ? r.expression.replace(/\*/g, 'x') : '';
                 let resText = showCurrency ? `${r.result} جنيه` : r.result;
                 htmlContent += `<tr><td>${i+1}</td><td>${textText}</td><td>${resText}</td><td>${exprText}</td></tr>`;
             });
