@@ -944,6 +944,11 @@
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
+        // المتغيرات الخاصة بالتحكم بالمايك المستمر وزر المسافة
+        let activeSpeechRecognition = null;
+        let isMicLockedManual = false;
+        let currentActiveMicBtn = null;
+
         function toggleHideSelectionMode() {
             isSelectionModeActive = !isSelectionModeActive;
             
@@ -1343,8 +1348,6 @@
             let lastTapTime = 0;
             let longPressTimer = null;
             let isLongPressFired = false;
-
-            // متغيرات خاصة بالكمبيوتر للتعرف على النقر الثلاثي
             let clickCount = 0;
             let clickTimer = null;
 
@@ -1389,18 +1392,16 @@
                     clearTimeout(longPressTimer);
                 });
             } else {
-                // سلوك الكمبيوتر حصراً
                 element.addEventListener('mousedown', (e) => {
                     activeRowIndex = index;
                     activeFieldIndex = field;
                     updateActiveRowClasses();
 
-                    // التعامل مع النقر الثلاثي بـ click الكباين/الماوس
                     clickCount++;
                     if (clickCount === 1) {
                         clickTimer = setTimeout(() => {
                             clickCount = 0;
-                        }, 400); // مهلة زمنية للـ Triple click
+                        }, 400);
                     } else if (clickCount === 3) {
                         clearTimeout(clickTimer);
                         clickCount = 0;
@@ -1412,7 +1413,6 @@
 
             element.addEventListener('dblclick', (e) => {
                 e.preventDefault();
-                // الموبايل يحتفظ بالسلوك القديم، بينما الكمبيوتر لا يفتح الآلة الحاسبة هنا بناءً على طلبك
                 if (isMobile) {
                     openCalcPadForField(index, field);
                 }
@@ -1828,6 +1828,7 @@
             }
         }
 
+        // التعديل الرئيسي هنا: تفعيل المايك بشكل مستمر عند الضغط على زر المسافة
         function startSpeechRecognition(index, micBtn) {
             const targetRow = activeRowIndex;
             const targetField = activeFieldIndex;
@@ -1838,16 +1839,34 @@
                 return;
             }
 
+            // إذا كان المايك شغال أساساً وتم الضغط عليه، نقوم بإيقافه يدوياً
+            if (activeSpeechRecognition) {
+                isMicLockedManual = false;
+                try { activeSpeechRecognition.stop(); } catch(e) {}
+                activeSpeechRecognition = null;
+                if (currentActiveMicBtn) {
+                    currentActiveMicBtn.classList.remove('listening');
+                    currentActiveMicBtn.innerHTML = '🎤';
+                }
+                currentActiveMicBtn = null;
+                return;
+            }
+
             const recognition = new SpeechRecognition();
+            activeSpeechRecognition = recognition;
+            currentActiveMicBtn = micBtn;
+            isMicLockedManual = false; // يبدأ بصورة طبيعية حتى يتم الضغط على المسافة
+
             recognition.lang = 'ar-SA';
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
+            recognition.continuous = true; // السماح بالاستماع المتواصل
 
             micBtn.classList.add('listening');
             micBtn.innerHTML = '🔴';
 
             recognition.onresult = (event) => {
-                const speechToText = event.results[0][0].transcript;
+                const speechToText = event.results[event.results.length - 1][0].transcript;
                 
                 if (targetField === 'text') {
                     rows[targetRow].textExpression = rows[targetRow].textExpression ? rows[targetRow].textExpression + ' ' + speechToText : speechToText;
@@ -1861,17 +1880,79 @@
             };
 
             recognition.onerror = () => {
-                micBtn.classList.remove('listening');
-                micBtn.innerHTML = '🎤';
+                if (!isMicLockedManual) {
+                    micBtn.classList.remove('listening');
+                    micBtn.innerHTML = '🎤';
+                    activeSpeechRecognition = null;
+                    currentActiveMicBtn = null;
+                }
             };
 
             recognition.onend = () => {
-                micBtn.classList.remove('listening');
-                micBtn.innerHTML = '🎤';
+                // إذا تم الضغط على زر المسافة وأصبح المايك مقفولاً يدوياً، نعيد تشغيله أوتوماتيكياً لكي لا يفصل أبداً
+                if (isMicLockedManual && activeSpeechRecognition === recognition) {
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        // تجاهل خطأ التشغيل المتكرر إن وجد
+                    }
+                } else {
+                    micBtn.classList.remove('listening');
+                    micBtn.innerHTML = '🎤';
+                    activeSpeechRecognition = null;
+                    currentActiveMicBtn = null;
+                }
             };
 
             recognition.start();
         }
+
+        // مراقبة لوحة المفاتيح لمعرفة هل تم الضغط على زر "المسافة" (Space) والمايك شغال
+        window.addEventListener('keydown', (event) => {
+            if (event.key === ' ' || event.code === 'Space') {
+                if (activeSpeechRecognition && !isMicLockedManual) {
+                    isMicLockedManual = true; // تثبيت المايك بحيث يستمر ولا يفصل إلا بالضغط اليدوي عليه
+                    if (currentActiveMicBtn) {
+                        currentActiveMicBtn.title = 'المايك يعمل بوضع الاستمرار (اضغط عليه لإيقافه)';
+                    }
+                }
+            }
+
+            const key = event.key;
+
+            if (key === 'Escape') {
+                if (activeSpeechRecognition) {
+                    try { activeSpeechRecognition.stop(); } catch(e) {}
+                    activeSpeechRecognition = null;
+                    isMicLockedManual = false;
+                    if (currentActiveMicBtn) {
+                        currentActiveMicBtn.classList.remove('listening');
+                        currentActiveMicBtn.innerHTML = '🎤';
+                    }
+                    currentActiveMicBtn = null;
+                }
+                rows = [{ 
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                }];
+                activeRowIndex = 0;
+                activeFieldIndex = 'calc';
+                renderCalculator('calc');
+            }
+            else if (key === 'Backspace') {
+                const activeInput = document.activeElement;
+                if (activeInput && (activeInput.classList.contains('calc-input') || activeInput.classList.contains('text-input'))) {
+                    if (activeInput.value === '' && activeRowIndex > 0) {
+                        event.preventDefault();
+                        rows.splice(activeRowIndex, 1);
+                        activeRowIndex--;
+                        closeAllPads();
+                        activeFieldIndex = 'calc';
+                        renderCalculator('calc');
+                    }
+                }
+            }
+        });
 
         function updateActiveRowClasses() {
             const rowDivs = screenContainer.querySelectorAll('.calc-row');
@@ -2210,33 +2291,6 @@
                 dropdown.style.display = 'inline-block';
             });
         }
-
-        document.addEventListener('keydown', (event) => {
-            const key = event.key;
-
-            if (key === 'Escape') {
-                rows = [{ 
-                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: title = true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                }];
-                activeRowIndex = 0;
-                activeFieldIndex = 'calc';
-                renderCalculator('calc');
-            }
-            else if (key === 'Backspace') {
-                const activeInput = document.activeElement;
-                if (activeInput && (activeInput.classList.contains('calc-input') || activeInput.classList.contains('text-input'))) {
-                    if (activeInput.value === '' && activeRowIndex > 0) {
-                        event.preventDefault();
-                        rows.splice(activeRowIndex, 1);
-                        activeRowIndex--;
-                        closeAllPads();
-                        activeFieldIndex = 'calc';
-                        renderCalculator('calc');
-                    }
-                }
-            }
-        });
 
         renderCalculator('calc');
     </script>
