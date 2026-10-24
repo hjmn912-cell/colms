@@ -717,6 +717,12 @@
             animation: pulse 1.2s infinite;
         }
 
+        .mic-btn.continuous-mode {
+            background-color: rgba(239, 68, 68, 0.2) !important;
+            border: 1px solid #ef4444 !important;
+            border-radius: 50%;
+        }
+
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.4; }
@@ -944,10 +950,11 @@
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
-        // المتغيرات الخاصة بالتحكم بالمايك المستمر وزر المسافة
+        // متغيرات للتحكم بوضع التعرف الصوتي المباشر والربط بالنقر المزدوج
         let activeSpeechRecognition = null;
-        let isMicLockedManual = false;
+        let isMicContinuousMode = false;
         let currentActiveMicBtn = null;
+        let micClickTimer = null;
 
         function toggleHideSelectionMode() {
             isSelectionModeActive = !isSelectionModeActive;
@@ -1688,12 +1695,24 @@
                 const micBtn = document.createElement('button');
                 micBtn.className = 'mic-btn';
                 micBtn.innerHTML = '🎤';
-                micBtn.title = 'تحدث للإدخال في الحقل النشط';
+                micBtn.title = 'انقر مرة واحدة للتحدث المؤقت، أو انقر مرتين متتاليتين للتشغيل المستمر';
                 micBtn.type = 'button';
+
+                // التعامل مع النقرة الفردية والنقرة المزدوجة على المايك
                 micBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    startSpeechRecognition(index, micBtn);
+                    if (micClickTimer === null) {
+                        micClickTimer = setTimeout(() => {
+                            micClickTimer = null;
+                            handleMicClick(index, micBtn, false); // نقرة واحدة (عادية)
+                        }, 300);
+                    } else {
+                        clearTimeout(micClickTimer);
+                        micClickTimer = null;
+                        handleMicClick(index, micBtn, true); // نقرتين متتاليتين (مستمر)
+                    }
                 });
+
                 micWrapper.appendChild(micBtn);
 
                 const deleteBtn = document.createElement('button');
@@ -1828,7 +1847,31 @@
             }
         }
 
-        // التعديل الرئيسي هنا: تفعيل المايك بشكل مستمر عند الضغط على زر المسافة
+        // دالة التعامل مع كليك المايك (نقرة واحدة أم نقرتين متتاليتين)
+        function handleMicClick(index, micBtn, isDoubleClick) {
+            if (activeSpeechRecognition) {
+                // إذا كان شغالاً بالفعل وقمنا بالضغط عليه مرة أخرى ينطفئ فوراً
+                stopActiveMic();
+                return;
+            }
+
+            isMicContinuousMode = isDoubleClick; // إن كانت دبل كليك يفعّل الوضع المستمر
+            startSpeechRecognition(index, micBtn);
+        }
+
+        function stopActiveMic() {
+            if (activeSpeechRecognition) {
+                isMicContinuousMode = false;
+                try { activeSpeechRecognition.stop(); } catch(e) {}
+                activeSpeechRecognition = null;
+            }
+            if (currentActiveMicBtn) {
+                currentActiveMicBtn.classList.remove('listening', 'continuous-mode');
+                currentActiveMicBtn.innerHTML = '🎤';
+                currentActiveMicBtn = null;
+            }
+        }
+
         function startSpeechRecognition(index, micBtn) {
             const targetRow = activeRowIndex;
             const targetField = activeFieldIndex;
@@ -1839,31 +1882,24 @@
                 return;
             }
 
-            // إذا كان المايك شغال أساساً وتم الضغط عليه، نقوم بإيقافه يدوياً
-            if (activeSpeechRecognition) {
-                isMicLockedManual = false;
-                try { activeSpeechRecognition.stop(); } catch(e) {}
-                activeSpeechRecognition = null;
-                if (currentActiveMicBtn) {
-                    currentActiveMicBtn.classList.remove('listening');
-                    currentActiveMicBtn.innerHTML = '🎤';
-                }
-                currentActiveMicBtn = null;
-                return;
-            }
-
             const recognition = new SpeechRecognition();
             activeSpeechRecognition = recognition;
             currentActiveMicBtn = micBtn;
-            isMicLockedManual = false; // يبدأ بصورة طبيعية حتى يتم الضغط على المسافة
 
             recognition.lang = 'ar-SA';
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
-            recognition.continuous = true; // السماح بالاستماع المتواصل
+            recognition.continuous = true;
 
             micBtn.classList.add('listening');
             micBtn.innerHTML = '🔴';
+
+            if (isMicContinuousMode) {
+                micBtn.classList.add('continuous-mode');
+                micBtn.title = 'المايك يعمل بوضع الاستمرار الدائم (اضغط لإيقافه)';
+            } else {
+                micBtn.title = 'تحدث للإدخال في الحقل النشط';
+            }
 
             recognition.onresult = (event) => {
                 const speechToText = event.results[event.results.length - 1][0].transcript;
@@ -1880,57 +1916,30 @@
             };
 
             recognition.onerror = () => {
-                if (!isMicLockedManual) {
-                    micBtn.classList.remove('listening');
-                    micBtn.innerHTML = '🎤';
-                    activeSpeechRecognition = null;
-                    currentActiveMicBtn = null;
+                if (!isMicContinuousMode) {
+                    stopActiveMic();
                 }
             };
 
             recognition.onend = () => {
-                // إذا تم الضغط على زر المسافة وأصبح المايك مقفولاً يدوياً، نعيد تشغيله أوتوماتيكياً لكي لا يفصل أبداً
-                if (isMicLockedManual && activeSpeechRecognition === recognition) {
+                // إذا كان المايك في وضع "النقرتين المتتاليتين" يستمر ولا يتوقف تلقائياً
+                if (isMicContinuousMode && activeSpeechRecognition === recognition) {
                     try {
                         recognition.start();
-                    } catch (e) {
-                        // تجاهل خطأ التشغيل المتكرر إن وجد
-                    }
+                    } catch (e) {}
                 } else {
-                    micBtn.classList.remove('listening');
-                    micBtn.innerHTML = '🎤';
-                    activeSpeechRecognition = null;
-                    currentActiveMicBtn = null;
+                    stopActiveMic();
                 }
             };
 
             recognition.start();
         }
 
-        // مراقبة لوحة المفاتيح لمعرفة هل تم الضغط على زر "المسافة" (Space) والمايك شغال
         window.addEventListener('keydown', (event) => {
-            if (event.key === ' ' || event.code === 'Space') {
-                if (activeSpeechRecognition && !isMicLockedManual) {
-                    isMicLockedManual = true; // تثبيت المايك بحيث يستمر ولا يفصل إلا بالضغط اليدوي عليه
-                    if (currentActiveMicBtn) {
-                        currentActiveMicBtn.title = 'المايك يعمل بوضع الاستمرار (اضغط عليه لإيقافه)';
-                    }
-                }
-            }
-
             const key = event.key;
 
             if (key === 'Escape') {
-                if (activeSpeechRecognition) {
-                    try { activeSpeechRecognition.stop(); } catch(e) {}
-                    activeSpeechRecognition = null;
-                    isMicLockedManual = false;
-                    if (currentActiveMicBtn) {
-                        currentActiveMicBtn.classList.remove('listening');
-                        currentActiveMicBtn.innerHTML = '🎤';
-                    }
-                    currentActiveMicBtn = null;
-                }
+                stopActiveMic();
                 rows = [{ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
                     isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
