@@ -303,7 +303,7 @@
             position: absolute;
             left: 0;
             background-color: #1e293b;
-            min-width: 190px;
+            min-width: 210px;
             box-shadow: 0px 8px 16px rgba(0,0,0,0.5);
             border-radius: 6px;
             z-index: 2000;
@@ -409,6 +409,12 @@
             gap: 4px;
             flex: 1; 
             min-width: 0;
+        }
+
+        .mic-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .global-select-checkbox, .calc-select-checkbox {
@@ -656,6 +662,10 @@
             pointer-events: none !important;
         }
 
+        .calc-row.hidden-mic .mic-btn {
+            display: none !important;
+        }
+
         .calc-output-container {
             display: flex;
             align-items: baseline;
@@ -855,12 +865,14 @@
                                 <button onclick="exportToExcel()">📊 إكسيل (Excel)</button>
                                 <button onclick="exportToWord()">📝 وورد (Word)</button>
                                 <button onclick="exportToPDF()">📄 بي دي إف (PDF)</button>
+                                <button onclick="exportToTXT()">📄 تصدير ملف نصي (TXT)</button>
                                 <button onclick="exportToImage()">🖼️ تنزيل صورة</button>
                                 
                                 <div class="dropdown-divider"></div>
                                 
                                 <button onclick="shareLinkToWhatsApp()">💬 إرسال التقرير للواتساب</button>
                                 <button onclick="shareLinkToMessenger()">⚡ إرسال التقرير للماسنجر</button>
+                                <button onclick="shareLinkToSMS()">📱 إرسال التقرير عبر رسالة نصية (SMS)</button>
                             </div>
                         </div>
                     </div>
@@ -918,6 +930,7 @@
                 ignoreBeforeIndex: 0, 
                 isCalcVisible: true, 
                 isTextVisible: true,
+                isMicVisible: true,
                 isCalcPadVisible: false, 
                 isTextPadVisible: false
             }
@@ -943,7 +956,6 @@
         }
 
         function updateGlobalHides() {
-            // تحديث إخفاء العناصر العامة بناءً على الـ Checkboxes الخاصة بها
             optionsDropdownEl.style.display = document.getElementById('hideOptionsCheckbox').checked ? 'none' : 'inline-block';
             refreshBtnEl.style.display = document.getElementById('hideRefreshCheckbox').checked ? 'none' : 'inline-flex';
             exportDropdownEl.style.display = document.getElementById('hideExportCheckbox').checked ? 'none' : 'inline-block';
@@ -974,7 +986,7 @@
             } else {
                 rows.push({ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = 'calc';
@@ -995,7 +1007,7 @@
             } else {
                 rows.push({ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = 'text';
@@ -1144,7 +1156,7 @@
             } else {
                 rows.push({ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = field;
@@ -1163,7 +1175,7 @@
             } else {
                 rows.push({ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                 });
                 targetIndex = rows.length - 1;
             }
@@ -1388,7 +1400,7 @@
 
             rows.forEach((row, index) => {
                 const rowDiv = document.createElement('div');
-                rowDiv.className = `calc-row ${index === activeRowIndex ? 'active' : ''} ${!row.isCalcVisible ? 'hidden-calc' : ''} ${!row.isTextVisible ? 'hidden-text' : ''}`;
+                rowDiv.className = `calc-row ${index === activeRowIndex ? 'active' : ''} ${!row.isCalcVisible ? 'hidden-calc' : ''} ${!row.isTextVisible ? 'hidden-text' : ''} ${!row.isMicVisible ? 'hidden-mic' : ''}`;
 
                 const rowMain = document.createElement('div');
                 rowMain.className = 'calc-row-main';
@@ -1436,7 +1448,7 @@
                         closeAllPads();
                         rows.push({ 
                             textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                            isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                            isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                         });
                         activeRowIndex = rows.length - 1;
                         activeFieldIndex = 'text';
@@ -1556,7 +1568,7 @@
                     } else {
                         rows.push({ 
                             textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                            isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                            isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                         });
                         targetIndex = rows.length - 1;
                     }
@@ -1625,6 +1637,24 @@
                 inputsGroup.appendChild(outputContainer);
                 inputsGroup.appendChild(calcWrapper);
 
+                const micWrapper = document.createElement('div');
+                micWrapper.className = 'mic-wrapper';
+
+                // Checkbox لإخفاء المايك لكل سطر
+                if (isSelectionModeActive) {
+                    const selectMicCheckbox = document.createElement('input');
+                    selectMicCheckbox.type = 'checkbox';
+                    selectMicCheckbox.className = 'calc-select-checkbox';
+                    selectMicCheckbox.checked = !row.isMicVisible;
+                    selectMicCheckbox.title = 'علم هنا لإخفاء المايك لهذا السطر';
+                    
+                    selectMicCheckbox.addEventListener('change', (e) => {
+                        row.isMicVisible = !e.target.checked;
+                    });
+                    
+                    micWrapper.appendChild(selectMicCheckbox);
+                }
+
                 const micBtn = document.createElement('button');
                 micBtn.className = 'mic-btn';
                 micBtn.innerHTML = '🎤';
@@ -1634,6 +1664,7 @@
                     e.stopPropagation();
                     startSpeechRecognition(index, micBtn);
                 });
+                micWrapper.appendChild(micBtn);
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'delete-row-btn';
@@ -1646,7 +1677,7 @@
                 });
 
                 rowMain.appendChild(inputsGroup);
-                rowMain.appendChild(micBtn);
+                rowMain.appendChild(micWrapper);
                 rowMain.appendChild(deleteBtn);
                 rowDiv.appendChild(rowMain);
 
@@ -1704,7 +1735,6 @@
             positiveTotalValEl.innerText = showPositiveCheckbox.checked ? posFormatted.text : '';
             negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
             
-            // تطبيق حالة الإخفاء العامة لضمان استمراريتها بعد التحديث
             updateGlobalHides();
         }
 
@@ -1724,7 +1754,7 @@
                 } else {
                     rows.push({ 
                         textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                        isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                        isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                     });
                     activeRowIndex = rows.length - 1;
                     activeFieldIndex = currentField;
@@ -1845,6 +1875,7 @@
                 rows[0].ignoreBeforeIndex = 0;
                 rows[0].isCalcVisible = true;
                 rows[0].isTextVisible = true;
+                rows[0].isMicVisible = true;
                 rows[0].isCalcPadVisible = false;
                 rows[0].isTextPadVisible = false;
             } else {
@@ -2011,40 +2042,69 @@
             });
 
             text += "-------------------------\n";
-            text += `💰 *الإجمالي النهائي:* ${grandTotalEl.innerText} ${showCurrency ? 'جنيه' : ''}\n`;
+            if (grandTotalEl.style.display !== 'none') {
+                text += `💰 *الإجمالي النهائي:* ${grandTotalEl.innerText} ${grandTotalCurrencyEl.style.display !== 'none' && showCurrency ? 'جنيه' : ''}\n`;
+            }
             return text;
         }
 
-        function shareLinkToWhatsApp() {
-            const text = generateShareSummaryText();
-            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-            window.open(whatsappUrl, '_blank');
-        }
-
-        function shareLinkToMessenger() {
-            const text = generateShareSummaryText();
-            
+        // نسخ النص وتوجيهه لأي تطبيق
+        function copyTextToClipboard(text, successMessage) {
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text).then(() => {
-                    alert("تم نسخ التقرير للحافظة بنجاح!\nسيفتح موقع الماسنجر الآن، قم بالدخول للمحادثة واضغط لصق (Ctrl + V).");
-                    window.open('https://www.messenger.com/', '_blank');
+                    if (successMessage) alert(successMessage);
                 }).catch(() => {
-                    fallbackMessengerCopy(text);
+                    fallbackCopyText(text, successMessage);
                 });
             } else {
-                fallbackMessengerCopy(text);
+                fallbackCopyText(text, successMessage);
             }
         }
 
-        function fallbackMessengerCopy(text) {
+        function fallbackCopyText(text, successMessage) {
             const dummy = document.createElement("textarea");
             document.body.appendChild(dummy);
             dummy.value = text;
             dummy.select();
             document.execCommand("copy");
             document.body.removeChild(dummy);
-            alert("تم نسخ التقرير للحافظة بنجاح!\nسيفتح موقع الماسنجر الآن، قم بالدخول للمحادثة واضغط لصق (Ctrl + V).");
+            if (successMessage) alert(successMessage);
+        }
+
+        // إرسال للواتساب مع نسخ التقرير بنفس الوقت
+        function shareLinkToWhatsApp() {
+            const text = generateShareSummaryText();
+            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيفتح موقع/تطبيق الواتساب الآن.");
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // إرسال للماسنجر
+        function shareLinkToMessenger() {
+            const text = generateShareSummaryText();
+            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيفتح موقع الماسنجر الآن، قم بالدخول للمحادثة واضغط لصق (Ctrl + V).");
             window.open('https://www.messenger.com/', '_blank');
+        }
+
+        // إرسال عبر SMS
+        function shareLinkToSMS() {
+            const text = generateShareSummaryText();
+            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيتم فتح برنامج الرسائل النصية (SMS) الآن.");
+            const smsUrl = `sms:?body=${encodeURIComponent(text)}`;
+            window.open(smsUrl, '_blank');
+        }
+
+        // تصدير كملف نصي TXT
+        function exportToTXT() {
+            const text = generateShareSummaryText();
+            let blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'Calculator_Results.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
         function exportToExcel() {
@@ -2122,7 +2182,7 @@
             if (key === 'Escape') {
                 rows = [{ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                 }];
                 activeRowIndex = 0;
                 activeFieldIndex = 'calc';
