@@ -1094,7 +1094,6 @@
                 rows[index].textExpression += val;
                 renderCalculator('text');
             } else {
-                // إذا كتب النجمة من اللوحة المصغرة، تتحول إلى * برمجياً لتخزينها
                 let actualVal = (val === 'x') ? '*' : val;
                 rows[index].expression += actualVal;
                 rows[index].forceCalc = false;
@@ -1281,7 +1280,6 @@
                 isDraggingKeypad = false;
             }
 
-            // عرض حرف x في اللوحة المصغرة للضرب
             const keys = [
                 '⬆ Up', '⬇ Down', '🗑 Del', '⌫',
                 '7', '8', '9', '/',
@@ -1346,57 +1344,78 @@
             let longPressTimer = null;
             let isLongPressFired = false;
 
+            // متغيرات خاصة بالكمبيوتر للتعرف على النقر الثلاثي
+            let clickCount = 0;
+            let clickTimer = null;
+
             if (isMobile) {
                 element.setAttribute('readonly', 'true');
                 element.setAttribute('inputmode', 'none');
-            }
 
-            element.addEventListener('touchstart', (e) => {
-                isLongPressFired = false;
-                activeRowIndex = index;
-                activeFieldIndex = field;
-                updateActiveRowClasses();
+                element.addEventListener('touchstart', (e) => {
+                    isLongPressFired = false;
+                    activeRowIndex = index;
+                    activeFieldIndex = field;
+                    updateActiveRowClasses();
 
-                longPressTimer = setTimeout(() => {
-                    isLongPressFired = true;
-                    openSystemKeyboard(index, field);
-                }, 400);
+                    longPressTimer = setTimeout(() => {
+                        isLongPressFired = true;
+                        openSystemKeyboard(index, field);
+                    }, 400);
 
-            }, { passive: true });
+                }, { passive: true });
 
-            element.addEventListener('touchend', (e) => {
-                clearTimeout(longPressTimer);
-                if (isLongPressFired) return;
+                element.addEventListener('touchend', (e) => {
+                    clearTimeout(longPressTimer);
+                    if (isLongPressFired) return;
 
-                const currentTime = new Date().getTime();
-                const tapLength = currentTime - lastTapTime;
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTapTime;
 
-                if (tapLength < 350 && tapLength > 0) {
-                    e.preventDefault();
-                    if (isMobile) {
-                        element.setAttribute('readonly', 'true');
-                        element.setAttribute('inputmode', 'none');
+                    if (tapLength < 350 && tapLength > 0) {
+                        e.preventDefault();
+                        if (isMobile) {
+                            element.setAttribute('readonly', 'true');
+                            element.setAttribute('inputmode', 'none');
+                        }
+                        openCalcPadForField(index, field);
+                        lastTapTime = 0;
+                    } else {
+                        lastTapTime = currentTime;
                     }
-                    openCalcPadForField(index, field);
-                    lastTapTime = 0;
-                } else {
-                    lastTapTime = currentTime;
-                }
-            });
+                });
 
-            element.addEventListener('touchmove', () => {
-                clearTimeout(longPressTimer);
-            });
+                element.addEventListener('touchmove', () => {
+                    clearTimeout(longPressTimer);
+                });
+            } else {
+                // سلوك الكمبيوتر حصراً
+                element.addEventListener('mousedown', (e) => {
+                    activeRowIndex = index;
+                    activeFieldIndex = field;
+                    updateActiveRowClasses();
 
-            element.addEventListener('mousedown', (e) => {
-                activeRowIndex = index;
-                activeFieldIndex = field;
-                updateActiveRowClasses();
-            });
+                    // التعامل مع النقر الثلاثي بـ click الكباين/الماوس
+                    clickCount++;
+                    if (clickCount === 1) {
+                        clickTimer = setTimeout(() => {
+                            clickCount = 0;
+                        }, 400); // مهلة زمنية للـ Triple click
+                    } else if (clickCount === 3) {
+                        clearTimeout(clickTimer);
+                        clickCount = 0;
+                        e.preventDefault();
+                        openCalcPadForField(index, field);
+                    }
+                });
+            }
 
             element.addEventListener('dblclick', (e) => {
                 e.preventDefault();
-                openCalcPadForField(index, field);
+                // الموبايل يحتفظ بالسلوك القديم، بينما الكمبيوتر لا يفتح الآلة الحاسبة هنا بناءً على طلبك
+                if (isMobile) {
+                    openCalcPadForField(index, field);
+                }
             });
         }
 
@@ -1591,7 +1610,6 @@
                 const inputField = document.createElement('input');
                 inputField.type = 'text';
                 inputField.className = 'calc-input';
-                // استبدال علامة الضرب * بـ x في العرض المرئي للمستخدم
                 inputField.value = row.expression.replace(/\*/g, 'x');
 
                 if (index === activeRowIndex && activeFieldIndex === 'calc') {
@@ -1599,7 +1617,6 @@
                 }
 
                 inputField.addEventListener('input', (e) => {
-                    // تحويل أي نجمة * تضاف من لوحة المفاتيح إلى حرف x في العرض، وحفظها كـ * في التعبير
                     let rawVal = e.target.value.replace(/x|X|×/g, '*');
                     let displayVal = rawVal.replace(/\*/g, 'x');
                     
@@ -1922,12 +1939,10 @@
                 return;
             }
 
-            // 1. استبدال x أو X أو × أو * بـ * برمجياً أولاً قبل أي فحص للنصوص
             let sanitizedExpr = expr
                 .replace(/x|X|×|\*/g, '*')
                 .replace(/÷/g, '/');
 
-            // 2. التحقق من وجود نصوص ملتصقة بعد تحويل رموز الضرب
             let hasAttachedTextBeforeOrAfter = /(\d+[a-zA-Zأ-ي\u0600-\u06FF])|([a-zA-Zأ-ي\u0600-\u06FF]\d+)/.test(sanitizedExpr);
 
             if (hasAttachedTextBeforeOrAfter && !currentRow.forceCalc) {
@@ -2202,7 +2217,7 @@
             if (key === 'Escape') {
                 rows = [{ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    isCalcVisible: title = true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                 }];
                 activeRowIndex = 0;
                 activeFieldIndex = 'calc';
