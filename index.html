@@ -1411,7 +1411,6 @@
                 const textWrapper = document.createElement('div');
                 textWrapper.className = 'text-input-wrapper';
 
-                // Checkbox لإخفاء الملاحظات لكل سطر
                 if (isSelectionModeActive) {
                     const selectTextCheckbox = document.createElement('input');
                     selectTextCheckbox.type = 'checkbox';
@@ -1532,7 +1531,6 @@
                 const calcWrapper = document.createElement('div');
                 calcWrapper.className = 'calc-input-wrapper';
 
-                // Checkbox لإخفاء العملية الحسابية لكل سطر
                 if (isSelectionModeActive) {
                     const selectCheckbox = document.createElement('input');
                     selectCheckbox.type = 'checkbox';
@@ -1640,7 +1638,6 @@
                 const micWrapper = document.createElement('div');
                 micWrapper.className = 'mic-wrapper';
 
-                // Checkbox لإخفاء المايك لكل سطر
                 if (isSelectionModeActive) {
                     const selectMicCheckbox = document.createElement('input');
                     selectMicCheckbox.type = 'checkbox';
@@ -2027,11 +2024,10 @@
             negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
         }
 
-        // --- دالة تجهيز نص التقرير للظاهر فقط ---
+        // --- دالة تجهيز نص التقرير للظاهر فقط (بدون أي عنوان علوي) ---
         function generateShareSummaryText() {
             const showCurrency = showCurrencyCheckbox.checked;
-            let text = "📊 *تقرير الآلة الحاسبة*\n";
-            text += "-------------------------\n";
+            let text = "";
 
             rows.forEach((r, i) => {
                 let note = (r.isTextVisible && r.textExpression) ? `[${r.textExpression}]` : `[سطر ${i+1}]`;
@@ -2048,7 +2044,6 @@
             return text;
         }
 
-        // نسخ النص وتوجيهه لأي تطبيق
         function copyTextToClipboard(text, successMessage) {
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text).then(() => {
@@ -2071,7 +2066,6 @@
             if (successMessage) alert(successMessage);
         }
 
-        // إرسال للواتساب مع نسخ التقرير بنفس الوقت
         function shareLinkToWhatsApp() {
             const text = generateShareSummaryText();
             copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيفتح موقع/تطبيق الواتساب الآن.");
@@ -2079,14 +2073,12 @@
             window.open(whatsappUrl, '_blank');
         }
 
-        // إرسال للماسنجر
         function shareLinkToMessenger() {
             const text = generateShareSummaryText();
             copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيفتح موقع الماسنجر الآن، قم بالدخول للمحادثة واضغط لصق (Ctrl + V).");
             window.open('https://www.messenger.com/', '_blank');
         }
 
-        // إرسال عبر SMS
         function shareLinkToSMS() {
             const text = generateShareSummaryText();
             copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيتم فتح برنامج الرسائل النصية (SMS) الآن.");
@@ -2094,7 +2086,6 @@
             window.open(smsUrl, '_blank');
         }
 
-        // تصدير كملف نصي TXT
         function exportToTXT() {
             const text = generateShareSummaryText();
             let blob = new Blob([text], { type: "text/plain;charset=utf-8" });
@@ -2125,7 +2116,6 @@
         function exportToWord() {
             const showCurrency = showCurrencyCheckbox.checked;
             let htmlContent = `<html dir="rtl"><head><meta charset='utf-8'></head><body>`;
-            htmlContent += `<h2>تقرير الآلة الحاسبة متعددة الأسطر</h2>`;
             htmlContent += `<table border="1" style="border-collapse:collapse; width:100%;">`;
             htmlContent += `<tr><th>السطر</th><th>الملاحظات (اليمين)</th><th>النتيجة (الوسط)</th><th>العملية الحسابية (اليسار)</th></tr>`;
             
