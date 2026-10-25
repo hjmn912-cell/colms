@@ -48,12 +48,12 @@
         }
 
         /* 
-          تعديل خاص للهواتف: تقسيم الشاشة إلى جزأين متساويين 
-          النصف العلوي للتحكم والإجماليات، النصف السفلي للآلة والأسطر 
+          تعديل خاص للهواتف: تقسيم الشاشة لنصفين متساويين 
+          الهيدر والإجماليات في النص العلوي، والأسطر وتبدأ مباشرة تحتها في النص السفلي 
         */
         .calculator-container.mobile-split-screen {
-            display: grid !important;
-            grid-template-rows: 50vh 50vh !important;
+            display: flex !important;
+            flex-direction: column !important;
             height: 100vh !important;
             max-height: 100vh !important;
         }
@@ -64,13 +64,15 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            flex-shrink: 0;
         }
 
         .mobile-split-screen .calculator-screen {
             height: 50vh;
             max-height: 50vh;
             flex-grow: unset !important;
-            padding-bottom: 80px !important;
+            flex-shrink: 0;
+            padding-bottom: 150px !important;
         }
 
         .sticky-top-section {
@@ -966,7 +968,7 @@
             }
         }
 
-        // تطبيق تقسيم الشاشة (50% علوي للتحكم، 50% سفلي للآلة والأسطر) للهواتف فقط
+        // تقسيم الشاشة لنصفين متساويين للهواتف، بحيث تبدأ الأسطر مباشرة تحت الهيدر في النص السفلي
         const deviceType = detectDeviceType();
         if (deviceType === 'mobile') {
             calculatorContainer.classList.add('mobile-split-screen');
