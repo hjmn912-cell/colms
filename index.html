@@ -58,7 +58,7 @@
         .resize-edge.bottom { bottom: 0; left: 0; width: 100%; height: 12px; cursor: s-resize; }
         .resize-edge.corner-br { bottom: 0; right: 0; width: 20px; height: 20px; cursor: nwse-resize; }
 
-        /* سطر المعاينة العلوي للموبايل (يعرض ما تكتبه فقط بدون أي إضافات) */
+        /* سطر المعاينة العلوي للموبايل (يعرض ما تكتبه مع ناتج السطر بلون مختلف) */
         .mobile-preview-top-bar {
             display: none;
             background-color: #020617;
@@ -73,6 +73,16 @@
             overflow-x: auto;
             flex-shrink: 0;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-preview-result {
+            color: #10b981;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-right: 15px;
         }
 
         .sticky-top-section {
@@ -816,8 +826,11 @@
         <!-- النقطة المؤشرة الزرقاء في أعلى اليسار للتحقق من التحديث -->
         <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
 
-        <!-- سطر المعاينة العلوي للموبايل (يعرض ما تكتبه فقط بدون أي إضافات) -->
-        <div id="mobilePreviewTopBar" class="mobile-preview-top-bar"></div>
+        <!-- سطر المعاينة العلوي للموبايل (يعرض النص/العملية مع ناتج السطر بلون أخضر) -->
+        <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
+            <span id="previewTextContent"></span>
+            <span id="previewResultContent" class="mobile-preview-result"></span>
+        </div>
 
         <div class="sticky-top-section" id="stickyTopSection">
             <div class="top-controls-wrapper">
@@ -940,6 +953,8 @@
         const screenContainer = document.getElementById('screenContainer');
         const calculatorContainer = document.getElementById('calculatorContainer');
         const mobilePreviewTopBar = document.getElementById('mobilePreviewTopBar');
+        const previewTextContent = document.getElementById('previewTextContent');
+        const previewResultContent = document.getElementById('previewResultContent');
         const stickyTopSection = document.getElementById('stickyTopSection');
         const grandTotalEl = document.getElementById('grandTotal');
         const grandTotalCurrencyEl = document.getElementById('grandTotalCurrency');
@@ -985,7 +1000,7 @@
         }
 
         if (isMobileNormal) {
-            mobilePreviewTopBar.style.display = 'block';
+            mobilePreviewTopBar.style.display = 'flex';
         }
 
         // تفعيل السحب والتوسيع من الحواف
@@ -1114,7 +1129,7 @@
                 if (hideOptions && hideRefresh && hideExport && document.getElementById('hideGrandTotalCheckbox').checked) {
                     mobilePreviewTopBar.style.display = 'none';
                 } else {
-                    mobilePreviewTopBar.style.display = 'block';
+                    mobilePreviewTopBar.style.display = 'flex';
                 }
             }
         }
@@ -1233,14 +1248,22 @@
             }
         });
 
-        // يعرض ما تكتبه فقط بدون أي كلمات إضافية مثل "السطر كذا"
+        // يعرض ما تكتبه مع ناتج السطر بلون أخضر مميز في الأعلى
         function updateMobilePreviewText() {
             if (!isMobileNormal) return;
             const currentRow = rows[activeRowIndex];
             if (!currentRow) return;
 
             let currentText = activeFieldIndex === 'text' ? currentRow.textExpression : currentRow.expression.replace(/\*/g, 'x');
-            mobilePreviewTopBar.innerText = currentText;
+            previewTextContent.innerText = currentText;
+
+            if (currentRow.result !== '' && currentRow.result !== 0) {
+                const formatted = formatDisplayValue(currentRow.result);
+                const showCurrency = showCurrencyCheckbox.checked;
+                previewResultContent.innerText = `${formatted.text} ${showCurrency ? 'جنيه' : ''}`;
+            } else {
+                previewResultContent.innerText = '';
+            }
         }
 
         function insertValueForField(index, field, val) {
@@ -2305,6 +2328,8 @@
 
             positiveTotalValEl.innerText = showPositiveCheckbox.checked ? posFormatted.text : '';
             negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
+            
+            updateMobilePreviewText();
         }
 
         function generateShareSummaryText() {
