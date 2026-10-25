@@ -58,13 +58,13 @@
         .resize-edge.bottom { bottom: 0; left: 0; width: 100%; height: 12px; cursor: s-resize; }
         .resize-edge.corner-br { bottom: 0; right: 0; width: 20px; height: 20px; cursor: nwse-resize; }
 
-        /* سطر المعاينة العلوي للموبايل (يعرض النص والناتج) */
+        /* سطر المعاينة العلوي للموبايل */
         .mobile-preview-top-bar {
             display: none;
             background-color: #020617;
             color: #38bdf8;
-            padding: 10px 14px;
-            font-size: 1.2rem;
+            padding: 6px 10px;
+            font-size: 1.1rem;
             font-weight: bold;
             border-bottom: 2px solid #38bdf8;
             width: 100%;
@@ -79,22 +79,52 @@
 
         .mobile-preview-result {
             color: #10b981;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
             margin-right: 15px;
         }
 
-        /* الكومبو بوكس الصغير الخاص بالموبايل للتحكم في الإخفاء */
+        /* الكومبو بوكس الصغير جداً بدون اسم وأصغر من زر الريفرش */
         .mobile-combo-box {
             background-color: #1e293b;
             color: #38bdf8;
             border: 1px solid #38bdf8;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.8rem;
+            padding: 3px 5px;
+            border-radius: 4px;
+            font-size: 0.75rem;
             cursor: pointer;
             outline: none;
-            margin-left: 8px;
+            margin-left: 6px;
+            height: 28px;
+            width: 32px;
+            text-align: center;
+        }
+
+        /* الأيقونة العائمة الصغيرة بجانب الكيبورد لفتح سطر جديد */
+        .floating-keyboard-action-btn {
+            position: fixed;
+            bottom: 260px;
+            left: 15px;
+            background-color: #38bdf8;
+            color: #0b0f19;
+            border: 2px solid #fff;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+            z-index: 100000;
+            cursor: pointer;
+            animation: bounceIn 0.3s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .sticky-top-section {
@@ -146,6 +176,11 @@
         .refresh-btn {
             padding: 6px 10px;
             font-size: 1rem;
+            height: 32px;
+            width: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .options-btn:hover, .refresh-btn:hover {
@@ -442,12 +477,12 @@
             min-width: 0;
         }
 
-        /* عمود الملاحظات يأخذ نسبة عرض أكبر مقارنة بالعملية الحسابية */
+        /* عمود الملاحظات يأخذ مساحة أكبر وتمدد ذكي لملء الفراغ عند إخفاء الأدوات */
         .text-input-wrapper {
             display: flex;
             align-items: center;
             gap: 4px;
-            flex: 2.2; 
+            flex: 2.5; 
             min-width: 0;
         }
 
@@ -710,6 +745,7 @@
             pointer-events: none !important;
         }
 
+        /* الفئات الافتراضية للإخفاء */
         .calc-row.hidden-mic .mic-wrapper {
             display: none !important;
         }
@@ -844,14 +880,17 @@
         <!-- النقطة المؤشرة الزرقاء في أعلى اليسار للتحقق من التحديث -->
         <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
 
-        <!-- سطر المعاينة العلوي للموبايل مع الكومبو بوكس الصغير للتحكم -->
+        <!-- الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد لإضافة سطر جديد -->
+        <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="إنشاء سطر جديد" onclick="handleFloatingKbdBtnClick()">➕</button>
+
+        <!-- سطر المعاينة العلوي للموبايل -->
         <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
-            <div style="display: flex; align-items: center; gap: 6px; overflow-x: auto; flex: 1;">
-                <!-- كومبو بوكس صغير للتحكم في الإخفاء -->
+            <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
+                <!-- كومبو بوكس صغير بدون اسم وصغر حجمه -->
                 <select id="mobileControlCombo" class="mobile-combo-box" onchange="handleMobileComboChange(this)">
-                    <option value="" disabled selected>خيارات الإخفاء ⚙️</option>
-                    <option value="toggle_mics">إخفاء/إظهار كل المايكات</option>
-                    <option value="toggle_tools">إخفاء/إظهار الأدوات الأخرى</option>
+                    <option value="" disabled selected>⚙️</option>
+                    <option value="toggle_mics">إظهار/إخفاء المايكات</option>
+                    <option value="toggle_tools">إظهار/إخفاء الأدوات</option>
                 </select>
                 <span id="previewTextContent"></span>
             </div>
@@ -982,6 +1021,7 @@
         const previewTextContent = document.getElementById('previewTextContent');
         const previewResultContent = document.getElementById('previewResultContent');
         const mobileControlCombo = document.getElementById('mobileControlCombo');
+        const floatingKeyboardNewRowBtn = document.getElementById('floatingKeyboardNewRowBtn');
         const stickyTopSection = document.getElementById('stickyTopSection');
         const grandTotalEl = document.getElementById('grandTotal');
         const grandTotalCurrencyEl = document.getElementById('grandTotalCurrency');
@@ -999,8 +1039,10 @@
         const exportDropdownEl = document.getElementById('exportDropdown');
 
         let isSelectionModeActive = false;
-        let globalHideMics = false;
-        let globalHideTools = false;
+        
+        // الوضع الافتراضي: المايكات مخفية والأدوات الأخرى مخفية
+        let globalHideMics = true;
+        let globalHideTools = true;
 
         function detectMobileEnvironment() {
             const ua = navigator.userAgent;
@@ -1032,6 +1074,35 @@
             mobilePreviewTopBar.style.display = 'flex';
         }
 
+        // كشف فتح كيبورد الموبايل وإظهار الأيقونة العائمة
+        let initialWindowHeight = window.innerHeight;
+        window.addEventListener('resize', () => {
+            if (isMobileAny) {
+                if (window.innerHeight < initialWindowHeight - 120) {
+                    // الكيبورد مفتوح
+                    floatingKeyboardNewRowBtn.style.display = 'flex';
+                } else {
+                    // الكيبورد مغلق
+                    floatingKeyboardNewRowBtn.style.display = 'none';
+                }
+            }
+        });
+
+        function handleFloatingKbdBtnClick() {
+            evaluateRow(activeRowIndex);
+            closeAllPads();
+
+            rows.push({ 
+                textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+            });
+            activeRowIndex = rows.length - 1;
+            activeFieldIndex = 'calc';
+            renderCalculator('calc');
+            screenContainer.scrollTop = screenContainer.scrollHeight;
+            updateMobilePreviewText();
+        }
+
         function handleMobileComboChange(selectEl) {
             const val = selectEl.value;
             if (val === 'toggle_mics') {
@@ -1039,7 +1110,7 @@
             } else if (val === 'toggle_tools') {
                 globalHideTools = !globalHideTools;
             }
-            selectEl.selectedIndex = 0; // إعادة ضبط القائمة
+            selectEl.selectedIndex = 0; // إعادة ضبط الاختيار
             renderCalculator();
         }
 
