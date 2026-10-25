@@ -48,7 +48,6 @@
             touch-action: none;
         }
 
-        /* حواف السحب والتوسيع (مثل نوافذ الويندوز) */
         .resize-edge {
             position: absolute;
             z-index: 10000;
@@ -58,7 +57,6 @@
         .resize-edge.bottom { bottom: 0; left: 0; width: 100%; height: 12px; cursor: s-resize; }
         .resize-edge.corner-br { bottom: 0; right: 0; width: 20px; height: 20px; cursor: nwse-resize; }
 
-        /* سطر المعاينة العلوي للموبايل */
         .mobile-preview-top-bar {
             display: none;
             background-color: #020617;
@@ -99,7 +97,6 @@
             text-align: center;
         }
 
-        /* كومبو بوكس إخفاء المايكات المصغر للكمبيوتر (بحجم زر العين تماماً) */
         .desktop-mic-combo {
             background-color: #1e293b;
             color: #38bdf8;
@@ -122,7 +119,6 @@
             color: #0b0f19;
         }
 
-        /* الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد */
         .floating-keyboard-action-btn {
             position: fixed;
             bottom: 260px;
@@ -216,7 +212,7 @@
             right: 0;
             top: 110%;
             background-color: #1e293b;
-            min-width: 170px;
+            min-width: 200px;
             box-shadow: 0px 8px 16px rgba(0,0,0,0.5);
             border-radius: 6px;
             z-index: 2000;
@@ -502,7 +498,6 @@
             min-width: 0;
         }
 
-        /* خلية الملاحظات (أعرض) */
         .text-input-wrapper {
             display: flex;
             align-items: center;
@@ -511,7 +506,6 @@
             min-width: 0;
         }
 
-        /* خلية العملية الحسابية (أقل عرضاً) */
         .calc-input-wrapper {
             display: flex;
             align-items: center;
@@ -896,8 +890,6 @@
         <div class="resize-edge bottom" id="edgeBottom"></div>
         <div class="resize-edge corner-br" id="edgeCornerBR"></div>
 
-        <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
-
         <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية وفتح الكيبورد" onclick="handleSmartNextCellClick()">🚀</button>
 
         <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
@@ -925,6 +917,14 @@
                                 <label class="option-toggle-label">
                                     <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
                                     إظهار كلمة جنيه
+                                </label>
+                                <label class="option-toggle-label">
+                                    <input type="checkbox" id="hideAllMicsCheckbox" onchange="renderCalculator()">
+                                    إخفاء جميع المايكات
+                                </label>
+                                <label class="option-toggle-label">
+                                    <input type="checkbox" id="hideOtherToolsCheckbox" onchange="updateGlobalHides()">
+                                    إخفاء الأدوات الأخرى
                                 </label>
                             </div>
                         </div>
@@ -973,7 +973,7 @@
             </div>
 
             <div class="calculator-header">
-                <div class="header-right-group">
+                <div class="header-right-group" id="headerRightGroupContainer">
                     <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
                     <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
                     
@@ -981,7 +981,6 @@
 
                     <span class="designer-credit">designed by Sami Arouj</span>
                     
-                    <!-- كومبو بوكس إخفاء/إظهار المايكات للكمبيوتر (موجود في الأعلى ناحية اليمين وبحجم زر العين تماماً) -->
                     <select id="desktopMicCombo" class="desktop-mic-combo" title="إظهار أو إخفاء المايكات" onchange="handleDesktopMicComboChange(this)">
                         <option value="" selected>🎤</option>
                         <option value="show">إظهار المايكات</option>
@@ -992,7 +991,7 @@
                         👁️
                     </button>
 
-                    <div style="display: flex; align-items: center; gap: 4px;">
+                    <div style="display: flex; align-items: center; gap: 4px;" id="exportDropdownContainer">
                         <input type="checkbox" id="hideExportCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
                         <div class="export-dropdown" id="exportDropdown">
                             <button class="export-btn" title="تصدير ومشاركة" onclick="toggleExportMenu(event)">
@@ -1043,6 +1042,8 @@
         const grandTotalEl = document.getElementById('grandTotal');
         const grandTotalCurrencyEl = document.getElementById('grandTotalCurrency');
         const showCurrencyCheckbox = document.getElementById('showCurrencyCheckbox');
+        const hideAllMicsCheckbox = document.getElementById('hideAllMicsCheckbox');
+        const hideOtherToolsCheckbox = document.getElementById('hideOtherToolsCheckbox');
         const showPositiveCheckbox = document.getElementById('showPositiveCheckbox');
         const showNegativeCheckbox = document.getElementById('showNegativeCheckbox');
         const positiveTotalValEl = document.getElementById('positiveTotalVal');
@@ -1054,12 +1055,10 @@
         const optionsDropdownEl = document.getElementById('optionsDropdown');
         const refreshBtnEl = document.getElementById('refreshBtnEl');
         const exportDropdownEl = document.getElementById('exportDropdown');
+        const toggleHideBtnEl = document.getElementById('toggleHideBtn');
 
         let isSelectionModeActive = false;
         
-        let globalHideMics = false; // افتراضياً ظاهرة للكمبيوتر ما لم يتم إخفاؤها
-        let globalHideTools = true;
-
         function detectMobileEnvironment() {
             const ua = navigator.userAgent;
             const width = window.innerWidth;
@@ -1081,12 +1080,14 @@
         const isMobileNormal = env === 'mobile-normal';
         const isMobileAny = env !== 'desktop';
 
-        // إخفاء أو إظهار الكومبو بوكس الخاص بالكمبيوتر حسب البيئة
+        // تعيين القيمة الافتراضية لإخفاء جميع المايكات بناءً على الموبايل
         if (isMobileAny) {
+            hideAllMicsCheckbox.checked = true;
             topActionBtn.style.display = 'inline-flex';
             topNotesFocusBtn.style.display = 'inline-flex';
             if (desktopMicCombo) desktopMicCombo.style.display = 'none';
         } else {
+            hideAllMicsCheckbox.checked = false;
             if (desktopMicCombo) desktopMicCombo.style.display = 'inline-flex';
         }
 
@@ -1125,24 +1126,16 @@
             renderCalculator(activeFieldIndex);
             scrollToActiveRow();
 
-            setTimeout(() => {
-                const targetEl = screenContainer.querySelector(`.calc-row.active .${activeFieldIndex === 'text' ? 'text-input' : 'calc-input'}`);
-                if (targetEl) {
-                    targetEl.removeAttribute('readonly');
-                    targetEl.removeAttribute('inputmode');
-                    targetEl.focus();
-                }
-            }, 30);
-
             updateMobilePreviewText();
         }
 
         function handleMobileComboChange(selectEl) {
             const val = selectEl.value;
             if (val === 'toggle_mics') {
-                globalHideMics = !globalHideMics;
+                hideAllMicsCheckbox.checked = !hideAllMicsCheckbox.checked;
             } else if (val === 'toggle_tools') {
-                globalHideTools = !globalHideTools;
+                hideOtherToolsCheckbox.checked = !hideOtherToolsCheckbox.checked;
+                updateGlobalHides();
             }
             selectEl.selectedIndex = 0;
             renderCalculator();
@@ -1151,9 +1144,9 @@
         function handleDesktopMicComboChange(selectEl) {
             const val = selectEl.value;
             if (val === 'show') {
-                globalHideMics = false;
+                hideAllMicsCheckbox.checked = false;
             } else if (val === 'hide') {
-                globalHideMics = true;
+                hideAllMicsCheckbox.checked = true;
             }
             selectEl.selectedIndex = 0;
             renderCalculator();
@@ -1269,10 +1262,24 @@
             const hideOptions = document.getElementById('hideOptionsCheckbox').checked;
             const hideRefresh = document.getElementById('hideRefreshCheckbox').checked;
             const hideExport = document.getElementById('hideExportCheckbox').checked;
+            const hideOtherTools = hideOtherToolsCheckbox.checked;
             
             optionsDropdownEl.style.display = hideOptions ? 'none' : 'inline-block';
             refreshBtnEl.style.display = hideRefresh ? 'none' : 'inline-flex';
             exportDropdownEl.style.display = hideExport ? 'none' : 'inline-block';
+            
+            // إخفاء الأدوات الأخرى (زر العين وزر الـ 🚀 والـ 📊 حسب الطلب)
+            if (hideOtherTools) {
+                toggleHideBtnEl.style.display = 'none';
+                const nextRowBtn = document.querySelector('.top-next-row-btn');
+                if (nextRowBtn) nextRowBtn.style.display = 'none';
+                exportDropdownEl.style.display = 'none';
+            } else {
+                toggleHideBtnEl.style.display = 'inline-flex';
+                const nextRowBtn = document.querySelector('.top-next-row-btn');
+                if (nextRowBtn) nextRowBtn.style.display = 'inline-flex';
+                if (!hideExport) exportDropdownEl.style.display = 'inline-block';
+            }
             
             document.getElementById('positiveTotalVal').parentElement.parentElement.style.display = document.getElementById('hidePositiveCheckbox').checked ? 'none' : 'flex';
             document.getElementById('negativeTotalVal').parentElement.parentElement.style.display = document.getElementById('hideNegativeCheckbox').checked ? 'none' : 'flex';
@@ -1462,15 +1469,6 @@
             activeFieldIndex = field;
             closeAllPads(); 
             renderCalculator(field);
-
-            setTimeout(() => {
-                const activeEl = screenContainer.querySelector(`.calc-row.active .${field === 'text' ? 'text-input' : 'calc-input'}`);
-                if (activeEl) {
-                    activeEl.removeAttribute('readonly');
-                    activeEl.removeAttribute('inputmode');
-                    activeEl.focus();
-                }
-            }, 30);
             updateMobilePreviewText();
         }
 
@@ -1530,14 +1528,6 @@
 
             if (field === 'text') {
                 renderCalculator(field);
-                setTimeout(() => {
-                    const activeText = screenContainer.querySelector('.calc-row.active .text-input');
-                    if (activeText) {
-                        activeText.removeAttribute('readonly');
-                        activeText.removeAttribute('inputmode');
-                        activeText.focus();
-                    }
-                }, 30);
             } else {
                 rows[targetIndex].isCalcPadVisible = true;
                 renderCalculator(field);
@@ -1686,9 +1676,6 @@
             let clickTimer = null;
 
             if (isMobileAny) {
-                element.setAttribute('readonly', 'true');
-                element.setAttribute('inputmode', 'none');
-
                 element.addEventListener('touchstart', (e) => {
                     isLongPressFired = false;
                     activeRowIndex = index;
@@ -1712,10 +1699,6 @@
 
                     if (tapLength < 350 && tapLength > 0) {
                         e.preventDefault();
-                        if (isMobileAny) {
-                            element.setAttribute('readonly', 'true');
-                            element.setAttribute('inputmode', 'none');
-                        }
                         openCalcPadForField(index, field);
                         lastTapTime = 0;
                     } else {
@@ -1803,14 +1786,14 @@
             let positiveSum = 0;
             let negativeSum = 0;
             const showCurrency = showCurrencyCheckbox.checked;
+            const hideAllMics = hideAllMicsCheckbox.checked;
 
             rows.forEach((row, index) => {
                 const rowDiv = document.createElement('div');
                 let rowClasses = `calc-row ${index === activeRowIndex ? 'active' : ''}`;
                 if (!row.isCalcVisible) rowClasses += ' hidden-calc';
                 if (!row.isTextVisible) rowClasses += ' hidden-text';
-                if (globalHideMics) rowClasses += ' hidden-mic';
-                if (globalHideTools) rowClasses += ' hidden-tools';
+                if (hideAllMics) rowClasses += ' hidden-mic';
                 rowDiv.className = rowClasses;
 
                 setupRowSwipeToDelete(rowDiv, index);
@@ -2085,16 +2068,8 @@
 
                 micWrapper.appendChild(micBtn);
 
-                // بناء السطر بناءً على جهاز الكمبيوتر أو الموبايل
-                // للكمبيوتر: المايك في الناحية الشمال (أقصى اليسار)
-                if (!isMobileAny) {
-                    rowMain.appendChild(inputsGroup);
-                    rowMain.appendChild(micWrapper);
-                } else {
-                    // للموبايل: المايك في مكانه الأصلي مع إخفائه افتراضياً حسب رغبتك السابقة
-                    rowMain.appendChild(inputsGroup);
-                    rowMain.appendChild(micWrapper);
-                }
+                rowMain.appendChild(inputsGroup);
+                rowMain.appendChild(micWrapper);
 
                 rowDiv.appendChild(rowMain);
 
