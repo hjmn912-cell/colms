@@ -47,10 +47,7 @@
             z-index: 9999;
         }
 
-        /* 
-          تعديل خاص للهواتف: تقسيم الشاشة لنصفين متساويين 
-          الهيدر والإجماليات في النص العلوي، والأسطر وتبدأ مباشرة تحتها في النص السفلي 
-        */
+        /* تقسيم الشاشة للموبايل: نصف علوي للتحكم والإجماليات، ونصف سفلي للأسطر تبدأ فوراً تحته */
         .calculator-container.mobile-split-screen {
             display: flex !important;
             flex-direction: column !important;
@@ -59,20 +56,21 @@
         }
 
         .mobile-split-screen .sticky-top-section {
-            height: 50vh;
-            max-height: 50vh;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
+            height: 50vh !important;
+            max-height: 50vh !important;
+            overflow-y: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            flex-shrink: 0 !important;
         }
 
         .mobile-split-screen .calculator-screen {
-            height: 50vh;
-            max-height: 50vh;
+            height: 50vh !important;
+            max-height: 50vh !important;
             flex-grow: unset !important;
-            flex-shrink: 0;
-            padding-bottom: 150px !important;
+            flex-shrink: 0 !important;
+            overflow-y: auto !important;
+            padding-bottom: 120px !important;
         }
 
         .sticky-top-section {
@@ -810,6 +808,9 @@
 
     <div class="calculator-container" id="calculatorContainer">
         
+        <!-- النقطة المؤشرة الخضراء في أعلى اليسار للتحقق من التحديث -->
+        <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #10b981; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #10b981;" title="مؤشر التحديث النشط"></div>
+
         <div class="sticky-top-section">
             <div class="top-controls-wrapper">
                 <div class="left-controls-group">
@@ -968,7 +969,7 @@
             }
         }
 
-        // تقسيم الشاشة لنصفين متساويين للهواتف، بحيث تبدأ الأسطر مباشرة تحت الهيدر في النص السفلي
+        // تطبيق تقسيم الشاشة للهواتف (سواء وضع عادي أو سطح مكتب)
         const deviceType = detectDeviceType();
         if (deviceType === 'mobile') {
             calculatorContainer.classList.add('mobile-split-screen');
