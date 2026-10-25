@@ -47,15 +47,30 @@
             z-index: 9999;
         }
 
-        /* فئة مخصصة لتعديل ارتفاع الآلة الحاسبة ليصبح نصف الشاشة فقط في الهواتف */
-        .calculator-container.mobile-half-screen {
-            height: 50vh !important;
-            max-height: 50vh !important;
-            top: auto !important;
-            bottom: 0 !important;
-            border-top: 2px solid #38bdf8;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
+        /* 
+          تعديل خاص للهواتف: تقسيم الشاشة إلى جزأين متساويين 
+          النصف العلوي للتحكم والإجماليات، النصف السفلي للآلة والأسطر 
+        */
+        .calculator-container.mobile-split-screen {
+            display: grid !important;
+            grid-template-rows: 50vh 50vh !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+        }
+
+        .mobile-split-screen .sticky-top-section {
+            height: 50vh;
+            max-height: 50vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-split-screen .calculator-screen {
+            height: 50vh;
+            max-height: 50vh;
+            flex-grow: unset !important;
+            padding-bottom: 80px !important;
         }
 
         .sticky-top-section {
@@ -930,19 +945,16 @@
 
         let isSelectionModeActive = false;
 
-        // دالة مخصصة للتحقق الدقيق من الجهاز (كمبيوتر، تابلت، موبايل) عند الفتح
         function detectDeviceType() {
             const ua = navigator.userAgent;
             const width = window.innerWidth;
             const height = window.innerHeight;
             const minDim = Math.min(width, height);
 
-            // التحقق مما إذا كان الجهاز آيباد أو تابلت أندرويد
             const isIPad = /iPad/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
             const isAndroidTablet = /Android/.test(ua) && !/Mobile/.test(ua);
             const isLargeScreenTablet = (isIPad || isAndroidTablet) || (minDim >= 600 && /Mobi|Android|iPhone|iPod/.test(ua));
 
-            // التحقق من الكمبيوتر (Desktop)
             const isDesktop = !(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) && width > 1024;
 
             if (isDesktop) {
@@ -954,10 +966,10 @@
             }
         }
 
-        // تطبيق شرط الارتفاع (نصف الشاشة للموبايل فقط عند الفتح)
+        // تطبيق تقسيم الشاشة (50% علوي للتحكم، 50% سفلي للآلة والأسطر) للهواتف فقط
         const deviceType = detectDeviceType();
         if (deviceType === 'mobile') {
-            calculatorContainer.classList.add('mobile-half-screen');
+            calculatorContainer.classList.add('mobile-split-screen');
         }
 
         const isMobile = deviceType === 'mobile' || deviceType === 'tablet';
@@ -2252,7 +2264,7 @@
 
         function exportToTXT() {
             const text = generateShareSummaryText();
-            let blob = new Blob([text], { type: "text/plain;charset=utf-8"});
+            let blob = new Blob([text], { type: "text/plain;charset=utf-8" });
             let url = URL.createObjectURL(blob);
             let a = document.createElement('a');
             a.href = url;
