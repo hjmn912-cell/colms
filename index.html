@@ -100,7 +100,7 @@
             text-align: center;
         }
 
-        /* الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد - تم تغيير الأيقونة للأيقونة الجديدة */
+        /* الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد */
         .floating-keyboard-action-btn {
             position: fixed;
             bottom: 260px;
@@ -355,7 +355,6 @@
             box-shadow: 0 0 8px rgba(234, 179, 8, 0.6);
         }
 
-        /* تصغير زر تصدير ومشاركة ليكون بحجم زر العين والريفرش وبدون نص */
         .export-dropdown {
             position: relative;
             display: inline-block;
@@ -433,7 +432,7 @@
 
         .calculator-screen {
             background-color: #0f172a;
-            padding: 10px;
+            padding: 10px 0; /* إزالة الحشو الأفقي من الشاشة ليفتح الجانب الأيسر بالكامل */
             display: flex;
             flex-direction: column;
             flex-grow: 1;
@@ -445,13 +444,15 @@
             will-change: transform;
         }
 
+        /* السطر (الإطار الخارجي): مفتوح من الجهة اليسارية لتخرج الخلية وتلتصق بحافة الشاشة */
         .calc-row {
             display: flex;
             flex-direction: column;
             background-color: #1e293b;
-            padding: 8px 10px;
-            border-radius: 8px;
+            padding: 8px 6px 8px 0px; /* فتح الحافة اليسارية بالكامل بـ 0px */
+            border-radius: 8px 0 0 8px; /* تدوير الجهة اليمنى فقط وترك اليسرى ممتدة مفتوحة */
             border: 1px solid transparent;
+            border-left: none !important; /* إلغاء الحد الأيسر للإطار الخارجي تماماً ليصبح مفتوحاً */
             transition: border-color 0.15s ease;
             gap: 8px;
             width: 100%;
@@ -468,40 +469,42 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             width: 100%;
         }
 
         .inputs-group {
             display: flex;
-            gap: 8px;
+            gap: 4px;
             flex-grow: 1;
             align-items: center;
             width: 100%;
             min-width: 0;
         }
 
-        /* عمود الملاحظات يأخذ مساحة أكبر وتمدد ذكي لملء الفراغ */
+        /* خلية الملاحظات (اليمين) أكبر وأوسع من خلية العملية الحسابية في كل الأحوال */
         .text-input-wrapper {
             display: flex;
             align-items: center;
             gap: 4px;
-            flex: 2.5; 
+            flex: 3; /* مساحة أكبر لضمان أن تكون دائماً أكبر وأوسع */
             min-width: 0;
+            padding-right: 6px; /* مسافة بسيطة من اليمين داخل الإطار */
         }
 
         .calc-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 4px;
-            flex: 1.2; 
+            gap: 2px;
+            flex: 1.5; /* مساحة أقل نسبياً مقارنة بالملاحظات، وتلتصق بالحافة اليسرى تماماً */
             min-width: 0;
         }
 
         .mic-wrapper {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
+            padding-left: 6px;
         }
 
         .global-select-checkbox, .calc-select-checkbox {
@@ -516,9 +519,9 @@
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid #38bdf8;
             color: #38bdf8;
-            font-size: 0.85rem;
-            width: 26px;
-            height: 26px;
+            font-size: 0.8rem;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: none;
             align-items: center;
@@ -707,7 +710,7 @@
             background: rgba(255, 255, 255, 0.03);
             border: 2px solid #334155;
             border-radius: 6px;
-            padding: 6px 8px;
+            padding: 6px 6px;
             color: #38bdf8;
             font-size: 1.3rem;
             font-weight: bold;
@@ -725,12 +728,16 @@
             line-height: 1.2;
         }
 
+        /* خلية الحسابات تلتصق تماماً بالحافة اليسارية للشاشة بدون أي زوايا مدورة من اليسار لتندمج مع الحافة */
         .calc-input {
             width: 100%;
             height: 38px;
             direction: ltr;
             text-align: right;
             font-size: 1.4rem;
+            border-left: none !important;
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
         }
 
         .text-border-active, .calc-border-active {
@@ -749,7 +756,6 @@
             pointer-events: none !important;
         }
 
-        /* الفئات الافتراضية للإخفاء */
         .calc-row.hidden-mic .mic-wrapper {
             display: none !important;
         }
@@ -762,22 +768,22 @@
         .calc-output-container {
             display: flex;
             align-items: baseline;
-            gap: 4px;
-            min-width: 90px;
+            gap: 3px;
+            min-width: 70px;
             text-align: left;
             white-space: nowrap;
             flex-shrink: 0;
         }
 
         .calc-output {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: #10b981;
             white-space: nowrap;
         }
 
         .row-currency {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #38bdf8;
             font-weight: 600;
             white-space: nowrap;
@@ -791,9 +797,9 @@
             background: transparent;
             border: none;
             color: #6b7280;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
-            padding: 2px 4px;
+            padding: 2px 2px;
             border-radius: 6px;
             transition: all 0.2s;
             white-space: nowrap;
@@ -856,7 +862,7 @@
                 justify-content: space-between;
             }
             .calc-output-container {
-                min-width: 70px;
+                min-width: 55px;
             }
             .text-input, .calc-input, .calc-output {
                 font-size: 1.15rem;
@@ -879,7 +885,7 @@
         <!-- النقطة المؤشرة الزرقاء في أعلى اليسار للتحقق من التحديث -->
         <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
 
-        <!-- الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد - أيقونة جديدة 🚀 -->
+        <!-- الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد 🚀 -->
         <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية وفتح الكيبورد" onclick="handleSmartNextCellClick()">🚀</button>
 
         <!-- سطر المعاينة العلوي للموبايل -->
@@ -967,7 +973,7 @@
                     <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
                     <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
                     
-                    <!-- زر الانتقال للخلية التي تحتها مباشرة وفتح الكيبورد بأيقونة جديدة 🚀 -->
+                    <!-- زر الانتقال للخلية التي تحتها مباشرة وفتح الكيبورد 🚀 -->
                     <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة وفتح كيبورد الموبايل" onclick="handleSmartNextCellClick()">🚀</button>
 
                     <span class="designer-credit">designed by Sami Arouj</span>
@@ -1087,19 +1093,15 @@
             }
         });
 
-        // السلوك المطلوب بالضبط للزر (🚀): الانتقال للخلية التي تحتها مباشرة بنفس العمود وفتح كيبورد الموبايل
         function handleSmartNextCellClick() {
             evaluateRow(activeRowIndex);
             closeAllPads();
 
-            // معرفة الخلية الحالية بالتحديد
-            let currentColumn = activeFieldIndex || 'text'; // لو مش محددة يفتح في الملاحظات
+            let currentColumn = activeFieldIndex || 'text';
 
-            // إذا كنا في الأسطر الوسطى، ننتقل للسطر الذي يليه بنفس العمود مباشرة
             if (activeRowIndex < rows.length - 1) {
                 activeRowIndex++;
             } else {
-                // إذا كنا في آخر سطر، ننشئ سطر جديد وننزل عليه لنفس العمود
                 rows.push({ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
                     isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
@@ -1111,7 +1113,6 @@
             renderCalculator(activeFieldIndex);
             scrollToActiveRow();
 
-            // فتح كيبورد الموبايل فوراً في الخلية التي تحتها مباشرة
             setTimeout(() => {
                 const targetEl = screenContainer.querySelector(`.calc-row.active .${activeFieldIndex === 'text' ? 'text-input' : 'calc-input'}`);
                 if (targetEl) {
@@ -1135,7 +1136,6 @@
             renderCalculator();
         }
 
-        // تفعيل السحب والتوسيع من الحواف
         let currentResizeDirection = null;
         let startX = 0, startY = 0;
         let startW = 0, startH = 0, startT = 0, startL = 0;
@@ -1218,7 +1218,7 @@
             }
         ];
         let activeRowIndex = 0;
-        let activeFieldIndex = 'text'; // الافتراضي أول ما يفتح يروح على الملاحظات
+        let activeFieldIndex = 'text';
 
         let activeSpeechRecognition = null;
         let isMicContinuousMode = false;
@@ -1956,693 +1956,3 @@
                     
                     let targetIndex;
                     if (index < rows.length - 1) {
-                        targetIndex = index + 1;
-                    } else {
-                        rows.push({ 
-                            textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                            isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                        });
-                        targetIndex = rows.length - 1;
-                    }
-
-                    activeRowIndex = targetIndex;
-                    activeFieldIndex = 'calc';
-                    rows[targetIndex].isCalcPadVisible = true;
-
-                    renderCalculator('calc');
-                    scrollToActiveRow();
-                    updateMobilePreviewText();
-                });
-
-                const inputField = document.createElement('input');
-                inputField.type = 'text';
-                inputField.className = 'calc-input';
-                inputField.value = row.expression.replace(/\*/g, 'x');
-
-                if (index === activeRowIndex && activeFieldIndex === 'calc') {
-                    inputField.classList.add('calc-border-active');
-                }
-
-                inputField.addEventListener('input', (e) => {
-                    let rawVal = e.target.value.replace(/x|X|×/g, '*');
-                    let displayVal = rawVal.replace(/\*/g, 'x');
-                    
-                    e.target.value = displayVal;
-                    rows[index].expression = rawVal;
-
-                    rows[index].forceCalc = false;
-                    if (e.target.value.length < rows[index].ignoreBeforeIndex) {
-                        rows[index].ignoreBeforeIndex = 0;
-                    }
-                    evaluateRow(index);
-                    updateMobilePreviewText();
-                });
-
-                inputField.addEventListener('focus', () => {
-                    activeRowIndex = index;
-                    activeFieldIndex = 'calc';
-                    updateActiveRowClasses();
-                    updateMobilePreviewText();
-                });
-
-                inputField.addEventListener('keydown', (e) => {
-                    if (e.key === 'Home') {
-                        e.preventDefault();
-                        rows[index].forceCalc = true;
-                        rows[index].ignoreBeforeIndex = 0;
-                        evaluateRow(index);
-                        renderCalculator('calc');
-                    }
-                    else if (e.key === 'PageUp') {
-                        e.preventDefault();
-                        rows[index].ignoreBeforeIndex = inputField.selectionStart;
-                        evaluateRow(index);
-                        renderCalculator('calc');
-                    }
-                    else if (e.key === 'Delete') {
-                        e.preventDefault();
-                        clearCurrentField();
-                    }
-                    else {
-                        handleKeyNavigation(e, index, 'calc');
-                    }
-                    updateMobilePreviewText();
-                });
-
-                setupCellGestures(inputField, index, 'calc');
-
-                calcWrapper.appendChild(calcArrowBtn);
-                calcWrapper.appendChild(inputField);
-
-                inputsGroup.appendChild(textWrapper);
-                inputsGroup.appendChild(outputContainer);
-                inputsGroup.appendChild(calcWrapper);
-
-                const micWrapper = document.createElement('div');
-                micWrapper.className = 'mic-wrapper';
-
-                const micBtn = document.createElement('button');
-                micBtn.className = 'mic-btn';
-                micBtn.innerHTML = '🎤';
-                micBtn.title = 'انقر مرة واحدة للتحدث المؤقت، أو انقر مرتين متتاليتين للتشغيل المستمر';
-                micBtn.type = 'button';
-
-                micBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (micClickTimer === null) {
-                        micClickTimer = setTimeout(() => {
-                            micClickTimer = null;
-                            handleMicClick(index, micBtn, false);
-                        }, 300);
-                    } else {
-                        clearTimeout(micClickTimer);
-                        micClickTimer = null;
-                        handleMicClick(index, micBtn, true);
-                    }
-                });
-
-                micWrapper.appendChild(micBtn);
-
-                rowMain.appendChild(inputsGroup);
-                rowMain.appendChild(micWrapper);
-                rowDiv.appendChild(rowMain);
-
-                if (index === activeRowIndex && (row.isTextPadVisible || row.isCalcPadVisible)) {
-                    const keypadContainer = document.createElement('div');
-                    keypadContainer.className = 'row-keypad-container';
-
-                    if (row.isTextPadVisible) {
-                        keypadContainer.appendChild(createMiniKeypad(index, 'text'));
-                    }
-                    if (row.isCalcPadVisible) {
-                        keypadContainer.appendChild(createMiniKeypad(index, 'calc'));
-                    }
-
-                    screenContainer.appendChild(keypadContainer);
-                }
-
-                screenContainer.appendChild(rowDiv);
-
-                setTimeout(() => {
-                    textInput.style.height = 'auto';
-                    textInput.style.height = (textInput.scrollHeight) + 'px';
-                }, 0);
-
-                if (typeof row.result === 'number' && !isNaN(row.result)) {
-                    totalSum += row.result;
-                    if (row.result > 0) {
-                        positiveSum += row.result;
-                    } else if (row.result < 0) {
-                        negativeSum += row.result;
-                    }
-                }
-            });
-
-            if (!isMobileAny && focusTarget) {
-                setTimeout(() => {
-                    const targetEl = screenContainer.querySelector(`.calc-row.active .${focusTarget === 'text' ? 'text-input' : 'calc-input'}`);
-                    if (targetEl) targetEl.focus();
-                }, 10);
-            }
-
-            const formattedTotal = formatDisplayValue(Number.isInteger(totalSum) ? totalSum : parseFloat(totalSum.toFixed(6)));
-            grandTotalEl.innerText = formattedTotal.text;
-            grandTotalCurrencyEl.innerText = showCurrency ? 'جنيه' : '';
-            
-            if (formattedTotal.isNegative) {
-                grandTotalEl.classList.add('negative');
-            } else {
-                grandTotalEl.classList.remove('negative');
-            }
-
-            const posFormatted = formatDisplayValue(Number.isInteger(positiveSum) ? positiveSum : parseFloat(positiveSum.toFixed(6)));
-            const negFormatted = formatDisplayValue(Number.isInteger(negativeSum) ? negativeSum : parseFloat(negativeSum.toFixed(6)));
-
-            positiveTotalValEl.innerText = showPositiveCheckbox.checked ? posFormatted.text : '';
-            negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
-            
-            updateGlobalHides();
-            updateMobilePreviewText();
-        }
-
-        function handleKeyNavigation(e, index, currentField) {
-            const key = e.key;
-
-            if (key === 'Enter') {
-                e.preventDefault();
-                evaluateRow(index);
-                closeAllPads();
-
-                if (index < rows.length - 1) {
-                    activeRowIndex = index + 1;
-                    activeFieldIndex = currentField;
-                    renderCalculator(currentField);
-                    scrollToActiveRow();
-                } else {
-                    rows.push({ 
-                        textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                        isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                    });
-                    activeRowIndex = rows.length - 1;
-                    activeFieldIndex = currentField;
-                    renderCalculator(currentField);
-                    screenContainer.scrollTop = screenContainer.scrollHeight;
-                }
-            }
-            else if (key === 'ArrowDown') {
-                if (index < rows.length - 1) {
-                    e.preventDefault();
-                    closeAllPads();
-                    activeRowIndex = index + 1;
-                    activeFieldIndex = currentField;
-                    renderCalculator(currentField);
-                    scrollToActiveRow();
-                }
-            } 
-            else if (key === 'ArrowUp') {
-                if (index > 0) {
-                    e.preventDefault();
-                    closeAllPads();
-                    activeRowIndex = index - 1;
-                    activeFieldIndex = currentField;
-                    renderCalculator(currentField);
-                    scrollToActiveRow();
-                }
-            } 
-            else if (key === 'ArrowRight') {
-                if (currentField === 'calc') {
-                    e.preventDefault();
-                    activeFieldIndex = 'text';
-                    renderCalculator('text');
-                }
-            } 
-            else if (key === 'ArrowLeft') {
-                if (currentField === 'text') {
-                    e.preventDefault();
-                    activeFieldIndex = 'calc';
-                    renderCalculator('calc');
-                }
-            }
-            updateMobilePreviewText();
-        }
-
-        function handleMicClick(index, micBtn, isDoubleClick) {
-            if (activeSpeechRecognition) {
-                stopActiveMic();
-                return;
-            }
-
-            isMicContinuousMode = isDoubleClick;
-            startSpeechRecognition(index, micBtn);
-        }
-
-        function stopActiveMic() {
-            if (activeSpeechRecognition) {
-                isMicContinuousMode = false;
-                try { activeSpeechRecognition.stop(); } catch(e) {}
-                activeSpeechRecognition = null;
-            }
-            if (currentActiveMicBtn) {
-                currentActiveMicBtn.classList.remove('listening', 'continuous-mode');
-                currentActiveMicBtn.innerHTML = '🎤';
-                currentActiveMicBtn = null;
-            }
-        }
-
-        function startSpeechRecognition(index, micBtn) {
-            const targetRow = activeRowIndex;
-            const targetField = activeFieldIndex;
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert('متصفحك لا يدعم خاصية التعرف على الصوت.');
-                return;
-            }
-
-            const recognition = new SpeechRecognition();
-            activeSpeechRecognition = recognition;
-            currentActiveMicBtn = micBtn;
-
-            recognition.lang = 'ar-SA';
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-            recognition.continuous = true;
-
-            micBtn.classList.add('listening');
-            micBtn.innerHTML = '🔴';
-
-            if (isMicContinuousMode) {
-                micBtn.classList.add('continuous-mode');
-                micBtn.title = 'المايك يعمل بوضع الاستمرار الدائم (اضغط لإيقافه)';
-            } else {
-                micBtn.title = 'تحدث للإدخال في الحقل النشط';
-            }
-
-            recognition.onresult = (event) => {
-                const speechToText = event.results[event.results.length - 1][0].transcript;
-                
-                if (targetField === 'text') {
-                    rows[targetRow].textExpression = rows[targetRow].textExpression ? rows[targetRow].textExpression + ' ' + speechToText : speechToText;
-                    renderCalculator('text');
-                } else {
-                    rows[targetRow].expression = rows[targetRow].expression ? rows[targetRow].expression + ' ' + speechToText : speechToText;
-                    rows[targetRow].forceCalc = false;
-                    evaluateRow(targetRow);
-                    renderCalculator('calc');
-                }
-                updateMobilePreviewText();
-            };
-
-            recognition.onerror = () => {
-                if (!isMicContinuousMode) {
-                    stopActiveMic();
-                }
-            };
-
-            recognition.onend = () => {
-                if (isMicContinuousMode && activeSpeechRecognition === recognition) {
-                    try {
-                        recognition.start();
-                    } catch (e) {}
-                } else {
-                    stopActiveMic();
-                }
-            };
-
-            recognition.start();
-        }
-
-        window.addEventListener('keydown', (event) => {
-            const key = event.key;
-
-            if (key === 'Escape') {
-                stopActiveMic();
-                rows = [{ 
-                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                }];
-                activeRowIndex = 0;
-                activeFieldIndex = 'calc';
-                renderCalculator('calc');
-            }
-            else if (key === 'Backspace') {
-                const activeInput = document.activeElement;
-                if (activeInput && (activeInput.classList.contains('calc-input') || activeInput.classList.contains('text-input'))) {
-                    if (activeInput.value === '' && activeRowIndex > 0) {
-                        event.preventDefault();
-                        rows.splice(activeRowIndex, 1);
-                        activeRowIndex--;
-                        closeAllPads();
-                        activeFieldIndex = 'calc';
-                        renderCalculator('calc');
-                    }
-                }
-            }
-            updateMobilePreviewText();
-        });
-
-        function updateActiveRowClasses() {
-            const rowDivs = screenContainer.querySelectorAll('.calc-row');
-            rowDivs.forEach((rowDiv, i) => {
-                const textInput = rowDiv.querySelector('.text-input');
-                const calcInput = rowDiv.querySelector('.calc-input');
-
-                if (i === activeRowIndex) {
-                    rowDiv.classList.add('active');
-                    if (activeFieldIndex === 'text' && textInput) {
-                        textInput.classList.add('text-border-active');
-                        if (calcInput) calcInput.classList.remove('calc-border-active');
-                    } else if (activeFieldIndex === 'calc' && calcInput) {
-                        calcInput.classList.add('calc-border-active');
-                        if (textInput) textInput.classList.remove('text-border-active');
-                    }
-                } else {
-                    rowDiv.classList.remove('active');
-                    if (textInput) textInput.classList.remove('text-border-active');
-                    if (calcInput) calcInput.classList.remove('calc-border-active');
-                }
-            });
-        }
-
-        function deleteRow(index) {
-            if (rows.length === 1) {
-                rows[0].textExpression = '';
-                rows[0].expression = '';
-                rows[0].result = 0;
-                rows[0].forceCalc = false;
-                rows[0].ignoreBeforeIndex = 0;
-                rows[0].isCalcVisible = true;
-                rows[0].isTextVisible = true;
-                rows[0].isMicVisible = true;
-                rows[0].isCalcPadVisible = false;
-                rows[0].isTextPadVisible = false;
-            } else {
-                rows.splice(index, 1);
-                if (activeRowIndex >= rows.length) {
-                    activeRowIndex = rows.length - 1;
-                }
-                closeAllPads();
-            }
-            renderCalculator('calc');
-            updateMobilePreviewText();
-        }
-
-        function evaluateRow(index) {
-            let currentRow = rows[index];
-            let fullExpr = currentRow.expression.trim();
-
-            if (fullExpr === '') {
-                currentRow.result = 0;
-                updateGrandTotalOnly();
-                return;
-            }
-
-            let expr = fullExpr;
-            if (currentRow.ignoreBeforeIndex > 0) {
-                expr = fullExpr.substring(currentRow.ignoreBeforeIndex).trim();
-            }
-
-            if (expr === '') {
-                currentRow.result = 0;
-                updateGrandTotalOnly();
-                return;
-            }
-
-            let sanitizedExpr = expr
-                .replace(/x|X|×|\*/g, '*')
-                .replace(/÷/g, '/');
-
-            let hasAttachedTextBeforeOrAfter = /(\d+[a-zA-Zأ-ي\u0600-\u06FF])|([a-zA-Zأ-ي\u0600-\u06FF]\d+)/.test(sanitizedExpr);
-
-            if (hasAttachedTextBeforeOrAfter && !currentRow.forceCalc) {
-                currentRow.result = 0;
-                updateGrandTotalOnly();
-                return;
-            }
-
-            let percentMatch = sanitizedExpr.match(/^([\d.]+)\s*([\+\-\*\/])\s*([\d.]+)%$/);
-            if (percentMatch) {
-                let baseNum = parseFloat(percentMatch[1]);
-                let operator = percentMatch[2];
-                let percentVal = parseFloat(percentMatch[3]);
-                let calculatedPercent = baseNum * (percentVal / 100);
-                let res = 0;
-
-                if (operator === '+') {
-                    res = baseNum + calculatedPercent;
-                } else if (operator === '-') {
-                    res = baseNum - calculatedPercent;
-                } else if (operator === '*') {
-                    res = calculatedPercent;
-                } else if (operator === '/') {
-                    res = calculatedPercent !== 0 ? baseNum / calculatedPercent : 0;
-                }
-
-                currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
-                updateGrandTotalOnly();
-                return;
-            }
-
-            let validMathPattern = /^[0-9+\-*/.\s()a-zA-Zأ-ي\u0600-\u06FF%]+$/;
-
-            if (validMathPattern.test(sanitizedExpr)) {
-                try {
-                    let singleNegativeMatch = sanitizedExpr.match(/^-\s*([\d.]+)$/);
-                    if (singleNegativeMatch) {
-                        let res = -parseFloat(singleNegativeMatch[1]);
-                        currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
-                        updateGrandTotalOnly();
-                        return;
-                    }
-
-                    let evalSafeExpr = sanitizedExpr.replace(/[^0-9+\-*/().]/g, '');
-                    let res = Function('"use strict"; return (' + evalSafeExpr + ')')();
-
-                    if (isNaN(res) || !isFinite(res)) {
-                        currentRow.result = 0;
-                    } else {
-                        currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
-                    }
-                } catch (e) {
-                    currentRow.result = 0;
-                }
-            } else {
-                currentRow.result = 0;
-            }
-            
-            updateGrandTotalOnly();
-        }
-
-        function updateGrandTotalOnly() {
-            let totalSum = 0;
-            let positiveSum = 0;
-            let negativeSum = 0;
-            const showCurrency = showCurrencyCheckbox.checked;
-
-            rows.forEach((row, index) => {
-                const rowDivs = screenContainer.querySelectorAll('.calc-row');
-                if (rowDivs[index]) {
-                    const outputDiv = rowDivs[index].querySelector('.calc-output');
-                    const currencySpan = rowDivs[index].querySelector('.row-currency');
-
-                    if (row.result !== '' && row.result !== 0) {
-                        const formatted = formatDisplayValue(row.result);
-                        outputDiv.innerText = formatted.text;
-                        currencySpan.innerText = showCurrency ? 'جنيه' : '';
-                        if (formatted.isNegative) {
-                            outputDiv.classList.add('negative');
-                        } else {
-                            outputDiv.classList.remove('negative');
-                        }
-                    } else {
-                        outputDiv.innerText = '';
-                        currencySpan.innerText = '';
-                    }
-                }
-                if (typeof row.result === 'number' && !isNaN(row.result)) {
-                    totalSum += row.result;
-                    if (row.result > 0) {
-                        positiveSum += row.result;
-                    } else if (row.result < 0) {
-                        negativeSum += row.result;
-                    }
-                }
-            });
-
-            const formattedTotal = formatDisplayValue(Number.isInteger(totalSum) ? totalSum : parseFloat(totalSum.toFixed(6)));
-            grandTotalEl.innerText = formattedTotal.text;
-            grandTotalCurrencyEl.innerText = showCurrency ? 'جنيه' : '';
-
-            if (formattedTotal.isNegative) {
-                grandTotalEl.classList.add('negative');
-            } else {
-                grandTotalEl.classList.remove('negative');
-            }
-
-            const posFormatted = formatDisplayValue(Number.isInteger(positiveSum) ? positiveSum : parseFloat(positiveSum.toFixed(6)));
-            const negFormatted = formatDisplayValue(Number.isInteger(negativeSum) ? negativeSum : parseFloat(negativeSum.toFixed(6)));
-
-            positiveTotalValEl.innerText = showPositiveCheckbox.checked ? posFormatted.text : '';
-            negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
-            
-            updateMobilePreviewText();
-        }
-
-        function generateShareSummaryText() {
-            const showCurrency = showCurrencyCheckbox.checked;
-            let text = "";
-
-            rows.forEach((r, i) => {
-                let note = (r.isTextVisible && r.textExpression) ? `[${r.textExpression}]` : `[سطر ${i+1}]`;
-                let calc = (r.isCalcVisible && r.expression) ? `= ${r.expression.replace(/\*/g, 'x')}` : '';
-                let res = r.result !== 0 ? `← ${r.result} ${showCurrency ? 'جنيه' : ''}` : '';
-                
-                text += `${i + 1}. ${note} ${calc} ${res}\n`;
-            });
-
-            text += "-------------------------\n";
-            if (grandTotalEl.style.display !== 'none') {
-                text += `💰 *الإجمالي النهائي:* ${grandTotalEl.innerText} ${grandTotalCurrencyEl.style.display !== 'none' && showCurrency ? 'جنيه' : ''}\n`;
-            }
-            return text;
-        }
-
-        function copyTextToClipboard(text, successMessage) {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    if (successMessage) alert(successMessage);
-                }).catch(() => {
-                    fallbackCopyText(text, successMessage);
-                });
-            } else {
-                fallbackCopyText(text, successMessage);
-            }
-        }
-
-        function fallbackCopyText(text, successMessage) {
-            const dummy = document.createElement("textarea");
-            document.body.appendChild(dummy);
-            dummy.value = text;
-            dummy.select();
-            document.execCommand("copy");
-            document.body.removeChild(dummy);
-            if (successMessage) alert(successMessage);
-        }
-
-        function openPhoneWhatsApp() {
-            window.location.href = "whatsapp://";
-        }
-
-        function openPhoneMessenger() {
-            window.location.href = "fb-messenger://";
-        }
-
-        function copyReportTextOnly() {
-            const text = generateShareSummaryText();
-            copyTextToClipboard(text, "تم نسخ التقرير نصياً بنجاح! يمكنك لصقه في أي مكان الآن.");
-        }
-
-        function shareLinkToWhatsApp() {
-            const text = generateShareSummaryText();
-            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيفتح موقع/تطبيق الواتساب الآن.");
-            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-            window.open(whatsappUrl, '_blank');
-        }
-
-        function shareLinkToMessenger() {
-            const text = generateShareSummaryText();
-            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيفتح موقع الماسنجر الآن، قم بالدخول للمحادثة واضغط لصق (Ctrl + V).");
-            window.open('https://www.messenger.com/', '_blank');
-        }
-
-        function shareLinkToSMS() {
-            const text = generateShareSummaryText();
-            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيتم فتح برنامج الرسائل النصية (SMS) الآن.");
-            const smsUrl = `sms:?body=${encodeURIComponent(text)}`;
-            window.open(smsUrl, '_blank');
-        }
-
-        function exportToTXT() {
-            const text = generateShareSummaryText();
-            let blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = 'Calculator_Results.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        function exportToExcel() {
-            const showCurrency = showCurrencyCheckbox.checked;
-            let dataToExport = rows.map((r, i) => ({
-                "السطر": i + 1,
-                "العمود النصي / الملاحظات (اليمين)": r.isTextVisible ? r.textExpression : '',
-                "النتيجة (الوسط)": showCurrency ? `${r.result} جنيه` : r.result,
-                "العملية الحسابية (اليسار)": r.isCalcVisible ? r.expression.replace(/\*/g, 'x') : ''
-            }));
-            
-            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "النتائج");
-            XLSX.writeFile(workbook, "Calculator_Results.xlsx");
-        }
-
-        function exportToWord() {
-            const showCurrency = showCurrencyCheckbox.checked;
-            let htmlContent = `<html dir="rtl"><head><meta charset='utf-8'></head><body>`;
-            htmlContent += `<table border="1" style="border-collapse:collapse; width:100%;">`;
-            htmlContent += `<tr><th>السطر</th><th>الملاحظات (اليمين)</th><th>النتيجة (الوسط)</th><th>العملية الحسابية (اليسار)</th></tr>`;
-            
-            rows.forEach((r, i) => {
-                let textText = r.isTextVisible ? r.textExpression : '';
-                let exprText = r.isCalcVisible ? r.expression.replace(/\*/g, 'x') : '';
-                let resText = showCurrency ? `${r.result} جنيه` : r.result;
-                htmlContent += `<tr><td>${i+1}</td><td>${textText}</td><td>${resText}</td><td>${exprText}</td></tr>`;
-            });
-            
-            htmlContent += `</table></body></html>`;
-
-            let blob = new Blob(['\ufeff' + htmlContent], {
-                type: 'application/msword'
-            });
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = 'Calculator_Results.doc';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        function exportToPDF() {
-            const opt = {
-                margin:       10,
-                filename:     'Calculator_Results.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().from(calculatorContainer).set(opt).save();
-        }
-
-        function exportToImage() {
-            const dropdown = document.getElementById('exportDropdown');
-            dropdown.classList.remove('active');
-            dropdown.style.display = 'none';
-
-            html2canvas(calculatorContainer).then(canvas => {
-                let link = document.createElement('a');
-                link.download = 'Calculator_Results.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                
-                dropdown.style.display = 'inline-block';
-            });
-        }
-
-        renderCalculator('text');
-    </script>
-</body>
-</html>
