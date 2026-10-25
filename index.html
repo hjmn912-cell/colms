@@ -58,7 +58,7 @@
         .resize-edge.bottom { bottom: 0; left: 0; width: 100%; height: 12px; cursor: s-resize; }
         .resize-edge.corner-br { bottom: 0; right: 0; width: 20px; height: 20px; cursor: nwse-resize; }
 
-        /* سطر المعاينة العلوي للموبايل (يعرض ما تكتبه مع ناتج السطر بلون مختلف) */
+        /* سطر المعاينة العلوي للموبايل (يعرض النص والناتج) */
         .mobile-preview-top-bar {
             display: none;
             background-color: #020617;
@@ -73,7 +73,6 @@
             overflow-x: auto;
             flex-shrink: 0;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            display: flex;
             justify-content: space-between;
             align-items: center;
         }
@@ -83,6 +82,19 @@
             font-size: 1.2rem;
             font-weight: 700;
             margin-right: 15px;
+        }
+
+        /* الكومبو بوكس الصغير الخاص بالموبايل للتحكم في الإخفاء */
+        .mobile-combo-box {
+            background-color: #1e293b;
+            color: #38bdf8;
+            border: 1px solid #38bdf8;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            outline: none;
+            margin-left: 8px;
         }
 
         .sticky-top-section {
@@ -430,11 +442,12 @@
             min-width: 0;
         }
 
+        /* عمود الملاحظات يأخذ نسبة عرض أكبر مقارنة بالعملية الحسابية */
         .text-input-wrapper {
             display: flex;
             align-items: center;
             gap: 4px;
-            flex: 2; 
+            flex: 2.2; 
             min-width: 0;
         }
 
@@ -442,7 +455,7 @@
             display: flex;
             align-items: center;
             gap: 4px;
-            flex: 1; 
+            flex: 1.2; 
             min-width: 0;
         }
 
@@ -697,7 +710,12 @@
             pointer-events: none !important;
         }
 
-        .calc-row.hidden-mic .mic-btn {
+        .calc-row.hidden-mic .mic-wrapper {
+            display: none !important;
+        }
+
+        .calc-row.hidden-tools .row-mobile-arrow-btn,
+        .calc-row.hidden-tools .row-calc-arrow-btn {
             display: none !important;
         }
 
@@ -826,9 +844,17 @@
         <!-- النقطة المؤشرة الزرقاء في أعلى اليسار للتحقق من التحديث -->
         <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
 
-        <!-- سطر المعاينة العلوي للموبايل (يعرض النص/العملية مع ناتج السطر بلون أخضر) -->
+        <!-- سطر المعاينة العلوي للموبايل مع الكومبو بوكس الصغير للتحكم -->
         <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
-            <span id="previewTextContent"></span>
+            <div style="display: flex; align-items: center; gap: 6px; overflow-x: auto; flex: 1;">
+                <!-- كومبو بوكس صغير للتحكم في الإخفاء -->
+                <select id="mobileControlCombo" class="mobile-combo-box" onchange="handleMobileComboChange(this)">
+                    <option value="" disabled selected>خيارات الإخفاء ⚙️</option>
+                    <option value="toggle_mics">إخفاء/إظهار كل المايكات</option>
+                    <option value="toggle_tools">إخفاء/إظهار الأدوات الأخرى</option>
+                </select>
+                <span id="previewTextContent"></span>
+            </div>
             <span id="previewResultContent" class="mobile-preview-result"></span>
         </div>
 
@@ -955,6 +981,7 @@
         const mobilePreviewTopBar = document.getElementById('mobilePreviewTopBar');
         const previewTextContent = document.getElementById('previewTextContent');
         const previewResultContent = document.getElementById('previewResultContent');
+        const mobileControlCombo = document.getElementById('mobileControlCombo');
         const stickyTopSection = document.getElementById('stickyTopSection');
         const grandTotalEl = document.getElementById('grandTotal');
         const grandTotalCurrencyEl = document.getElementById('grandTotalCurrency');
@@ -972,6 +999,8 @@
         const exportDropdownEl = document.getElementById('exportDropdown');
 
         let isSelectionModeActive = false;
+        let globalHideMics = false;
+        let globalHideTools = false;
 
         function detectMobileEnvironment() {
             const ua = navigator.userAgent;
@@ -1001,6 +1030,17 @@
 
         if (isMobileNormal) {
             mobilePreviewTopBar.style.display = 'flex';
+        }
+
+        function handleMobileComboChange(selectEl) {
+            const val = selectEl.value;
+            if (val === 'toggle_mics') {
+                globalHideMics = !globalHideMics;
+            } else if (val === 'toggle_tools') {
+                globalHideTools = !globalHideTools;
+            }
+            selectEl.selectedIndex = 0; // إعادة ضبط القائمة
+            renderCalculator();
         }
 
         // تفعيل السحب والتوسيع من الحواف
@@ -1248,7 +1288,6 @@
             }
         });
 
-        // يعرض ما تكتبه مع ناتج السطر بلون أخضر مميز في الأعلى
         function updateMobilePreviewText() {
             if (!isMobileNormal) return;
             const currentRow = rows[activeRowIndex];
@@ -1610,7 +1649,12 @@
 
             rows.forEach((row, index) => {
                 const rowDiv = document.createElement('div');
-                rowDiv.className = `calc-row ${index === activeRowIndex ? 'active' : ''} ${!row.isCalcVisible ? 'hidden-calc' : ''} ${!row.isTextVisible ? 'hidden-text' : ''} ${!row.isMicVisible ? 'hidden-mic' : ''}`;
+                let rowClasses = `calc-row ${index === activeRowIndex ? 'active' : ''}`;
+                if (!row.isCalcVisible) rowClasses += ' hidden-calc';
+                if (!row.isTextVisible) rowClasses += ' hidden-text';
+                if (globalHideMics) rowClasses += ' hidden-mic';
+                if (globalHideTools) rowClasses += ' hidden-tools';
+                rowDiv.className = rowClasses;
 
                 const rowMain = document.createElement('div');
                 rowMain.className = 'calc-row-main';
@@ -1859,20 +1903,6 @@
 
                 const micWrapper = document.createElement('div');
                 micWrapper.className = 'mic-wrapper';
-
-                if (isSelectionModeActive) {
-                    const selectMicCheckbox = document.createElement('input');
-                    selectMicCheckbox.type = 'checkbox';
-                    selectMicCheckbox.className = 'calc-select-checkbox';
-                    selectMicCheckbox.checked = !row.isMicVisible;
-                    selectMicCheckbox.title = 'علم هنا لإخفاء المايك لهذا السطر';
-                    
-                    selectMicCheckbox.addEventListener('change', (e) => {
-                        row.isMicVisible = !e.target.checked;
-                    });
-                    
-                    micWrapper.appendChild(selectMicCheckbox);
-                }
 
                 const micBtn = document.createElement('button');
                 micBtn.className = 'mic-btn';
