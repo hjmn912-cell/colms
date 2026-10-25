@@ -29,7 +29,6 @@
             overflow: hidden;
         }
 
-        /* نافذة الآلة الحاسبة العائمة (تشبه نافذة ويندوز قابلة للتحجيم) */
         .calculator-container {
             width: 100vw;
             height: 100vh;
@@ -49,7 +48,7 @@
             touch-action: none;
         }
 
-        /* حواف التوسيع والتقليص (تشبه ويندوز) */
+        /* حواف السحب والتوسيع (مثل نوافذ الويندوز) */
         .resize-edge {
             position: absolute;
             z-index: 10000;
@@ -58,6 +57,23 @@
         .resize-edge.left { top: 0; left: 0; width: 12px; height: 100%; cursor: w-resize; }
         .resize-edge.bottom { bottom: 0; left: 0; width: 100%; height: 12px; cursor: s-resize; }
         .resize-edge.corner-br { bottom: 0; right: 0; width: 20px; height: 20px; cursor: nwse-resize; }
+
+        /* سطر المعاينة العلوي الخاص بالموبايل (مكان الهيدر عند الكتابة) */
+        .mobile-preview-top-bar {
+            display: none;
+            background-color: #020617;
+            color: #38bdf8;
+            padding: 10px 14px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-bottom: 2px solid #38bdf8;
+            width: 100%;
+            text-align: right;
+            white-space: nowrap;
+            overflow-x: auto;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
 
         .sticky-top-section {
             position: relative;
@@ -356,7 +372,6 @@
             display: block;
         }
 
-        /* الأسطر تبدأ من تحت الهيدر مباشرة وبدون أي فراغات */
         .calculator-screen {
             background-color: #0f172a;
             padding: 10px;
@@ -790,7 +805,6 @@
 </head>
 <body>
 
-    <!-- نافذة الآلة الحاسبة القابلة لتغيير الحجم من الحواف -->
     <div class="calculator-container" id="calculatorContainer">
         
         <!-- حواف السحب والتوسيع (مثل نوافذ الويندوز) -->
@@ -799,10 +813,13 @@
         <div class="resize-edge bottom" id="edgeBottom"></div>
         <div class="resize-edge corner-br" id="edgeCornerBR"></div>
 
-        <!-- النقطة المؤشرة الخضراء في أعلى اليسار للتحقق من التحديث -->
-        <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #10b981; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #10b981;" title="مؤشر التحديث النشط (أخضر)"></div>
+        <!-- النقطة المؤشرة الزرقاء في أعلى اليسار للتحقق من التحديث -->
+        <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
 
-        <div class="sticky-top-section">
+        <!-- سطر المعاينة العلوي الذكي للموبايل في وضع المتصفح العادي -->
+        <div id="mobilePreviewTopBar" class="mobile-preview-top-bar"></div>
+
+        <div class="sticky-top-section" id="stickyTopSection">
             <div class="top-controls-wrapper">
                 <div class="left-controls-group">
                     <!-- الخيارات -->
@@ -912,7 +929,6 @@
             </div>
         </div>
 
-        <!-- منطقة الأسطر تبدأ فوراً تحت الهيدر -->
         <div id="screenContainer" class="calculator-screen"></div>
 
         <div class="keyboard-hint">
@@ -923,6 +939,8 @@
     <script>
         const screenContainer = document.getElementById('screenContainer');
         const calculatorContainer = document.getElementById('calculatorContainer');
+        const mobilePreviewTopBar = document.getElementById('mobilePreviewTopBar');
+        const stickyTopSection = document.getElementById('stickyTopSection');
         const grandTotalEl = document.getElementById('grandTotal');
         const grandTotalCurrencyEl = document.getElementById('grandTotalCurrency');
         const showCurrencyCheckbox = document.getElementById('showCurrencyCheckbox');
@@ -940,27 +958,38 @@
 
         let isSelectionModeActive = false;
 
-        function detectDeviceType() {
+        function detectMobileEnvironment() {
             const ua = navigator.userAgent;
             const width = window.innerWidth;
-            return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || width <= 1024) ? 'mobile' : 'desktop';
+            const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || width <= 1024;
+            
+            if (!isMobileDevice) {
+                return 'desktop';
+            }
+
+            const isDesktopModeOnMobile = width > 768 && !/Mobi/i.test(ua);
+            if (isDesktopModeOnMobile) {
+                return 'mobile-desktop';
+            } else {
+                return 'mobile-normal';
+            }
         }
 
-        const deviceType = detectDeviceType();
-        const isMobile = deviceType === 'mobile';
+        const env = detectMobileEnvironment();
+        const isMobileNormal = env === 'mobile-normal';
+        const isMobileAny = env !== 'desktop';
 
-        if (isMobile) {
+        if (isMobileAny) {
             topActionBtn.style.display = 'inline-flex';
             topNotesFocusBtn.style.display = 'inline-flex';
-            
-            // تعيين مقاس مبدئي عائم للنافذة (يمكنك تصغيره أو تكبيره بالشد)
-            calculatorContainer.style.width = '100vw';
-            calculatorContainer.style.height = '100vh';
-            calculatorContainer.style.top = '0px';
-            calculatorContainer.style.left = '0px';
         }
 
-        // تفعيل السحب والتوسيع من الحواف تماماً مثل نوافذ الويندوز
+        // إظهار سطر المعاينة العلوي فقط في وضع متصفح الموبايل العادي
+        if (isMobileNormal) {
+            mobilePreviewTopBar.style.display = 'block';
+        }
+
+        // تفعيل السحب والتوسيع من الحواف
         let currentResizeDirection = null;
         let startX = 0, startY = 0;
         let startW = 0, startH = 0, startT = 0, startL = 0;
@@ -1068,15 +1097,28 @@
         }
 
         function updateGlobalHides() {
-            optionsDropdownEl.style.display = document.getElementById('hideOptionsCheckbox').checked ? 'none' : 'inline-block';
-            refreshBtnEl.style.display = document.getElementById('hideRefreshCheckbox').checked ? 'none' : 'inline-flex';
-            exportDropdownEl.style.display = document.getElementById('hideExportCheckbox').checked ? 'none' : 'inline-block';
+            const hideOptions = document.getElementById('hideOptionsCheckbox').checked;
+            const hideRefresh = document.getElementById('hideRefreshCheckbox').checked;
+            const hideExport = document.getElementById('hideExportCheckbox').checked;
+            
+            optionsDropdownEl.style.display = hideOptions ? 'none' : 'inline-block';
+            refreshBtnEl.style.display = hideRefresh ? 'none' : 'inline-flex';
+            exportDropdownEl.style.display = hideExport ? 'none' : 'inline-block';
             
             document.getElementById('positiveTotalVal').parentElement.parentElement.style.display = document.getElementById('hidePositiveCheckbox').checked ? 'none' : 'flex';
             document.getElementById('negativeTotalVal').parentElement.parentElement.style.display = document.getElementById('hideNegativeCheckbox').checked ? 'none' : 'flex';
             
             grandTotalEl.style.display = document.getElementById('hideGrandTotalCheckbox').checked ? 'none' : 'block';
             grandTotalCurrencyEl.style.display = document.getElementById('hideGrandCurrencyCheckbox').checked ? 'none' : 'block';
+
+            // إذا تم إخفاء الهيدر بالكامل أو استخدام وضع الإخفاء، يتم إخفاء سطر المعاينة العلوي أيضاً تلقائياً كما طلبت
+            if (isMobileNormal) {
+                if (hideOptions && hideRefresh && hideExport && document.getElementById('hideGrandTotalCheckbox').checked) {
+                    mobilePreviewTopBar.style.display = 'none';
+                } else {
+                    mobilePreviewTopBar.style.display = 'block';
+                }
+            }
         }
 
         function closeAllPads() {
@@ -1193,6 +1235,21 @@
             }
         });
 
+        function updateMobilePreviewText() {
+            if (!isMobileNormal) return;
+            const currentRow = rows[activeRowIndex];
+            if (!currentRow) return;
+
+            let currentText = activeFieldIndex === 'text' ? currentRow.textExpression : currentRow.expression.replace(/\*/g, 'x');
+            let labelType = activeFieldIndex === 'text' ? 'ملاحظة' : 'عملية حسابية';
+            
+            if (currentText.trim() !== '') {
+                mobilePreviewTopBar.innerText = `[${labelType} سطر ${activeRowIndex + 1}]: ${currentText}`;
+            } else {
+                mobilePreviewTopBar.innerText = `السطر ${activeRowIndex + 1} (ابدأ الكتابة...)`;
+            }
+        }
+
         function insertValueForField(index, field, val) {
             activeRowIndex = index;
             activeFieldIndex = field;
@@ -1206,6 +1263,7 @@
                 evaluateRow(index);
                 renderCalculator('calc');
             }
+            updateMobilePreviewText();
         }
 
         function handleBackspaceForField(index, field) {
@@ -1226,6 +1284,7 @@
                     renderCalculator('calc');
                 }
             }
+            updateMobilePreviewText();
         }
 
         function openSystemKeyboard(index, field) {
@@ -1242,6 +1301,7 @@
                     activeEl.focus();
                 }
             }, 30);
+            updateMobilePreviewText();
         }
 
         function openCalcPadForField(index, field) {
@@ -1255,6 +1315,7 @@
                 rows[index].isCalcPadVisible = true;
             }
             renderCalculator(field);
+            updateMobilePreviewText();
         }
 
         function addNewRowFromPad(index, field) {
@@ -1276,6 +1337,7 @@
                 renderCalculator(field);
                 screenContainer.scrollTop = screenContainer.scrollHeight;
             }
+            updateMobilePreviewText();
         }
 
         function addNewRowAndOpenTool(index, field) {
@@ -1312,6 +1374,7 @@
             }
 
             scrollToActiveRow();
+            updateMobilePreviewText();
         }
 
         function formatDisplayValue(val) {
@@ -1452,7 +1515,7 @@
             let clickCount = 0;
             let clickTimer = null;
 
-            if (isMobile) {
+            if (isMobileAny) {
                 element.setAttribute('readonly', 'true');
                 element.setAttribute('inputmode', 'none');
 
@@ -1461,6 +1524,7 @@
                     activeRowIndex = index;
                     activeFieldIndex = field;
                     updateActiveRowClasses();
+                    updateMobilePreviewText();
 
                     longPressTimer = setTimeout(() => {
                         isLongPressFired = true;
@@ -1478,7 +1542,7 @@
 
                     if (tapLength < 350 && tapLength > 0) {
                         e.preventDefault();
-                        if (isMobile) {
+                        if (isMobileAny) {
                             element.setAttribute('readonly', 'true');
                             element.setAttribute('inputmode', 'none');
                         }
@@ -1497,6 +1561,7 @@
                     activeRowIndex = index;
                     activeFieldIndex = field;
                     updateActiveRowClasses();
+                    updateMobilePreviewText();
 
                     clickCount++;
                     if (clickCount === 1) {
@@ -1514,7 +1579,7 @@
 
             element.addEventListener('dblclick', (e) => {
                 e.preventDefault();
-                if (isMobile) {
+                if (isMobileAny) {
                     openCalcPadForField(index, field);
                 }
             });
@@ -1560,7 +1625,7 @@
                 mobileArrowBtn.innerHTML = '🔽';
                 mobileArrowBtn.title = 'التنقل لأسفل أو إضافة سطر جديد';
                 
-                if (isMobile) {
+                if (isMobileAny) {
                     mobileArrowBtn.style.display = 'flex';
                 }
 
@@ -1583,6 +1648,7 @@
                         renderCalculator('text');
                         screenContainer.scrollTop = screenContainer.scrollHeight;
                     }
+                    updateMobilePreviewText();
                 });
 
                 const mobileKbdArrowBtn = document.createElement('button');
@@ -1591,7 +1657,7 @@
                 mobileKbdArrowBtn.innerHTML = '⌨️';
                 mobileKbdArrowBtn.title = 'إضافة سطر جديد وفتح الكيبورد';
 
-                if (isMobile) {
+                if (isMobileAny) {
                     mobileKbdArrowBtn.style.display = 'flex';
                 }
 
@@ -1613,12 +1679,14 @@
                     rows[index].textExpression = e.target.value;
                     e.target.style.height = 'auto';
                     e.target.style.height = (e.target.scrollHeight) + 'px';
+                    updateMobilePreviewText();
                 });
 
                 textInput.addEventListener('focus', () => {
                     activeRowIndex = index;
                     activeFieldIndex = 'text';
                     updateActiveRowClasses();
+                    updateMobilePreviewText();
                 });
 
                 textInput.addEventListener('keydown', (e) => {
@@ -1680,7 +1748,7 @@
                 calcArrowBtn.innerHTML = '🧮';
                 calcArrowBtn.title = 'إضافة سطر جديد وفتح الآلة الحاسبة المصغرة';
 
-                if (isMobile) {
+                if (isMobileAny) {
                     calcArrowBtn.style.display = 'flex';
                 }
 
@@ -1706,6 +1774,7 @@
 
                     renderCalculator('calc');
                     scrollToActiveRow();
+                    updateMobilePreviewText();
                 });
 
                 const inputField = document.createElement('input');
@@ -1729,12 +1798,14 @@
                         rows[index].ignoreBeforeIndex = 0;
                     }
                     evaluateRow(index);
+                    updateMobilePreviewText();
                 });
 
                 inputField.addEventListener('focus', () => {
                     activeRowIndex = index;
                     activeFieldIndex = 'calc';
                     updateActiveRowClasses();
+                    updateMobilePreviewText();
                 });
 
                 inputField.addEventListener('keydown', (e) => {
@@ -1758,6 +1829,7 @@
                     else {
                         handleKeyNavigation(e, index, 'calc');
                     }
+                    updateMobilePreviewText();
                 });
 
                 setupCellGestures(inputField, index, 'calc');
@@ -1854,7 +1926,7 @@
                 }
             });
 
-            if (!isMobile && focusTarget) {
+            if (!isMobileAny && focusTarget) {
                 setTimeout(() => {
                     const targetEl = screenContainer.querySelector(`.calc-row.active .${focusTarget === 'text' ? 'text-input' : 'calc-input'}`);
                     if (targetEl) targetEl.focus();
@@ -1878,6 +1950,7 @@
             negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
             
             updateGlobalHides();
+            updateMobilePreviewText();
         }
 
         function handleKeyNavigation(e, index, currentField) {
@@ -1938,6 +2011,7 @@
                     renderCalculator('calc');
                 }
             }
+            updateMobilePreviewText();
         }
 
         function handleMicClick(index, micBtn, isDoubleClick) {
@@ -2004,6 +2078,7 @@
                     evaluateRow(targetRow);
                     renderCalculator('calc');
                 }
+                updateMobilePreviewText();
             };
 
             recognition.onerror = () => {
@@ -2051,6 +2126,7 @@
                     }
                 }
             }
+            updateMobilePreviewText();
         });
 
         function updateActiveRowClasses() {
@@ -2096,6 +2172,7 @@
                 closeAllPads();
             }
             renderCalculator('calc');
+            updateMobilePreviewText();
         }
 
         function evaluateRow(index) {
