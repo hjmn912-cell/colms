@@ -100,7 +100,7 @@
             text-align: center;
         }
 
-        /* الأيقونة العائمة الصغيرة بجانب الكيبورد لفتح سطر جديد */
+        /* الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد */
         .floating-keyboard-action-btn {
             position: fixed;
             bottom: 260px;
@@ -449,10 +449,11 @@
             padding: 8px 10px;
             border-radius: 8px;
             border: 1px solid transparent;
-            transition: border-color 0.2s;
+            transition: transform 0.2s ease, border-color 0.2s;
             gap: 8px;
             width: 100%;
             min-width: 0 !important;
+            touch-action: pan-y;
         }
 
         .calc-row.active {
@@ -477,7 +478,7 @@
             min-width: 0;
         }
 
-        /* عمود الملاحظات يأخذ مساحة أكبر وتمدد ذكي لملء الفراغ عند إخفاء الأدوات */
+        /* عمود الملاحظات يأخذ مساحة أكبر وتمدد ذكي لملء الفراغ */
         .text-input-wrapper {
             display: flex;
             align-items: center;
@@ -783,7 +784,7 @@
             color: #ef4444 !important;
         }
 
-        .mic-btn, .delete-row-btn {
+        .mic-btn {
             background: transparent;
             border: none;
             color: #6b7280;
@@ -816,11 +817,6 @@
             0% { opacity: 1; }
             50% { opacity: 0.4; }
             100% { opacity: 1; }
-        }
-
-        .delete-row-btn:hover {
-            background-color: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
         }
 
         .keyboard-hint {
@@ -880,13 +876,13 @@
         <!-- النقطة المؤشرة الزرقاء في أعلى اليسار للتحقق من التحديث -->
         <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
 
-        <!-- الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد لإضافة سطر جديد -->
-        <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="إنشاء سطر جديد" onclick="handleFloatingKbdBtnClick()">➕</button>
+        <!-- الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد -->
+        <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="التنقل للسطر التالي أو إضافة سطر جديد" onclick="handleFloatingKbdBtnClick()">➕</button>
 
         <!-- سطر المعاينة العلوي للموبايل -->
         <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
             <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
-                <!-- كومبو بوكس صغير بدون اسم وصغر حجمه -->
+                <!-- كومبو بوكس صغير جداً بدون اسم -->
                 <select id="mobileControlCombo" class="mobile-combo-box" onchange="handleMobileComboChange(this)">
                     <option value="" disabled selected>⚙️</option>
                     <option value="toggle_mics">إظهار/إخفاء المايكات</option>
@@ -1040,7 +1036,7 @@
 
         let isSelectionModeActive = false;
         
-        // الوضع الافتراضي: المايكات مخفية والأدوات الأخرى مخفية
+        // الافتراضي: المايكات والأدوات مخفية
         let globalHideMics = true;
         let globalHideTools = true;
 
@@ -1079,27 +1075,35 @@
         window.addEventListener('resize', () => {
             if (isMobileAny) {
                 if (window.innerHeight < initialWindowHeight - 120) {
-                    // الكيبورد مفتوح
                     floatingKeyboardNewRowBtn.style.display = 'flex';
                 } else {
-                    // الكيبورد مغلق
                     floatingKeyboardNewRowBtn.style.display = 'none';
                 }
             }
         });
 
+        // سلوك الأيقونة العائمة عند الكيبورد بناءً على مكانك (آخر سطر أو أسطر وسطى)
         function handleFloatingKbdBtnClick() {
             evaluateRow(activeRowIndex);
             closeAllPads();
 
-            rows.push({ 
-                textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-            });
-            activeRowIndex = rows.length - 1;
-            activeFieldIndex = 'calc';
-            renderCalculator('calc');
-            screenContainer.scrollTop = screenContainer.scrollHeight;
+            if (activeRowIndex < rows.length - 1) {
+                // إذا كنت في سطر من الأسطر الوسطى، انتقل للسطر التالي مباشرة
+                activeRowIndex++;
+                activeFieldIndex = 'calc';
+                renderCalculator('calc');
+                scrollToActiveRow();
+            } else {
+                // إذا كنت في السطر الأخير، أضف سطر جديد وافتح الكيبورد فيه
+                rows.push({ 
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                });
+                activeRowIndex = rows.length - 1;
+                activeFieldIndex = 'calc';
+                renderCalculator('calc');
+                screenContainer.scrollTop = screenContainer.scrollHeight;
+            }
             updateMobilePreviewText();
         }
 
@@ -1110,7 +1114,7 @@
             } else if (val === 'toggle_tools') {
                 globalHideTools = !globalHideTools;
             }
-            selectEl.selectedIndex = 0; // إعادة ضبط الاختيار
+            selectEl.selectedIndex = 0;
             renderCalculator();
         }
 
@@ -1711,6 +1715,52 @@
             });
         }
 
+        // إيماءة السحب (Swipe) يميناً أو يساراً لحذف السطر
+        function setupRowSwipeToDelete(rowDiv, index) {
+            let startX = 0;
+            let currentX = 0;
+            let isSwiping = false;
+
+            rowDiv.addEventListener('touchstart', (e) => {
+                if (e.target.closest('button') || e.target.closest('textarea') || e.target.closest('input')) return;
+                startX = e.touches[0].clientX;
+                isSwiping = true;
+            }, { passive: true });
+
+            rowDiv.addEventListener('touchmove', (e) => {
+                if (!isSwiping) return;
+                currentX = e.touches[0].clientX;
+                let diffX = currentX - startX;
+                
+                // تحريك السطر بصرياً مع السحب يميناً أو يساراً
+                if (Math.abs(diffX) > 10) {
+                    rowDiv.style.transform = `translateX(${diffX}px)`;
+                    rowDiv.style.opacity = `${1 - Math.abs(diffX) / 300}`;
+                }
+            }, { passive: true });
+
+            rowDiv.addEventListener('touchend', (e) => {
+                if (!isSwiping) return;
+                isSwiping = false;
+                let diffX = currentX - startX;
+
+                if (Math.abs(diffX) > 100) {
+                    // إذا تخطى السحب 100 بكسل، احذف السطر
+                    rowDiv.style.transition = 'all 0.3s ease';
+                    rowDiv.style.transform = diffX > 0 ? 'translateX(100vw)' : 'translateX(-100vw)';
+                    rowDiv.style.opacity = '0';
+                    setTimeout(() => {
+                        deleteRow(index);
+                    }, 300);
+                } else {
+                    // إعادة السطر مكانه لو لم يكتمل السحب
+                    rowDiv.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+                    rowDiv.style.transform = 'translateX(0px)';
+                    rowDiv.style.opacity = '1';
+                }
+            });
+        }
+
         function renderCalculator(focusTarget = null) {
             screenContainer.innerHTML = '';
             let totalSum = 0;
@@ -1726,6 +1776,8 @@
                 if (globalHideMics) rowClasses += ' hidden-mic';
                 if (globalHideTools) rowClasses += ' hidden-tools';
                 rowDiv.className = rowClasses;
+
+                setupRowSwipeToDelete(rowDiv, index);
 
                 const rowMain = document.createElement('div');
                 rowMain.className = 'calc-row-main';
@@ -1997,19 +2049,8 @@
 
                 micWrapper.appendChild(micBtn);
 
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-row-btn';
-                deleteBtn.innerHTML = '✕';
-                deleteBtn.title = 'حذف السطر';
-                deleteBtn.type = 'button';
-                deleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    deleteRow(index);
-                });
-
                 rowMain.appendChild(inputsGroup);
                 rowMain.appendChild(micWrapper);
-                rowMain.appendChild(deleteBtn);
                 rowDiv.appendChild(rowMain);
 
                 if (index === activeRowIndex && (row.isTextPadVisible || row.isCalcPadVisible)) {
