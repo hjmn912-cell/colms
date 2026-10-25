@@ -100,7 +100,7 @@
             text-align: center;
         }
 
-        /* الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد */
+        /* الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد - تم تغيير الأيقونة للأيقونة الجديدة */
         .floating-keyboard-action-btn {
             position: fixed;
             bottom: 260px;
@@ -442,6 +442,7 @@
             gap: 8px;
             width: 100%;
             -webkit-overflow-scrolling: touch;
+            will-change: transform;
         }
 
         .calc-row {
@@ -451,7 +452,7 @@
             padding: 8px 10px;
             border-radius: 8px;
             border: 1px solid transparent;
-            transition: transform 0.2s ease, border-color 0.2s;
+            transition: border-color 0.15s ease;
             gap: 8px;
             width: 100%;
             min-width: 0 !important;
@@ -615,7 +616,7 @@
             font-size: 1.3rem;
             font-weight: bold;
             text-align: center;
-            transition: all 0.2s;
+            transition: all 0.15s;
             user-select: none;
         }
 
@@ -713,7 +714,7 @@
             outline: none;
             font-family: inherit;
             width: 100%;
-            transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+            transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
         }
 
         .text-input {
@@ -878,8 +879,8 @@
         <!-- النقطة المؤشرة الزرقاء في أعلى اليسار للتحقق من التحديث -->
         <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
 
-        <!-- الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد -->
-        <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال أو إنشاء سطر جديد" onclick="handleFloatingKbdBtnClick()">➕</button>
+        <!-- الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد - أيقونة جديدة 🚀 -->
+        <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية وفتح الكيبورد" onclick="handleSmartNextCellClick()">🚀</button>
 
         <!-- سطر المعاينة العلوي للموبايل -->
         <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
@@ -966,8 +967,8 @@
                     <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
                     <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
                     
-                    <!-- زر جديد من الأعلى للنزول للخلية التالية أو سطر جديد وفتح كيبورد الموبايل -->
-                    <button type="button" class="top-next-row-btn" title="الانتقال للخلية/السطر التالي وفتح الكيبورد" onclick="handleTopNextRowBtnClick()">➕</button>
+                    <!-- زر الانتقال للخلية التي تحتها مباشرة وفتح الكيبورد بأيقونة جديدة 🚀 -->
+                    <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة وفتح كيبورد الموبايل" onclick="handleSmartNextCellClick()">🚀</button>
 
                     <span class="designer-credit">designed by Sami Arouj</span>
                     
@@ -1041,7 +1042,6 @@
 
         let isSelectionModeActive = false;
         
-        // الافتراضي: المايكات والأدوات مخفية
         let globalHideMics = true;
         let globalHideTools = true;
 
@@ -1075,7 +1075,7 @@
             mobilePreviewTopBar.style.display = 'flex';
         }
 
-        // كشف فتح كيبورد الموبايل وإظهار الأيقونة العائمة
+        // كشف فتح كيبورد الموبايل
         let initialWindowHeight = window.innerHeight;
         window.addEventListener('resize', () => {
             if (isMobileAny) {
@@ -1087,36 +1087,31 @@
             }
         });
 
-        // الوظيفة الذكية للزر العلوي الجديد والزر العيوني للكيبورد
-        function handleTopNextRowBtnClick() {
+        // السلوك المطلوب بالضبط للزر (🚀): الانتقال للخلية التي تحتها مباشرة بنفس العمود وفتح كيبورد الموبايل
+        function handleSmartNextCellClick() {
             evaluateRow(activeRowIndex);
             closeAllPads();
 
-            if (activeFieldIndex === 'text') {
-                // إذا كنت في عمود الملاحظات، انتقل لعمود العملية الحسابية في نفس السطر أولاً
-                activeFieldIndex = 'calc';
-                renderCalculator('calc');
+            // معرفة الخلية الحالية بالتحديد
+            let currentColumn = activeFieldIndex || 'text'; // لو مش محددة يفتح في الملاحظات
+
+            // إذا كنا في الأسطر الوسطى، ننتقل للسطر الذي يليه بنفس العمود مباشرة
+            if (activeRowIndex < rows.length - 1) {
+                activeRowIndex++;
             } else {
-                // إذا كنت في عمود العملية الحسابية، انتقل للسطر التالي
-                if (activeRowIndex < rows.length - 1) {
-                    activeRowIndex++;
-                    activeFieldIndex = 'text';
-                    renderCalculator('text');
-                    scrollToActiveRow();
-                } else {
-                    // إذا كنت في السطر الأخير، أنشئ سطر جديد وانتقل إليه
-                    rows.push({ 
-                        textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                        isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                    });
-                    activeRowIndex = rows.length - 1;
-                    activeFieldIndex = 'text';
-                    renderCalculator('text');
-                    screenContainer.scrollTop = screenContainer.scrollHeight;
-                }
+                // إذا كنا في آخر سطر، ننشئ سطر جديد وننزل عليه لنفس العمود
+                rows.push({ 
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                });
+                activeRowIndex = rows.length - 1;
             }
 
-            // فتح الكيبورد في الخلية الجديدة مباشرة
+            activeFieldIndex = currentColumn;
+            renderCalculator(activeFieldIndex);
+            scrollToActiveRow();
+
+            // فتح كيبورد الموبايل فوراً في الخلية التي تحتها مباشرة
             setTimeout(() => {
                 const targetEl = screenContainer.querySelector(`.calc-row.active .${activeFieldIndex === 'text' ? 'text-input' : 'calc-input'}`);
                 if (targetEl) {
@@ -1125,11 +1120,8 @@
                     targetEl.focus();
                 }
             }, 30);
-            updateMobilePreviewText();
-        }
 
-        function handleFloatingKbdBtnClick() {
-            handleTopNextRowBtnClick();
+            updateMobilePreviewText();
         }
 
         function handleMobileComboChange(selectEl) {
@@ -1226,7 +1218,7 @@
             }
         ];
         let activeRowIndex = 0;
-        let activeFieldIndex = 'calc';
+        let activeFieldIndex = 'text'; // الافتراضي أول ما يفتح يروح على الملاحظات
 
         let activeSpeechRecognition = null;
         let isMicContinuousMode = false;
@@ -1769,14 +1761,14 @@
                 let diffX = currentX - startX;
 
                 if (Math.abs(diffX) > 100) {
-                    rowDiv.style.transition = 'all 0.3s ease';
+                    rowDiv.style.transition = 'all 0.25s ease';
                     rowDiv.style.transform = diffX > 0 ? 'translateX(100vw)' : 'translateX(-100vw)';
                     rowDiv.style.opacity = '0';
                     setTimeout(() => {
                         deleteRow(index);
-                    }, 300);
+                    }, 250);
                 } else {
-                    rowDiv.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+                    rowDiv.style.transition = 'transform 0.15s ease, opacity 0.15s ease';
                     rowDiv.style.transform = 'translateX(0px)';
                     rowDiv.style.opacity = '1';
                 }
@@ -2650,7 +2642,7 @@
             });
         }
 
-        renderCalculator('calc');
+        renderCalculator('text');
     </script>
 </body>
 </html>
