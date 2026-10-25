@@ -48,6 +48,7 @@
             touch-action: none;
         }
 
+        /* حواف السحب والتوسيع (مثل نوافذ الويندوز) */
         .resize-edge {
             position: absolute;
             z-index: 10000;
@@ -57,6 +58,7 @@
         .resize-edge.bottom { bottom: 0; left: 0; width: 100%; height: 12px; cursor: s-resize; }
         .resize-edge.corner-br { bottom: 0; right: 0; width: 20px; height: 20px; cursor: nwse-resize; }
 
+        /* سطر المعاينة العلوي للموبايل */
         .mobile-preview-top-bar {
             display: none;
             background-color: #020617;
@@ -97,6 +99,7 @@
             text-align: center;
         }
 
+        /* كومبو بوكس إخفاء المايكات المصغر للكمبيوتر (بحجم زر العين تماماً) */
         .desktop-mic-combo {
             background-color: #1e293b;
             color: #38bdf8;
@@ -117,6 +120,33 @@
         .desktop-mic-combo:hover {
             background-color: #38bdf8;
             color: #0b0f19;
+        }
+
+        /* الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد */
+        .floating-keyboard-action-btn {
+            position: fixed;
+            bottom: 260px;
+            left: 15px;
+            background-color: #38bdf8;
+            color: #0b0f19;
+            border: 2px solid #fff;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+            z-index: 100000;
+            cursor: pointer;
+            animation: bounceIn 0.3s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .sticky-top-section {
@@ -242,6 +272,13 @@
             white-space: nowrap;
         }
 
+        .summary-item input[type="checkbox"] {
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+            accent-color: #38bdf8;
+        }
+
         .positive-sum {
             color: #10b981;
             font-size: 1.1rem;
@@ -273,6 +310,7 @@
             gap: 6px;
             flex: 2;
             white-space: nowrap;
+            overflow: visible;
         }
 
         .total-value {
@@ -305,6 +343,38 @@
             color: #6b7280;
             letter-spacing: 0.5px;
             white-space: nowrap;
+        }
+
+        .top-action-btn, .top-notes-focus-btn, .toggle-hide-btn, .top-next-row-btn {
+            background-color: #1e293b;
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+
+        .top-action-btn, .top-notes-focus-btn {
+            display: none;
+        }
+
+        .toggle-hide-btn:hover, .top-next-row-btn:hover {
+            background-color: #38bdf8;
+            color: #0b0f19;
+        }
+
+        .toggle-hide-btn.active-mode {
+            background-color: #eab308;
+            color: #000;
+            border-color: #facc15;
+            box-shadow: 0 0 8px rgba(234, 179, 8, 0.6);
         }
 
         .export-dropdown {
@@ -363,9 +433,23 @@
             border-bottom: 1px solid #334155;
         }
 
+        .dropdown-content button:last-child {
+            border-bottom: none;
+        }
+
         .dropdown-content button:hover {
             background-color: #38bdf8;
             color: #0b0f19;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background-color: #38bdf8;
+            margin: 2px 0;
+        }
+
+        .export-dropdown.active .dropdown-content {
+            display: block;
         }
 
         .calculator-screen {
@@ -378,6 +462,8 @@
             overflow-x: hidden;
             gap: 8px;
             width: 100%;
+            -webkit-overflow-scrolling: touch;
+            will-change: transform;
         }
 
         .calc-row {
@@ -387,12 +473,16 @@
             padding: 8px 6px;
             border-radius: 8px;
             border: 1px solid transparent;
+            transition: border-color 0.15s ease;
             gap: 8px;
             width: 100%;
+            min-width: 0 !important;
+            touch-action: pan-y;
         }
 
         .calc-row.active {
             border-color: #38bdf8;
+            background-color: #1e293b;
         }
 
         .calc-row-main {
@@ -409,8 +499,10 @@
             flex-grow: 1;
             align-items: center;
             width: 100%;
+            min-width: 0;
         }
 
+        /* خلية الملاحظات (أعرض) */
         .text-input-wrapper {
             display: flex;
             align-items: center;
@@ -419,6 +511,7 @@
             min-width: 0;
         }
 
+        /* خلية العملية الحسابية (أقل عرضاً) */
         .calc-input-wrapper {
             display: flex;
             align-items: center;
@@ -433,6 +526,205 @@
             gap: 2px;
         }
 
+        .global-select-checkbox, .calc-select-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #eab308;
+            flex-shrink: 0;
+        }
+
+        .row-mobile-arrow-btn, .row-calc-arrow-btn {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+            font-size: 0.8rem;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .row-mobile-arrow-btn:active, .row-calc-arrow-btn:active {
+            background-color: #38bdf8;
+            color: #0b0f19;
+        }
+
+        .row-keypad-container {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+            position: fixed;
+            bottom: 25px;
+            left: 0;
+            padding: 0 10px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .row-mini-keypad {
+            pointer-events: auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            background-color: #030712;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid #38bdf8;
+            width: 100%;
+            max-width: 100%;
+            direction: ltr;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.95);
+            touch-action: none;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .row-mini-keypad:active {
+            cursor: grabbing;
+        }
+
+        .keypad-header {
+            grid-column: span 4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+            background-color: #1e293b;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+
+        .keypad-drag-title {
+            color: #38bdf8;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .close-keypad-btn {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 3px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .close-keypad-btn:hover {
+            background-color: #ef4444;
+            color: #fff;
+        }
+
+        .mini-key-btn {
+            background-color: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            padding: 14px 6px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .mini-key-btn:hover {
+            background-color: #38bdf8;
+            color: #0b0f19;
+            border-color: #38bdf8;
+        }
+
+        .mini-key-btn.op {
+            background-color: #0f172a;
+            color: #38bdf8;
+            border-color: #38bdf8;
+        }
+
+        .mini-key-btn.backspace {
+            background-color: #331f29;
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .mini-key-btn.backspace:hover {
+            background-color: #ef4444;
+            color: #fff;
+        }
+
+        .mini-key-btn.enter-key {
+            background-color: #065f46;
+            color: #34d399;
+            border-color: #059669;
+            font-size: 1.05rem;
+        }
+
+        .mini-key-btn.enter-key:hover {
+            background-color: #10b981;
+            color: #ffffff;
+        }
+
+        .mini-key-btn.enter-open-key {
+            background-color: #1e1b4b;
+            color: #a78bfa;
+            border-color: #8b5cf6;
+            font-size: 1.05rem;
+        }
+
+        .mini-key-btn.enter-open-key:hover {
+            background-color: #8b5cf6;
+            color: #ffffff;
+        }
+
+        .mini-key-btn.kbd-key {
+            background-color: #1e1b4b;
+            color: #818cf8;
+            border-color: #6366f1;
+            font-size: 0.95rem;
+        }
+
+        .mini-key-btn.kbd-key:hover {
+            background-color: #6366f1;
+            color: #ffffff;
+        }
+
+        .mini-key-btn.nav-key {
+            background-color: #0284c7;
+            color: #ffffff;
+            border-color: #38bdf8;
+            font-size: 1.05rem;
+        }
+
+        .mini-key-btn.nav-key:hover {
+            background-color: #38bdf8;
+            color: #0b0f19;
+        }
+
+        .mini-key-btn.clear-key {
+            background-color: #7f1d1d;
+            color: #fca5a5;
+            border-color: #ef4444;
+            font-size: 1.05rem;
+        }
+
+        .mini-key-btn.clear-key:hover {
+            background-color: #ef4444;
+            color: #ffffff;
+        }
+
         .text-input, .calc-input {
             background: rgba(255, 255, 255, 0.03);
             border: 2px solid #334155;
@@ -444,6 +736,7 @@
             outline: none;
             font-family: inherit;
             width: 100%;
+            transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
         }
 
         .text-input {
@@ -451,6 +744,7 @@
             resize: none;
             overflow-y: hidden;
             min-height: 38px;
+            line-height: 1.2;
         }
 
         .calc-input {
@@ -467,6 +761,25 @@
             box-shadow: 0 0 8px rgba(56, 189, 248, 0.4) !important;
         }
 
+        .calc-row.hidden-calc .calc-input {
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        .calc-row.hidden-text .text-input {
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        .calc-row.hidden-mic .mic-wrapper {
+            display: none !important;
+        }
+
+        .calc-row.hidden-tools .row-mobile-arrow-btn,
+        .calc-row.hidden-tools .row-calc-arrow-btn {
+            display: none !important;
+        }
+
         .calc-output-container {
             display: flex;
             align-items: baseline;
@@ -481,12 +794,18 @@
             font-size: 1.2rem;
             font-weight: 700;
             color: #10b981;
+            white-space: nowrap;
         }
 
         .row-currency {
             font-size: 0.9rem;
             color: #38bdf8;
             font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .calc-output.negative {
+            color: #ef4444 !important;
         }
 
         .mic-btn {
@@ -495,7 +814,33 @@
             color: #6b7280;
             font-size: 1.1rem;
             cursor: pointer;
-            padding: 2px;
+            padding: 2px 2px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .mic-btn:hover {
+            background-color: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+        }
+
+        .mic-btn.listening {
+            color: #ef4444 !important;
+            animation: pulse 1.2s infinite;
+        }
+
+        .mic-btn.continuous-mode {
+            background-color: rgba(239, 68, 68, 0.2) !important;
+            border: 1px solid #ef4444 !important;
+            border-radius: 50%;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
         }
 
         .keyboard-hint {
@@ -513,71 +858,167 @@
             color: #38bdf8;
             font-weight: bold;
         }
+
+        @media (max-width: 600px) {
+            .calculator-header {
+                flex-direction: column;
+                gap: 4px;
+                padding: 6px;
+            }
+            .total-value-container {
+                width: 100%;
+                justify-content: center;
+            }
+            .total-value {
+                font-size: 1.5rem;
+            }
+            .header-right-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .calc-output-container {
+                min-width: 60px;
+            }
+            .text-input, .calc-input, .calc-output {
+                font-size: 1.15rem;
+                height: 36px;
+                min-height: 36px;
+            }
+        }
     </style>
 </head>
 <body>
 
     <div class="calculator-container" id="calculatorContainer">
+        
         <div class="resize-edge right" id="edgeRight"></div>
         <div class="resize-edge left" id="edgeLeft"></div>
         <div class="resize-edge bottom" id="edgeBottom"></div>
         <div class="resize-edge corner-br" id="edgeCornerBR"></div>
 
+        <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
+
+        <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية وفتح الكيبورد" onclick="handleSmartNextCellClick()">🚀</button>
+
+        <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
+            <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
+                <select id="mobileControlCombo" class="mobile-combo-box" onchange="handleMobileComboChange(this)">
+                    <option value="" disabled selected>⚙️</option>
+                    <option value="toggle_mics">إظهار/إخفاء المايكات</option>
+                    <option value="toggle_tools">إظهار/إخفاء الأدوات</option>
+                </select>
+                <span id="previewTextContent"></span>
+            </div>
+            <span id="previewResultContent" class="mobile-preview-result"></span>
+        </div>
+
         <div class="sticky-top-section" id="stickyTopSection">
             <div class="top-controls-wrapper">
                 <div class="left-controls-group">
-                    <div class="options-dropdown" id="optionsDropdown">
-                        <button class="options-btn" type="button" onclick="toggleOptionsMenu(event)">
-                            الخيارات <span>▼</span>
-                        </button>
-                        <div class="options-dropdown-content" id="optionsDropdownContent">
-                            <label class="option-toggle-label">
-                                <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
-                                إظهار كلمة جنيه
-                            </label>
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <input type="checkbox" id="hideOptionsCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                        <div class="options-dropdown" id="optionsDropdown">
+                            <button class="options-btn" type="button" onclick="toggleOptionsMenu(event)">
+                                الخيارات <span>▼</span>
+                            </button>
+                            <div class="options-dropdown-content" id="optionsDropdownContent">
+                                <label class="option-toggle-label">
+                                    <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
+                                    إظهار كلمة جنيه
+                                </label>
+                            </div>
                         </div>
                     </div>
-                    <button class="refresh-btn" id="refreshBtnEl" type="button" onclick="location.reload()">🔄</button>
+
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <input type="checkbox" id="hideRefreshCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                        <button class="refresh-btn" id="refreshBtnEl" type="button" title="إعادة تحميل الصفحة" onclick="location.reload()">
+                            🔄
+                        </button>
+                    </div>
                 </div>
 
                 <div class="totals-summary-bar">
                     <div class="sub-totals-row">
-                        <div class="summary-item">
-                            <input type="checkbox" id="showPositiveCheckbox" onchange="renderCalculator()">
-                            <span id="positiveTotalVal" class="positive-sum"></span>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="hidePositiveCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                            <div class="summary-item">
+                                <input type="checkbox" id="showPositiveCheckbox" onchange="renderCalculator()">
+                                <span id="positiveTotalVal" class="positive-sum"></span>
+                            </div>
                         </div>
-                        <div class="summary-item">
-                            <input type="checkbox" id="showNegativeCheckbox" onchange="renderCalculator()">
-                            <span id="negativeTotalVal" class="negative-sum"></span>
+
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="hideNegativeCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                            <div class="summary-item">
+                                <input type="checkbox" id="showNegativeCheckbox" onchange="renderCalculator()">
+                                <span id="negativeTotalVal" class="negative-sum"></span>
+                            </div>
                         </div>
                     </div>
 
                     <div class="total-value-container">
-                        <div id="grandTotal" class="total-value">0</div>
-                        <div id="grandTotalCurrency" class="total-currency">جنيه</div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="hideGrandTotalCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                            <div id="grandTotal" class="total-value">0</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="hideGrandCurrencyCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                            <div id="grandTotalCurrency" class="total-currency">جنيه</div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="export-dropdown" id="exportDropdown">
-                    <button class="export-btn" title="تصدير ومشاركة" onclick="toggleExportMenu(event)">📊</button>
-                    <div class="dropdown-content">
-                        <button onclick="exportToExcel()">📊 إكسيل (Excel)</button>
-                        <button onclick="exportToWord()">📝 وورد (Word)</button>
-                        <button onclick="exportToPDF()">📄 بي دي إف (PDF)</button>
-                        <button onclick="exportToTXT()">📄 تصدير ملف نصي (TXT)</button>
-                        <button onclick="exportToImage()">🖼️ تنزيل صورة</button>
-                    </div>
-                </div>
+                <div style="width: 60px;"></div>
             </div>
 
             <div class="calculator-header">
                 <div class="header-right-group">
-                    <span class="designer-credit">designed by Sami Arouj[cite: 1]</span>
-                    <select id="desktopMicCombo" class="desktop-mic-combo" onchange="handleDesktopMicComboChange(this)">
+                    <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
+                    <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
+                    
+                    <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة وفتح كيبورد الموبايل" onclick="handleSmartNextCellClick()">🚀</button>
+
+                    <span class="designer-credit">designed by Sami Arouj</span>
+                    
+                    <!-- كومبو بوكس إخفاء/إظهار المايكات للكمبيوتر (موجود في الأعلى ناحية اليمين وبحجم زر العين تماماً) -->
+                    <select id="desktopMicCombo" class="desktop-mic-combo" title="إظهار أو إخفاء المايكات" onchange="handleDesktopMicComboChange(this)">
                         <option value="" selected>🎤</option>
                         <option value="show">إظهار المايكات</option>
                         <option value="hide">إخفاء المايكات</option>
                     </select>
+
+                    <button type="button" id="toggleHideBtn" class="toggle-hide-btn" title="تحديد العناصر المراد إخفاؤها" onclick="toggleHideSelectionMode()">
+                        👁️
+                    </button>
+
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <input type="checkbox" id="hideExportCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                        <div class="export-dropdown" id="exportDropdown">
+                            <button class="export-btn" title="تصدير ومشاركة" onclick="toggleExportMenu(event)">
+                                📊
+                            </button>
+                            <div class="dropdown-content">
+                                <button onclick="exportToExcel()">📊 إكسيل (Excel)</button>
+                                <button onclick="exportToWord()">📝 وورد (Word)</button>
+                                <button onclick="exportToPDF()">📄 بي دي إف (PDF)</button>
+                                <button onclick="exportToTXT()">📄 تصدير ملف نصي (TXT)</button>
+                                <button onclick="exportToImage()">🖼️ تنزيل صورة</button>
+                                
+                                <div class="dropdown-divider"></div>
+                                
+                                <button onclick="openPhoneWhatsApp()">📱 فتح واتساب الهاتف</button>
+                                <button onclick="openPhoneMessenger()">💬 فتح ماسنجر الهاتف</button>
+                                <button onclick="copyReportTextOnly()">📋 نسخ التقرير نصياً</button>
+
+                                <div class="dropdown-divider"></div>
+
+                                <button onclick="shareLinkToWhatsApp()">💬 إرسال التقرير للواتساب</button>
+                                <button onclick="shareLinkToMessenger()">⚡ إرسال التقرير للماسنجر</button>
+                                <button onclick="shareLinkToSMS()">📱 إرسال التقرير عبر رسالة نصية (SMS)</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -585,62 +1026,794 @@
         <div id="screenContainer" class="calculator-screen"></div>
 
         <div class="keyboard-hint">
-            <span>الأسهم</span> للتحرك بين الأسطر والحقول | <span>Enter</span> للسطر التالي
+            <span>الأسهم</span> للتحرك بين الأسطر والحقول | <span>Home</span> للحساب بالقوة | <span>Page Up</span> لتجاهل ما قبل المؤشر | <span>Enter</span> للسطر التالي أو جديد
         </div>
     </div>
 
     <script>
         const screenContainer = document.getElementById('screenContainer');
+        const calculatorContainer = document.getElementById('calculatorContainer');
+        const mobilePreviewTopBar = document.getElementById('mobilePreviewTopBar');
+        const previewTextContent = document.getElementById('previewTextContent');
+        const previewResultContent = document.getElementById('previewResultContent');
+        const mobileControlCombo = document.getElementById('mobileControlCombo');
+        const desktopMicCombo = document.getElementById('desktopMicCombo');
+        const floatingKeyboardNewRowBtn = document.getElementById('floatingKeyboardNewRowBtn');
+        const stickyTopSection = document.getElementById('stickyTopSection');
+        const grandTotalEl = document.getElementById('grandTotal');
+        const grandTotalCurrencyEl = document.getElementById('grandTotalCurrency');
         const showCurrencyCheckbox = document.getElementById('showCurrencyCheckbox');
         const showPositiveCheckbox = document.getElementById('showPositiveCheckbox');
         const showNegativeCheckbox = document.getElementById('showNegativeCheckbox');
         const positiveTotalValEl = document.getElementById('positiveTotalVal');
         const negativeTotalValEl = document.getElementById('negativeTotalVal');
-        const grandTotalEl = document.getElementById('grandTotal');
-        const grandTotalCurrencyEl = document.getElementById('grandTotalCurrency');
-        const desktopMicCombo = document.getElementById('desktopMicCombo');
+        const topActionBtn = document.getElementById('topActionBtn');
+        const topNotesFocusBtn = document.getElementById('topNotesFocusBtn');
+        const toggleHideBtn = document.getElementById('toggleHideBtn');
 
-        let globalHideMics = false;
+        const optionsDropdownEl = document.getElementById('optionsDropdown');
+        const refreshBtnEl = document.getElementById('refreshBtnEl');
+        const exportDropdownEl = document.getElementById('exportDropdown');
+
+        let isSelectionModeActive = false;
+        
+        let globalHideMics = false; // افتراضياً ظاهرة للكمبيوتر ما لم يتم إخفاؤها
+        let globalHideTools = true;
 
         function detectMobileEnvironment() {
             const ua = navigator.userAgent;
             const width = window.innerWidth;
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || width <= 1024 ? 'mobile' : 'desktop';
+            const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || width <= 1024;
+            
+            if (!isMobileDevice) {
+                return 'desktop';
+            }
+
+            const isDesktopModeOnMobile = width > 768 && !/Mobi/i.test(ua);
+            if (isDesktopModeOnMobile) {
+                return 'mobile-desktop';
+            } else {
+                return 'mobile-normal';
+            }
         }
 
         const env = detectMobileEnvironment();
+        const isMobileNormal = env === 'mobile-normal';
         const isMobileAny = env !== 'desktop';
 
-        let rows = [
-            { textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false }
-        ];
-        let activeRowIndex = 0;
-        let activeFieldIndex = 'calc'; // الافتراضي على حقل العمليات الحسابية
-
-        function toggleOptionsMenu(e) {
-            e.stopPropagation();
-            document.getElementById('optionsDropdownContent').classList.toggle('active');
+        // إخفاء أو إظهار الكومبو بوكس الخاص بالكمبيوتر حسب البيئة
+        if (isMobileAny) {
+            topActionBtn.style.display = 'inline-flex';
+            topNotesFocusBtn.style.display = 'inline-flex';
+            if (desktopMicCombo) desktopMicCombo.style.display = 'none';
+        } else {
+            if (desktopMicCombo) desktopMicCombo.style.display = 'inline-flex';
         }
 
-        function toggleExportMenu(e) {
-            e.stopPropagation();
-            document.getElementById('exportDropdown').classList.toggle('active');
+        if (isMobileNormal) {
+            mobilePreviewTopBar.style.display = 'flex';
         }
 
-        function handleDesktopMicComboChange(selectEl) {
-            globalHideMics = selectEl.value === 'hide';
+        let initialWindowHeight = window.innerHeight;
+        window.addEventListener('resize', () => {
+            if (isMobileAny) {
+                if (window.innerHeight < initialWindowHeight - 120) {
+                    floatingKeyboardNewRowBtn.style.display = 'flex';
+                } else {
+                    floatingKeyboardNewRowBtn.style.display = 'none';
+                }
+            }
+        });
+
+        function handleSmartNextCellClick() {
+            evaluateRow(activeRowIndex);
+            closeAllPads();
+
+            let currentColumn = activeFieldIndex || 'text';
+
+            if (activeRowIndex < rows.length - 1) {
+                activeRowIndex++;
+            } else {
+                rows.push({ 
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                });
+                activeRowIndex = rows.length - 1;
+            }
+
+            activeFieldIndex = currentColumn;
+            renderCalculator(activeFieldIndex);
+            scrollToActiveRow();
+
+            setTimeout(() => {
+                const targetEl = screenContainer.querySelector(`.calc-row.active .${activeFieldIndex === 'text' ? 'text-input' : 'calc-input'}`);
+                if (targetEl) {
+                    targetEl.removeAttribute('readonly');
+                    targetEl.removeAttribute('inputmode');
+                    targetEl.focus();
+                }
+            }, 30);
+
+            updateMobilePreviewText();
+        }
+
+        function handleMobileComboChange(selectEl) {
+            const val = selectEl.value;
+            if (val === 'toggle_mics') {
+                globalHideMics = !globalHideMics;
+            } else if (val === 'toggle_tools') {
+                globalHideTools = !globalHideTools;
+            }
             selectEl.selectedIndex = 0;
             renderCalculator();
         }
 
-        function renderCalculator(focusTarget = 'calc') {
+        function handleDesktopMicComboChange(selectEl) {
+            const val = selectEl.value;
+            if (val === 'show') {
+                globalHideMics = false;
+            } else if (val === 'hide') {
+                globalHideMics = true;
+            }
+            selectEl.selectedIndex = 0;
+            renderCalculator();
+        }
+
+        let currentResizeDirection = null;
+        let startX = 0, startY = 0;
+        let startW = 0, startH = 0, startT = 0, startL = 0;
+
+        function initResize(dir, e) {
+            currentResizeDirection = dir;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            startX = clientX;
+            startY = clientY;
+            startW = calculatorContainer.offsetWidth;
+            startH = calculatorContainer.offsetHeight;
+            startT = calculatorContainer.offsetTop;
+            startL = calculatorContainer.offsetLeft;
+        }
+
+        document.getElementById('edgeRight').addEventListener('mousedown', (e) => initResize('right', e));
+        document.getElementById('edgeRight').addEventListener('touchstart', (e) => initResize('right', e), { passive: true });
+
+        document.getElementById('edgeLeft').addEventListener('mousedown', (e) => initResize('left', e));
+        document.getElementById('edgeLeft').addEventListener('touchstart', (e) => initResize('left', e), { passive: true });
+
+        document.getElementById('edgeBottom').addEventListener('mousedown', (e) => initResize('bottom', e));
+        document.getElementById('edgeBottom').addEventListener('touchstart', (e) => initResize('bottom', e), { passive: true });
+
+        document.getElementById('edgeCornerBR').addEventListener('mousedown', (e) => initResize('cornerBR', e));
+        document.getElementById('edgeCornerBR').addEventListener('touchstart', (e) => initResize('cornerBR', e), { passive: true });
+
+        window.addEventListener('mousemove', doResize);
+        window.addEventListener('touchmove', doResize, { passive: true });
+
+        window.addEventListener('mouseup', stopResize);
+        window.addEventListener('touchend', stopResize);
+
+        function doResize(e) {
+            if (!currentResizeDirection) return;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+
+            if (currentResizeDirection === 'right') {
+                let newW = Math.max(250, startW + dx);
+                calculatorContainer.style.width = newW + 'px';
+            } else if (currentResizeDirection === 'left') {
+                let newW = Math.max(250, startW - dx);
+                let newL = startL + dx;
+                if (newW > 250) {
+                    calculatorContainer.style.width = newW + 'px';
+                    calculatorContainer.style.left = newL + 'px';
+                }
+            } else if (currentResizeDirection === 'bottom') {
+                let newH = Math.max(200, startH + dy);
+                calculatorContainer.style.height = newH + 'px';
+            } else if (currentResizeDirection === 'cornerBR') {
+                let newW = Math.max(250, startW + dx);
+                let newH = Math.max(200, startH + dy);
+                calculatorContainer.style.width = newW + 'px';
+                calculatorContainer.style.height = newH + 'px';
+            }
+        }
+
+        function stopResize() {
+            currentResizeDirection = null;
+        }
+
+        let rows = [
+            { 
+                textExpression: '', 
+                expression: '', 
+                result: 0, 
+                forceCalc: false, 
+                ignoreBeforeIndex: 0, 
+                isCalcVisible: true, 
+                isTextVisible: true,
+                isMicVisible: true,
+                isCalcPadVisible: false, 
+                isTextPadVisible: false
+            }
+        ];
+        let activeRowIndex = 0;
+        let activeFieldIndex = 'text';
+
+        let activeSpeechRecognition = null;
+        let isMicContinuousMode = false;
+        let currentActiveMicBtn = null;
+        let micClickTimer = null;
+
+        function toggleHideSelectionMode() {
+            isSelectionModeActive = !isSelectionModeActive;
+            
+            const checkboxes = document.querySelectorAll('.global-select-checkbox');
+            checkboxes.forEach(cb => {
+                cb.style.display = isSelectionModeActive ? 'inline-block' : 'none';
+            });
+
+            if (isSelectionModeActive) {
+                toggleHideBtn.classList.add('active-mode');
+            } else {
+                toggleHideBtn.classList.remove('active-mode');
+            }
+            
+            renderCalculator();
+        }
+
+        function updateGlobalHides() {
+            const hideOptions = document.getElementById('hideOptionsCheckbox').checked;
+            const hideRefresh = document.getElementById('hideRefreshCheckbox').checked;
+            const hideExport = document.getElementById('hideExportCheckbox').checked;
+            
+            optionsDropdownEl.style.display = hideOptions ? 'none' : 'inline-block';
+            refreshBtnEl.style.display = hideRefresh ? 'none' : 'inline-flex';
+            exportDropdownEl.style.display = hideExport ? 'none' : 'inline-block';
+            
+            document.getElementById('positiveTotalVal').parentElement.parentElement.style.display = document.getElementById('hidePositiveCheckbox').checked ? 'none' : 'flex';
+            document.getElementById('negativeTotalVal').parentElement.parentElement.style.display = document.getElementById('hideNegativeCheckbox').checked ? 'none' : 'flex';
+            
+            grandTotalEl.style.display = document.getElementById('hideGrandTotalCheckbox').checked ? 'none' : 'block';
+            grandTotalCurrencyEl.style.display = document.getElementById('hideGrandCurrencyCheckbox').checked ? 'none' : 'block';
+
+            if (isMobileNormal) {
+                if (hideOptions && hideRefresh && hideExport && document.getElementById('hideGrandTotalCheckbox').checked) {
+                    mobilePreviewTopBar.style.display = 'none';
+                } else {
+                    mobilePreviewTopBar.style.display = 'flex';
+                }
+            }
+        }
+
+        function closeAllPads() {
+            rows.forEach(r => {
+                r.isCalcPadVisible = false;
+                r.isTextPadVisible = false;
+            });
+        }
+
+        function handleTopActionBtnClick() {
+            evaluateRow(activeRowIndex);
+            closeAllPads();
+
+            if (activeRowIndex < rows.length - 1) {
+                activeRowIndex++;
+                activeFieldIndex = 'calc';
+                renderCalculator('calc');
+                scrollToActiveRow();
+            } else {
+                rows.push({ 
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                });
+                activeRowIndex = rows.length - 1;
+                activeFieldIndex = 'calc';
+                renderCalculator('calc');
+                screenContainer.scrollTop = screenContainer.scrollHeight;
+            }
+        }
+
+        function handleTopNotesFocusClick() {
+            evaluateRow(activeRowIndex);
+            closeAllPads();
+
+            if (activeRowIndex < rows.length - 1) {
+                activeRowIndex++;
+                activeFieldIndex = 'text';
+                renderCalculator('text');
+                scrollToActiveRow();
+            } else {
+                rows.push({ 
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                });
+                activeRowIndex = rows.length - 1;
+                activeFieldIndex = 'text';
+                renderCalculator('text');
+                screenContainer.scrollTop = screenContainer.scrollHeight;
+            }
+        }
+
+        function goToFirstRow() {
+            if (rows.length > 0) {
+                activeRowIndex = 0;
+                renderCalculator(activeFieldIndex);
+                scrollToActiveRow();
+            }
+        }
+
+        function goToLastRow() {
+            if (rows.length > 0) {
+                activeRowIndex = rows.length - 1;
+                renderCalculator(activeFieldIndex);
+                scrollToActiveRow();
+            }
+        }
+
+        function clearCurrentField() {
+            if (rows[activeRowIndex]) {
+                if (activeFieldIndex === 'text') {
+                    rows[activeRowIndex].textExpression = '';
+                } else {
+                    rows[activeRowIndex].expression = '';
+                    rows[activeRowIndex].result = 0;
+                    rows[activeRowIndex].forceCalc = false;
+                    rows[activeRowIndex].ignoreBeforeIndex = 0;
+                }
+                renderCalculator(activeFieldIndex);
+            }
+        }
+
+        function scrollToActiveRow() {
+            const activeRowEl = screenContainer.children[activeRowIndex];
+            if (activeRowEl) {
+                activeRowEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function toggleOptionsMenu(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('optionsDropdownContent');
+            const exportDropdown = document.querySelector('#exportDropdown .dropdown-content');
+            if (exportDropdown) exportDropdown.parentElement.classList.remove('active');
+            dropdown.classList.toggle('active');
+        }
+
+        function toggleExportMenu(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('exportDropdown');
+            const optionsDropdown = document.getElementById('optionsDropdownContent');
+            if (optionsDropdown) optionsDropdown.classList.remove('active');
+            dropdown.classList.toggle('active');
+        }
+
+        window.addEventListener('click', (e) => {
+            const optionsDropdown = document.getElementById('optionsDropdownContent');
+            const exportDropdown = document.getElementById('exportDropdown');
+            
+            if (optionsDropdown && !optionsDropdown.contains(e.target) && !e.target.closest('.options-btn')) {
+                optionsDropdown.classList.remove('active');
+            }
+            if (exportDropdown && !exportDropdown.contains(e.target)) {
+                exportDropdown.classList.remove('active');
+            }
+        });
+
+        function updateMobilePreviewText() {
+            if (!isMobileNormal) return;
+            const currentRow = rows[activeRowIndex];
+            if (!currentRow) return;
+
+            let currentText = activeFieldIndex === 'text' ? currentRow.textExpression : currentRow.expression.replace(/\*/g, 'x');
+            previewTextContent.innerText = currentText;
+
+            if (currentRow.result !== '' && currentRow.result !== 0) {
+                const formatted = formatDisplayValue(currentRow.result);
+                const showCurrency = showCurrencyCheckbox.checked;
+                previewResultContent.innerText = `${formatted.text} ${showCurrency ? 'جنيه' : ''}`;
+            } else {
+                previewResultContent.innerText = '';
+            }
+        }
+
+        function insertValueForField(index, field, val) {
+            activeRowIndex = index;
+            activeFieldIndex = field;
+            if (field === 'text') {
+                rows[index].textExpression += val;
+                renderCalculator('text');
+            } else {
+                let actualVal = (val === 'x') ? '*' : val;
+                rows[index].expression += actualVal;
+                rows[index].forceCalc = false;
+                evaluateRow(index);
+                renderCalculator('calc');
+            }
+            updateMobilePreviewText();
+        }
+
+        function handleBackspaceForField(index, field) {
+            activeRowIndex = index;
+            activeFieldIndex = field;
+            if (field === 'text') {
+                let text = rows[index].textExpression;
+                if (text.length > 0) {
+                    rows[index].textExpression = text.substring(0, text.length - 1);
+                    renderCalculator('text');
+                }
+            } else {
+                let expr = rows[index].expression;
+                if (expr.length > 0) {
+                    rows[index].expression = expr.substring(0, expr.length - 1);
+                    rows[index].forceCalc = false;
+                    evaluateRow(index);
+                    renderCalculator('calc');
+                }
+            }
+            updateMobilePreviewText();
+        }
+
+        function openSystemKeyboard(index, field) {
+            activeRowIndex = index;
+            activeFieldIndex = field;
+            closeAllPads(); 
+            renderCalculator(field);
+
+            setTimeout(() => {
+                const activeEl = screenContainer.querySelector(`.calc-row.active .${field === 'text' ? 'text-input' : 'calc-input'}`);
+                if (activeEl) {
+                    activeEl.removeAttribute('readonly');
+                    activeEl.removeAttribute('inputmode');
+                    activeEl.focus();
+                }
+            }, 30);
+            updateMobilePreviewText();
+        }
+
+        function openCalcPadForField(index, field) {
+            activeRowIndex = index;
+            activeFieldIndex = field;
+            closeAllPads();
+
+            if (field === 'text') {
+                rows[index].isTextPadVisible = true;
+            } else {
+                rows[index].isCalcPadVisible = true;
+            }
+            renderCalculator(field);
+            updateMobilePreviewText();
+        }
+
+        function addNewRowFromPad(index, field) {
+            evaluateRow(index);
+            closeAllPads();
+
+            if (index < rows.length - 1) {
+                activeRowIndex = index + 1;
+                activeFieldIndex = field;
+                renderCalculator(field);
+                scrollToActiveRow();
+            } else {
+                rows.push({ 
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                });
+                activeRowIndex = rows.length - 1;
+                activeFieldIndex = field;
+                renderCalculator(field);
+                screenContainer.scrollTop = screenContainer.scrollHeight;
+            }
+            updateMobilePreviewText();
+        }
+
+        function addNewRowAndOpenTool(index, field) {
+            evaluateRow(index);
+            closeAllPads();
+
+            let targetIndex;
+            if (index < rows.length - 1) {
+                targetIndex = index + 1;
+            } else {
+                rows.push({ 
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                });
+                targetIndex = rows.length - 1;
+            }
+
+            activeRowIndex = targetIndex;
+            activeFieldIndex = field;
+
+            if (field === 'text') {
+                renderCalculator(field);
+                setTimeout(() => {
+                    const activeText = screenContainer.querySelector('.calc-row.active .text-input');
+                    if (activeText) {
+                        activeText.removeAttribute('readonly');
+                        activeText.removeAttribute('inputmode');
+                        activeText.focus();
+                    }
+                }, 30);
+            } else {
+                rows[targetIndex].isCalcPadVisible = true;
+                renderCalculator(field);
+            }
+
+            scrollToActiveRow();
+            updateMobilePreviewText();
+        }
+
+        function formatDisplayValue(val) {
+            if (typeof val === 'number') {
+                if (val < 0) {
+                    return { text: `(${Math.abs(val)})`, isNegative: true };
+                }
+                return { text: `${val}`, isNegative: false };
+            }
+            return { text: val, isNegative: false };
+        }
+
+        function createMiniKeypad(index, field) {
+            const keypadDiv = document.createElement('div');
+            keypadDiv.className = 'row-mini-keypad';
+            
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'keypad-header';
+            
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'keypad-drag-title';
+            titleSpan.innerHTML = '☰ لوحة المفاتيح والآلة الحاسبة (اسحب للتحريك)';
+            headerDiv.appendChild(titleSpan);
+
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'close-keypad-btn';
+            closeBtn.innerText = 'إخفاء ✕';
+            closeBtn.title = 'إخفاء الآلة الحاسبة';
+            closeBtn.addEventListener('click', () => {
+                if (field === 'text') {
+                    rows[index].isTextPadVisible = false;
+                } else {
+                    rows[index].isCalcPadVisible = false;
+                }
+                renderCalculator(field);
+            });
+            headerDiv.appendChild(closeBtn);
+            keypadDiv.appendChild(headerDiv);
+
+            let isDraggingKeypad = false;
+            let startX = 0, startY = 0;
+            let currentX = 0, currentY = 0;
+
+            keypadDiv.addEventListener('mousedown', startKeypadDrag);
+            window.addEventListener('mousemove', onKeypadDrag);
+            window.addEventListener('mouseup', stopKeypadDrag);
+
+            keypadDiv.addEventListener('touchstart', startKeypadDrag, { passive: true });
+            window.addEventListener('touchmove', onKeypadDrag, { passive: true });
+            window.addEventListener('touchend', stopKeypadDrag);
+
+            function startKeypadDrag(e) {
+                if (e.target.closest('button')) return;
+                isDraggingKeypad = true;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                startX = clientX - currentX;
+                startY = clientY - currentY;
+            }
+
+            function onKeypadDrag(e) {
+                if (!isDraggingKeypad) return;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                currentX = clientX - startX;
+                currentY = clientY - startY;
+                keypadDiv.style.transform = `translate(${currentX}px, ${currentY}px)`;
+            }
+
+            function stopKeypadDrag() {
+                isDraggingKeypad = false;
+            }
+
+            const keys = [
+                '⬆ Up', '⬇ Down', '🗑 Del', '⌫',
+                '7', '8', '9', '/',
+                '4', '5', '6', 'x',
+                '1', '2', '3', '-',
+                '0', '.', '%', '+',
+                '⌨ Keyboard', 'Enter', 'Enter+Open'
+            ];
+
+            keys.forEach(k => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'mini-key-btn';
+                if (['+', '-', 'x', 'X', '*', '/', '%'].includes(k)) btn.classList.add('op');
+                if (k === '⌫') btn.classList.add('backspace');
+                if (k === '⌨ Keyboard') {
+                    btn.classList.add('kbd-key');
+                    btn.style.gridColumn = 'span 1';
+                }
+                if (k === '⬆ Up' || k === '⬇ Down') btn.classList.add('nav-key');
+                if (k === '🗑 Del') btn.classList.add('clear-key');
+                if (k === 'Enter') {
+                    btn.classList.add('enter-key');
+                    btn.style.gridColumn = 'span 1';
+                }
+                if (k === 'Enter+Open') {
+                    btn.classList.add('enter-open-key');
+                    btn.style.gridColumn = 'span 2';
+                }
+
+                if (k === 'Enter') btn.innerText = 'Enter ↵';
+                else if (k === 'Enter+Open') btn.innerText = 'Enter + Open 🚀';
+                else btn.innerText = k;
+                
+                btn.addEventListener('click', () => {
+                    if (k === '⌫') {
+                        handleBackspaceForField(index, field);
+                    } else if (k === '⌨ Keyboard') {
+                        openSystemKeyboard(index, field);
+                    } else if (k === '⬆ Up') {
+                        goToFirstRow();
+                    } else if (k === '⬇ Down') {
+                        goToLastRow();
+                    } else if (k === '🗑 Del') {
+                        clearCurrentField();
+                    } else if (k === 'Enter') {
+                        addNewRowFromPad(index, field);
+                    } else if (k === 'Enter+Open') {
+                        addNewRowAndOpenTool(index, field);
+                    } else {
+                        insertValueForField(index, field, k);
+                    }
+                });
+                keypadDiv.appendChild(btn);
+            });
+
+            return keypadDiv;
+        }
+
+        function setupCellGestures(element, index, field) {
+            let lastTapTime = 0;
+            let longPressTimer = null;
+            let isLongPressFired = false;
+            let clickCount = 0;
+            let clickTimer = null;
+
+            if (isMobileAny) {
+                element.setAttribute('readonly', 'true');
+                element.setAttribute('inputmode', 'none');
+
+                element.addEventListener('touchstart', (e) => {
+                    isLongPressFired = false;
+                    activeRowIndex = index;
+                    activeFieldIndex = field;
+                    updateActiveRowClasses();
+                    updateMobilePreviewText();
+
+                    longPressTimer = setTimeout(() => {
+                        isLongPressFired = true;
+                        openSystemKeyboard(index, field);
+                    }, 400);
+
+                }, { passive: true });
+
+                element.addEventListener('touchend', (e) => {
+                    clearTimeout(longPressTimer);
+                    if (isLongPressFired) return;
+
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTapTime;
+
+                    if (tapLength < 350 && tapLength > 0) {
+                        e.preventDefault();
+                        if (isMobileAny) {
+                            element.setAttribute('readonly', 'true');
+                            element.setAttribute('inputmode', 'none');
+                        }
+                        openCalcPadForField(index, field);
+                        lastTapTime = 0;
+                    } else {
+                        lastTapTime = currentTime;
+                    }
+                });
+
+                element.addEventListener('touchmove', () => {
+                    clearTimeout(longPressTimer);
+                });
+            } else {
+                element.addEventListener('mousedown', (e) => {
+                    activeRowIndex = index;
+                    activeFieldIndex = field;
+                    updateActiveRowClasses();
+                    updateMobilePreviewText();
+
+                    clickCount++;
+                    if (clickCount === 1) {
+                        clickTimer = setTimeout(() => {
+                            clickCount = 0;
+                        }, 400);
+                    } else if (clickCount === 3) {
+                        clearTimeout(clickTimer);
+                        clickCount = 0;
+                        e.preventDefault();
+                        openCalcPadForField(index, field);
+                    }
+                });
+            }
+
+            element.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                if (isMobileAny) {
+                    openCalcPadForField(index, field);
+                }
+            });
+        }
+
+        function setupRowSwipeToDelete(rowDiv, index) {
+            let startX = 0;
+            let currentX = 0;
+            let isSwiping = false;
+
+            rowDiv.addEventListener('touchstart', (e) => {
+                if (e.target.closest('button') || e.target.closest('textarea') || e.target.closest('input')) return;
+                startX = e.touches[0].clientX;
+                isSwiping = true;
+            }, { passive: true });
+
+            rowDiv.addEventListener('touchmove', (e) => {
+                if (!isSwiping) return;
+                currentX = e.touches[0].clientX;
+                let diffX = currentX - startX;
+                
+                if (Math.abs(diffX) > 10) {
+                    rowDiv.style.transform = `translateX(${diffX}px)`;
+                    rowDiv.style.opacity = `${1 - Math.abs(diffX) / 300}`;
+                }
+            }, { passive: true });
+
+            rowDiv.addEventListener('touchend', (e) => {
+                if (!isSwiping) return;
+                isSwiping = false;
+                let diffX = currentX - startX;
+
+                if (Math.abs(diffX) > 100) {
+                    rowDiv.style.transition = 'all 0.25s ease';
+                    rowDiv.style.transform = diffX > 0 ? 'translateX(100vw)' : 'translateX(-100vw)';
+                    rowDiv.style.opacity = '0';
+                    setTimeout(() => {
+                        deleteRow(index);
+                    }, 250);
+                } else {
+                    rowDiv.style.transition = 'transform 0.15s ease, opacity 0.15s ease';
+                    rowDiv.style.transform = 'translateX(0px)';
+                    rowDiv.style.opacity = '1';
+                }
+            });
+        }
+
+        function renderCalculator(focusTarget = null) {
             screenContainer.innerHTML = '';
-            let totalSum = 0, positiveSum = 0, negativeSum = 0;
+            let totalSum = 0;
+            let positiveSum = 0;
+            let negativeSum = 0;
             const showCurrency = showCurrencyCheckbox.checked;
 
             rows.forEach((row, index) => {
                 const rowDiv = document.createElement('div');
-                rowDiv.className = `calc-row ${index === activeRowIndex ? 'active' : ''}`;
+                let rowClasses = `calc-row ${index === activeRowIndex ? 'active' : ''}`;
+                if (!row.isCalcVisible) rowClasses += ' hidden-calc';
+                if (!row.isTextVisible) rowClasses += ' hidden-text';
+                if (globalHideMics) rowClasses += ' hidden-mic';
+                if (globalHideTools) rowClasses += ' hidden-tools';
+                rowDiv.className = rowClasses;
+
+                setupRowSwipeToDelete(rowDiv, index);
 
                 const rowMain = document.createElement('div');
                 rowMain.className = 'calc-row-main';
@@ -648,55 +1821,185 @@
                 const inputsGroup = document.createElement('div');
                 inputsGroup.className = 'inputs-group';
 
-                // حقل الملاحظات (النص)
                 const textWrapper = document.createElement('div');
                 textWrapper.className = 'text-input-wrapper';
+
+                if (isSelectionModeActive) {
+                    const selectTextCheckbox = document.createElement('input');
+                    selectTextCheckbox.type = 'checkbox';
+                    selectTextCheckbox.className = 'calc-select-checkbox';
+                    selectTextCheckbox.checked = !row.isTextVisible;
+                    selectTextCheckbox.title = 'علم هنا لإخفاء ملاحظات هذا السطر';
+                    
+                    selectTextCheckbox.addEventListener('change', (e) => {
+                        row.isTextVisible = !e.target.checked;
+                    });
+                    
+                    textWrapper.appendChild(selectTextCheckbox);
+                }
+
+                const mobileArrowBtn = document.createElement('button');
+                mobileArrowBtn.type = 'button';
+                mobileArrowBtn.className = 'row-mobile-arrow-btn';
+                mobileArrowBtn.innerHTML = '🔽';
+                mobileArrowBtn.title = 'التنقل لأسفل أو إضافة سطر جديد';
+                
+                if (isMobileAny) {
+                    mobileArrowBtn.style.display = 'flex';
+                }
+
+                mobileArrowBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (index < rows.length - 1) {
+                        activeRowIndex = index + 1;
+                        activeFieldIndex = 'text';
+                        renderCalculator('text');
+                        scrollToActiveRow();
+                    } else {
+                        evaluateRow(index);
+                        closeAllPads();
+                        rows.push({ 
+                            textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                            isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                        });
+                        activeRowIndex = rows.length - 1;
+                        activeFieldIndex = 'text';
+                        renderCalculator('text');
+                        screenContainer.scrollTop = screenContainer.scrollHeight;
+                    }
+                    updateMobilePreviewText();
+                });
+
+                const mobileKbdArrowBtn = document.createElement('button');
+                mobileKbdArrowBtn.type = 'button';
+                mobileKbdArrowBtn.className = 'row-mobile-arrow-btn';
+                mobileKbdArrowBtn.innerHTML = '⌨️';
+                mobileKbdArrowBtn.title = 'إضافة سطر جديد وفتح الكيبورد';
+
+                if (isMobileAny) {
+                    mobileKbdArrowBtn.style.display = 'flex';
+                }
+
+                mobileKbdArrowBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    addNewRowAndOpenTool(index, 'text');
+                });
+
                 const textInput = document.createElement('textarea');
                 textInput.className = 'text-input';
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
 
-                if (!isMobileAny) {
-                    textInput.removeAttribute('readonly');
+                if (index === activeRowIndex && activeFieldIndex === 'text') {
+                    textInput.classList.add('text-border-active');
                 }
 
                 textInput.addEventListener('input', (e) => {
                     rows[index].textExpression = e.target.value;
+                    e.target.style.height = 'auto';
+                    e.target.style.height = (e.target.scrollHeight) + 'px';
+                    updateMobilePreviewText();
                 });
+
                 textInput.addEventListener('focus', () => {
                     activeRowIndex = index;
                     activeFieldIndex = 'text';
                     updateActiveRowClasses();
+                    updateMobilePreviewText();
                 });
+
+                textInput.addEventListener('keydown', (e) => {
+                    handleKeyNavigation(e, index, 'text');
+                });
+
+                setupCellGestures(textInput, index, 'text');
+
+                textWrapper.appendChild(mobileArrowBtn);
+                textWrapper.appendChild(mobileKbdArrowBtn);
                 textWrapper.appendChild(textInput);
 
-                // الناتج
                 const outputContainer = document.createElement('div');
                 outputContainer.className = 'calc-output-container';
+
                 const outputDiv = document.createElement('div');
                 outputDiv.className = 'calc-output';
+
                 const currencySpan = document.createElement('span');
                 currencySpan.className = 'row-currency';
                 currencySpan.innerText = showCurrency ? 'جنيه' : '';
 
-                if (row.result !== 0) {
-                    outputDiv.innerText = row.result < 0 ? `(${Math.abs(row.result)})` : row.result;
-                    if (row.result < 0) outputDiv.classList.add('negative');
+                if (row.result !== '' && row.result !== 0) {
+                    const formatted = formatDisplayValue(row.result);
+                    outputDiv.innerText = formatted.text;
+                    if (formatted.isNegative) {
+                        outputDiv.classList.add('negative');
+                    } else {
+                        outputDiv.classList.remove('negative');
+                    }
+                } else {
+                    outputDiv.innerText = '';
+                    currencySpan.innerText = '';
                 }
+
                 outputContainer.appendChild(outputDiv);
                 outputContainer.appendChild(currencySpan);
 
-                // حقل العمليات الحسابية
                 const calcWrapper = document.createElement('div');
                 calcWrapper.className = 'calc-input-wrapper';
+
+                if (isSelectionModeActive) {
+                    const selectCheckbox = document.createElement('input');
+                    selectCheckbox.type = 'checkbox';
+                    selectCheckbox.className = 'calc-select-checkbox';
+                    selectCheckbox.checked = !row.isCalcVisible;
+                    selectCheckbox.title = 'علم هنا لإخفاء نص العملية الحسابية لهذا السطر';
+                    
+                    selectCheckbox.addEventListener('change', (e) => {
+                        row.isCalcVisible = !e.target.checked;
+                    });
+                    
+                    calcWrapper.appendChild(selectCheckbox);
+                }
+
+                const calcArrowBtn = document.createElement('button');
+                calcArrowBtn.type = 'button';
+                calcArrowBtn.className = 'row-calc-arrow-btn';
+                calcArrowBtn.innerHTML = '🧮';
+                calcArrowBtn.title = 'إضافة سطر جديد وفتح الآلة الحاسبة المصغرة';
+
+                if (isMobileAny) {
+                    calcArrowBtn.style.display = 'flex';
+                }
+
+                calcArrowBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    evaluateRow(index);
+                    closeAllPads();
+                    
+                    let targetIndex;
+                    if (index < rows.length - 1) {
+                        targetIndex = index + 1;
+                    } else {
+                        rows.push({ 
+                            textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                            isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                        });
+                        targetIndex = rows.length - 1;
+                    }
+
+                    activeRowIndex = targetIndex;
+                    activeFieldIndex = 'calc';
+                    rows[targetIndex].isCalcPadVisible = true;
+
+                    renderCalculator('calc');
+                    scrollToActiveRow();
+                    updateMobilePreviewText();
+                });
+
                 const inputField = document.createElement('input');
                 inputField.type = 'text';
                 inputField.className = 'calc-input';
                 inputField.value = row.expression.replace(/\*/g, 'x');
-
-                if (!isMobileAny) {
-                    inputField.removeAttribute('readonly');
-                }
 
                 if (index === activeRowIndex && activeFieldIndex === 'calc') {
                     inputField.classList.add('calc-border-active');
@@ -704,110 +2007,613 @@
 
                 inputField.addEventListener('input', (e) => {
                     let rawVal = e.target.value.replace(/x|X|×/g, '*');
-                    e.target.value = rawVal.replace(/\*/g, 'x');
+                    let displayVal = rawVal.replace(/\*/g, 'x');
+                    
+                    e.target.value = displayVal;
                     rows[index].expression = rawVal;
+
+                    rows[index].forceCalc = false;
+                    if (e.target.value.length < rows[index].ignoreBeforeIndex) {
+                        rows[index].ignoreBeforeIndex = 0;
+                    }
                     evaluateRow(index);
+                    updateMobilePreviewText();
                 });
 
                 inputField.addEventListener('focus', () => {
                     activeRowIndex = index;
                     activeFieldIndex = 'calc';
                     updateActiveRowClasses();
+                    updateMobilePreviewText();
                 });
 
                 inputField.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === 'Home') {
                         e.preventDefault();
-                        if (index === rows.length - 1) {
-                            rows.push({ textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false });
-                        }
-                        activeRowIndex = index + 1;
-                        activeFieldIndex = 'calc';
+                        rows[index].forceCalc = true;
+                        rows[index].ignoreBeforeIndex = 0;
+                        evaluateRow(index);
                         renderCalculator('calc');
                     }
+                    else if (e.key === 'PageUp') {
+                        e.preventDefault();
+                        rows[index].ignoreBeforeIndex = inputField.selectionStart;
+                        evaluateRow(index);
+                        renderCalculator('calc');
+                    }
+                    else if (e.key === 'Delete') {
+                        e.preventDefault();
+                        clearCurrentField();
+                    }
+                    else {
+                        handleKeyNavigation(e, index, 'calc');
+                    }
+                    updateMobilePreviewText();
                 });
 
+                setupCellGestures(inputField, index, 'calc');
+
+                calcWrapper.appendChild(calcArrowBtn);
                 calcWrapper.appendChild(inputField);
 
                 inputsGroup.appendChild(textWrapper);
                 inputsGroup.appendChild(outputContainer);
                 inputsGroup.appendChild(calcWrapper);
-                rowMain.appendChild(inputsGroup);
+
+                const micWrapper = document.createElement('div');
+                micWrapper.className = 'mic-wrapper';
+
+                const micBtn = document.createElement('button');
+                micBtn.className = 'mic-btn';
+                micBtn.innerHTML = '🎤';
+                micBtn.title = 'انقر مرة واحدة للتحدث المؤقت، أو انقر مرتين متتاليتين للتشغيل المستمر';
+                micBtn.type = 'button';
+
+                micBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (micClickTimer === null) {
+                        micClickTimer = setTimeout(() => {
+                            micClickTimer = null;
+                            handleMicClick(index, micBtn, false);
+                        }, 300);
+                    } else {
+                        clearTimeout(micClickTimer);
+                        micClickTimer = null;
+                        handleMicClick(index, micBtn, true);
+                    }
+                });
+
+                micWrapper.appendChild(micBtn);
+
+                // بناء السطر بناءً على جهاز الكمبيوتر أو الموبايل
+                // للكمبيوتر: المايك في الناحية الشمال (أقصى اليسار)
+                if (!isMobileAny) {
+                    rowMain.appendChild(inputsGroup);
+                    rowMain.appendChild(micWrapper);
+                } else {
+                    // للموبايل: المايك في مكانه الأصلي مع إخفائه افتراضياً حسب رغبتك السابقة
+                    rowMain.appendChild(inputsGroup);
+                    rowMain.appendChild(micWrapper);
+                }
+
                 rowDiv.appendChild(rowMain);
+
+                if (index === activeRowIndex && (row.isTextPadVisible || row.isCalcPadVisible)) {
+                    const keypadContainer = document.createElement('div');
+                    keypadContainer.className = 'row-keypad-container';
+
+                    if (row.isTextPadVisible) {
+                        keypadContainer.appendChild(createMiniKeypad(index, 'text'));
+                    }
+                    if (row.isCalcPadVisible) {
+                        keypadContainer.appendChild(createMiniKeypad(index, 'calc'));
+                    }
+
+                    screenContainer.appendChild(keypadContainer);
+                }
+
                 screenContainer.appendChild(rowDiv);
 
-                totalSum += row.result;
-                if (row.result > 0) positiveSum += row.result;
-                if (row.result < 0) negativeSum += row.result;
+                setTimeout(() => {
+                    textInput.style.height = 'auto';
+                    textInput.style.height = (textInput.scrollHeight) + 'px';
+                }, 0);
+
+                if (typeof row.result === 'number' && !isNaN(row.result)) {
+                    totalSum += row.result;
+                    if (row.result > 0) {
+                        positiveSum += row.result;
+                    } else if (row.result < 0) {
+                        negativeSum += row.result;
+                    }
+                }
             });
 
-            grandTotalEl.innerText = totalSum;
-            grandTotalCurrencyEl.innerText = showCurrency ? 'جنيه' : '';
-            positiveTotalValEl.innerText = showPositiveCheckbox.checked ? positiveSum : '';
-            negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negativeSum : '';
+            if (!isMobileAny && focusTarget) {
+                setTimeout(() => {
+                    const targetEl = screenContainer.querySelector(`.calc-row.active .${focusTarget === 'text' ? 'text-input' : 'calc-input'}`);
+                    if (targetEl) targetEl.focus();
+                }, 10);
+            }
 
-            // التركيز التلقائي الافتراضي حصرياً على حقل العمليات الحسابية
-            setTimeout(() => {
-                const targetEl = screenContainer.querySelector(`.calc-row.active .${focusTarget === 'text' ? 'text-input' : 'calc-input'}`);
-                if (targetEl) targetEl.focus();
-            }, 50);
+            const formattedTotal = formatDisplayValue(Number.isInteger(totalSum) ? totalSum : parseFloat(totalSum.toFixed(6)));
+            grandTotalEl.innerText = formattedTotal.text;
+            grandTotalCurrencyEl.innerText = showCurrency ? 'جنيه' : '';
+            
+            if (formattedTotal.isNegative) {
+                grandTotalEl.classList.add('negative');
+            } else {
+                grandTotalEl.classList.remove('negative');
+            }
+
+            const posFormatted = formatDisplayValue(Number.isInteger(positiveSum) ? positiveSum : parseFloat(positiveSum.toFixed(6)));
+            const negFormatted = formatDisplayValue(Number.isInteger(negativeSum) ? negativeSum : parseFloat(negativeSum.toFixed(6)));
+
+            positiveTotalValEl.innerText = showPositiveCheckbox.checked ? posFormatted.text : '';
+            negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
+            
+            updateGlobalHides();
+            updateMobilePreviewText();
         }
 
+        function handleKeyNavigation(e, index, currentField) {
+            const key = e.key;
+
+            if (key === 'Enter') {
+                e.preventDefault();
+                evaluateRow(index);
+                closeAllPads();
+
+                if (index < rows.length - 1) {
+                    activeRowIndex = index + 1;
+                    activeFieldIndex = currentField;
+                    renderCalculator(currentField);
+                    scrollToActiveRow();
+                } else {
+                    rows.push({ 
+                        textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                        isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    });
+                    activeRowIndex = rows.length - 1;
+                    activeFieldIndex = currentField;
+                    renderCalculator(currentField);
+                    screenContainer.scrollTop = screenContainer.scrollHeight;
+                }
+            }
+            else if (key === 'ArrowDown') {
+                if (index < rows.length - 1) {
+                    e.preventDefault();
+                    closeAllPads();
+                    activeRowIndex = index + 1;
+                    activeFieldIndex = currentField;
+                    renderCalculator(currentField);
+                    scrollToActiveRow();
+                }
+            } 
+            else if (key === 'ArrowUp') {
+                if (index > 0) {
+                    e.preventDefault();
+                    closeAllPads();
+                    activeRowIndex = index - 1;
+                    activeFieldIndex = currentField;
+                    renderCalculator(currentField);
+                    scrollToActiveRow();
+                }
+            } 
+            else if (key === 'ArrowRight') {
+                if (currentField === 'calc') {
+                    e.preventDefault();
+                    activeFieldIndex = 'text';
+                    renderCalculator('text');
+                }
+            } 
+            else if (key === 'ArrowLeft') {
+                if (currentField === 'text') {
+                    e.preventDefault();
+                    activeFieldIndex = 'calc';
+                    renderCalculator('calc');
+                }
+            }
+            updateMobilePreviewText();
+        }
+
+        function handleMicClick(index, micBtn, isDoubleClick) {
+            if (activeSpeechRecognition) {
+                stopActiveMic();
+                return;
+            }
+
+            isMicContinuousMode = isDoubleClick;
+            startSpeechRecognition(index, micBtn);
+        }
+
+        function stopActiveMic() {
+            if (activeSpeechRecognition) {
+                isMicContinuousMode = false;
+                try { activeSpeechRecognition.stop(); } catch(e) {}
+                activeSpeechRecognition = null;
+            }
+            if (currentActiveMicBtn) {
+                currentActiveMicBtn.classList.remove('listening', 'continuous-mode');
+                currentActiveMicBtn.innerHTML = '🎤';
+                currentActiveMicBtn = null;
+            }
+        }
+
+        function startSpeechRecognition(index, micBtn) {
+            const targetRow = activeRowIndex;
+            const targetField = activeFieldIndex;
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert('متصفحك لا يدعم خاصية التعرف على الصوت.');
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            activeSpeechRecognition = recognition;
+            currentActiveMicBtn = micBtn;
+
+            recognition.lang = 'ar-SA';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            recognition.continuous = true;
+
+            micBtn.classList.add('listening');
+            micBtn.innerHTML = '🔴';
+
+            if (isMicContinuousMode) {
+                micBtn.classList.add('continuous-mode');
+                micBtn.title = 'المايك يعمل بوضع الاستمرار الدائم (اضغط لإيقافه)';
+            } else {
+                micBtn.title = 'تحدث للإدخال في الحقل النشط';
+            }
+
+            recognition.onresult = (event) => {
+                const speechToText = event.results[event.results.length - 1][0].transcript;
+                
+                if (targetField === 'text') {
+                    rows[targetRow].textExpression = rows[targetRow].textExpression ? rows[targetRow].textExpression + ' ' + speechToText : speechToText;
+                    renderCalculator('text');
+                } else {
+                    rows[targetRow].expression = rows[targetRow].expression ? rows[targetRow].expression + ' ' + speechToText : speechToText;
+                    rows[targetRow].forceCalc = false;
+                    evaluateRow(targetRow);
+                    renderCalculator('calc');
+                }
+                updateMobilePreviewText();
+            };
+
+            recognition.onerror = () => {
+                if (!isMicContinuousMode) {
+                    stopActiveMic();
+                }
+            };
+
+            recognition.onend = () => {
+                if (isMicContinuousMode && activeSpeechRecognition === recognition) {
+                    try {
+                        recognition.start();
+                    } catch (e) {}
+                } else {
+                    stopActiveMic();
+                }
+            };
+
+            recognition.start();
+        }
+
+        window.addEventListener('keydown', (event) => {
+            const key = event.key;
+
+            if (key === 'Escape') {
+                stopActiveMic();
+                rows = [{ 
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                }];
+                activeRowIndex = 0;
+                activeFieldIndex = 'calc';
+                renderCalculator('calc');
+            }
+            else if (key === 'Backspace') {
+                const activeInput = document.activeElement;
+                if (activeInput && (activeInput.classList.contains('calc-input') || activeInput.classList.contains('text-input'))) {
+                    if (activeInput.value === '' && activeRowIndex > 0) {
+                        event.preventDefault();
+                        rows.splice(activeRowIndex, 1);
+                        activeRowIndex--;
+                        closeAllPads();
+                        activeFieldIndex = 'calc';
+                        renderCalculator('calc');
+                    }
+                }
+            }
+            updateMobilePreviewText();
+        });
+
         function updateActiveRowClasses() {
-            document.querySelectorAll('.calc-row').forEach((rowDiv, i) => {
+            const rowDivs = screenContainer.querySelectorAll('.calc-row');
+            rowDivs.forEach((rowDiv, i) => {
                 const textInput = rowDiv.querySelector('.text-input');
                 const calcInput = rowDiv.querySelector('.calc-input');
+
                 if (i === activeRowIndex) {
                     rowDiv.classList.add('active');
-                    if (activeFieldIndex === 'text') textInput.classList.add('text-border-active');
-                    else calcInput.classList.add('calc-border-active');
+                    if (activeFieldIndex === 'text' && textInput) {
+                        textInput.classList.add('text-border-active');
+                        if (calcInput) calcInput.classList.remove('calc-border-active');
+                    } else if (activeFieldIndex === 'calc' && calcInput) {
+                        calcInput.classList.add('calc-border-active');
+                        if (textInput) textInput.classList.remove('text-border-active');
+                    }
                 } else {
                     rowDiv.classList.remove('active');
-                    textInput.classList.remove('text-border-active');
-                    calcInput.classList.remove('calc-border-active');
+                    if (textInput) textInput.classList.remove('text-border-active');
+                    if (calcInput) calcInput.classList.remove('calc-border-active');
                 }
             });
         }
 
-        function evaluateRow(index) {
-            let row = rows[index];
-            let expr = row.expression.trim().replace(/x|X|×|\*/g, '*');
-            if (!expr) { row.result = 0; updateGrandTotalOnly(); return; }
-            try {
-                let res = Function('"use strict"; return (' + expr.replace(/[^0-9+\-*/().]/g, '') + ')')();
-                row.result = isNaN(res) || !isFinite(res) ? 0 : (Number.isInteger(res) ? res : parseFloat(res.toFixed(6)));
-            } catch (e) {
-                row.result = 0;
+        function deleteRow(index) {
+            if (rows.length === 1) {
+                rows[0].textExpression = '';
+                rows[0].expression = '';
+                rows[0].result = 0;
+                rows[0].forceCalc = false;
+                rows[0].ignoreBeforeIndex = 0;
+                rows[0].isCalcVisible = true;
+                rows[0].isTextVisible = true;
+                rows[0].isMicVisible = true;
+                rows[0].isCalcPadVisible = false;
+                rows[0].isTextPadVisible = false;
+            } else {
+                rows.splice(index, 1);
+                if (activeRowIndex >= rows.length) {
+                    activeRowIndex = rows.length - 1;
+                }
+                closeAllPads();
             }
+            renderCalculator('calc');
+            updateMobilePreviewText();
+        }
+
+        function evaluateRow(index) {
+            let currentRow = rows[index];
+            let fullExpr = currentRow.expression.trim();
+
+            if (fullExpr === '') {
+                currentRow.result = 0;
+                updateGrandTotalOnly();
+                return;
+            }
+
+            let expr = fullExpr;
+            if (currentRow.ignoreBeforeIndex > 0) {
+                expr = fullExpr.substring(currentRow.ignoreBeforeIndex).trim();
+            }
+
+            if (expr === '') {
+                currentRow.result = 0;
+                updateGrandTotalOnly();
+                return;
+            }
+
+            let sanitizedExpr = expr
+                .replace(/x|X|×|\*/g, '*')
+                .replace(/÷/g, '/');
+
+            let hasAttachedTextBeforeOrAfter = /(\d+[a-zA-Zأ-ي\u0600-\u06FF])|([a-zA-Zأ-ي\u0600-\u06FF]\d+)/.test(sanitizedExpr);
+
+            if (hasAttachedTextBeforeOrAfter && !currentRow.forceCalc) {
+                currentRow.result = 0;
+                updateGrandTotalOnly();
+                return;
+            }
+
+            let percentMatch = sanitizedExpr.match(/^([\d.]+)\s*([\+\-\*\/])\s*([\d.]+)%$/);
+            if (percentMatch) {
+                let baseNum = parseFloat(percentMatch[1]);
+                let operator = percentMatch[2];
+                let percentVal = parseFloat(percentMatch[3]);
+                let calculatedPercent = baseNum * (percentVal / 100);
+                let res = 0;
+
+                if (operator === '+') {
+                    res = baseNum + calculatedPercent;
+                } else if (operator === '-') {
+                    res = baseNum - calculatedPercent;
+                } else if (operator === '*') {
+                    res = calculatedPercent;
+                } else if (operator === '/') {
+                    res = calculatedPercent !== 0 ? baseNum / calculatedPercent : 0;
+                }
+
+                currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
+                updateGrandTotalOnly();
+                return;
+            }
+
+            let validMathPattern = /^[0-9+\-*/.\s()a-zA-Zأ-ي\u0600-\u06FF%]+$/;
+
+            if (validMathPattern.test(sanitizedExpr)) {
+                try {
+                    let singleNegativeMatch = sanitizedExpr.match(/^-\s*([\d.]+)$/);
+                    if (singleNegativeMatch) {
+                        let res = -parseFloat(singleNegativeMatch[1]);
+                        currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
+                        updateGrandTotalOnly();
+                        return;
+                    }
+
+                    let evalSafeExpr = sanitizedExpr.replace(/[^0-9+\-*/().]/g, '');
+                    let res = Function('"use strict"; return (' + evalSafeExpr + ')')();
+
+                    if (isNaN(res) || !isFinite(res)) {
+                        currentRow.result = 0;
+                    } else {
+                        currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
+                    }
+                } catch (e) {
+                    currentRow.result = 0;
+                }
+            } else {
+                currentRow.result = 0;
+            }
+            
             updateGrandTotalOnly();
         }
 
         function updateGrandTotalOnly() {
-            let totalSum = 0, positiveSum = 0, negativeSum = 0;
+            let totalSum = 0;
+            let positiveSum = 0;
+            let negativeSum = 0;
             const showCurrency = showCurrencyCheckbox.checked;
+
             rows.forEach((row, index) => {
                 const rowDivs = screenContainer.querySelectorAll('.calc-row');
                 if (rowDivs[index]) {
-                    rowDivs[index].querySelector('.calc-output').innerText = row.result !== 0 ? (row.result < 0 ? `(${Math.abs(row.result)})` : row.result) : '';
-                    rowDivs[index].querySelector('.row-currency').innerText = showCurrency ? 'جنيه' : '';
+                    const outputDiv = rowDivs[index].querySelector('.calc-output');
+                    const currencySpan = rowDivs[index].querySelector('.row-currency');
+
+                    if (row.result !== '' && row.result !== 0) {
+                        const formatted = formatDisplayValue(row.result);
+                        outputDiv.innerText = formatted.text;
+                        currencySpan.innerText = showCurrency ? 'جنيه' : '';
+                        if (formatted.isNegative) {
+                            outputDiv.classList.add('negative');
+                        } else {
+                            outputDiv.classList.remove('negative');
+                        }
+                    } else {
+                        outputDiv.innerText = '';
+                        currencySpan.innerText = '';
+                    }
                 }
-                totalSum += row.result;
-                if (row.result > 0) positiveSum += row.result;
-                if (row.result < 0) negativeSum += row.result;
+                if (typeof row.result === 'number' && !isNaN(row.result)) {
+                    totalSum += row.result;
+                    if (row.result > 0) {
+                        positiveSum += row.result;
+                    } else if (row.result < 0) {
+                        negativeSum += row.result;
+                    }
+                }
             });
-            grandTotalEl.innerText = totalSum;
-            positiveTotalValEl.innerText = showPositiveCheckbox.checked ? positiveSum : '';
-            negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negativeSum : '';
+
+            const formattedTotal = formatDisplayValue(Number.isInteger(totalSum) ? totalSum : parseFloat(totalSum.toFixed(6)));
+            grandTotalEl.innerText = formattedTotal.text;
+            grandTotalCurrencyEl.innerText = showCurrency ? 'جنيه' : '';
+
+            if (formattedTotal.isNegative) {
+                grandTotalEl.classList.add('negative');
+            } else {
+                grandTotalEl.classList.remove('negative');
+            }
+
+            const posFormatted = formatDisplayValue(Number.isInteger(positiveSum) ? positiveSum : parseFloat(positiveSum.toFixed(6)));
+            const negFormatted = formatDisplayValue(Number.isInteger(negativeSum) ? negativeSum : parseFloat(negativeSum.toFixed(6)));
+
+            positiveTotalValEl.innerText = showPositiveCheckbox.checked ? posFormatted.text : '';
+            negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
+            
+            updateMobilePreviewText();
+        }
+
+        function generateShareSummaryText() {
+            const showCurrency = showCurrencyCheckbox.checked;
+            let text = "";
+
+            rows.forEach((r, i) => {
+                let note = (r.isTextVisible && r.textExpression) ? `[${r.textExpression}]` : `[سطر ${i+1}]`;
+                let calc = (r.isCalcVisible && r.expression) ? `= ${r.expression.replace(/\*/g, 'x')}` : '';
+                let res = r.result !== 0 ? `← ${r.result} ${showCurrency ? 'جنيه' : ''}` : '';
+                
+                text += `${i + 1}. ${note} ${calc} ${res}\n`;
+            });
+
+            text += "-------------------------\n";
+            if (grandTotalEl.style.display !== 'none') {
+                text += `💰 *الإجمالي النهائي:* ${grandTotalEl.innerText} ${grandTotalCurrencyEl.style.display !== 'none' && showCurrency ? 'جنيه' : ''}\n`;
+            }
+            return text;
+        }
+
+        function copyTextToClipboard(text, successMessage) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    if (successMessage) alert(successMessage);
+                }).catch(() => {
+                    fallbackCopyText(text, successMessage);
+                });
+            } else {
+                fallbackCopyText(text, successMessage);
+            }
+        }
+
+        function fallbackCopyText(text, successMessage) {
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            if (successMessage) alert(successMessage);
+        }
+
+        function openPhoneWhatsApp() {
+            window.location.href = "whatsapp://";
+        }
+
+        function openPhoneMessenger() {
+            window.location.href = "fb-messenger://";
+        }
+
+        function copyReportTextOnly() {
+            const text = generateShareSummaryText();
+            copyTextToClipboard(text, "تم نسخ التقرير نصياً بنجاح! يمكنك لصقه في أي مكان الآن.");
+        }
+
+        function shareLinkToWhatsApp() {
+            const text = generateShareSummaryText();
+            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيفتح موقع/تطبيق الواتساب الآن.");
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function shareLinkToMessenger() {
+            const text = generateShareSummaryText();
+            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيفتح موقع الماسنجر الآن، قم بالدخول للمحادثة واضغط لصق (Ctrl + V).");
+            window.open('https://www.messenger.com/', '_blank');
+        }
+
+        function shareLinkToSMS() {
+            const text = generateShareSummaryText();
+            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيتم فتح برنامج الرسائل النصية (SMS) الآن.");
+            const smsUrl = `sms:?body=${encodeURIComponent(text)}`;
+            window.open(smsUrl, '_blank');
+        }
+
+        function exportToTXT() {
+            const text = generateShareSummaryText();
+            let blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'Calculator_Results.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
         function exportToExcel() {
             const showCurrency = showCurrencyCheckbox.checked;
             let dataToExport = rows.map((r, i) => ({
                 "السطر": i + 1,
-                "الملاحظات": r.textExpression,
-                "النتيجة": showCurrency ? `${r.result} جنيه` : r.result,
-                "العملية الحسابية": r.expression.replace(/\*/g, 'x')
+                "العمود النصي / الملاحظات (اليمين)": r.isTextVisible ? r.textExpression : '',
+                "النتيجة (الوسط)": showCurrency ? `${r.result} جنيه` : r.result,
+                "العملية الحسابية (اليسار)": r.isCalcVisible ? r.expression.replace(/\*/g, 'x') : ''
             }));
+            
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "النتائج");
@@ -816,47 +2622,58 @@
 
         function exportToWord() {
             const showCurrency = showCurrencyCheckbox.checked;
-            let htmlContent = `<html dir="rtl"><head><meta charset='utf-8'></head><body><table border="1" style="border-collapse:collapse; width:100%;">`;
-            htmlContent += `<tr><th>السطر</th><th>الملاحظات</th><th>النتيجة</th><th>العملية الحسابية</th></tr>`;
+            let htmlContent = `<html dir="rtl"><head><meta charset='utf-8'></head><body>`;
+            htmlContent += `<table border="1" style="border-collapse:collapse; width:100%;">`;
+            htmlContent += `<tr><th>السطر</th><th>الملاحظات (اليمين)</th><th>النتيجة (الوسط)</th><th>العملية الحسابية (اليسار)</th></tr>`;
+            
             rows.forEach((r, i) => {
-                htmlContent += `<tr><td>${i+1}</td><td>${r.textExpression}</td><td>${showCurrency ? `${r.result} جنيه` : r.result}</td><td>${r.expression.replace(/\*/g, 'x')}</td></tr>`;
+                let textText = r.isTextVisible ? r.textExpression : '';
+                let exprText = r.isCalcVisible ? r.expression.replace(/\*/g, 'x') : '';
+                let resText = showCurrency ? `${r.result} جنيه` : r.result;
+                htmlContent += `<tr><td>${i+1}</td><td>${textText}</td><td>${resText}</td><td>${exprText}</td></tr>`;
             });
+            
             htmlContent += `</table></body></html>`;
-            let blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+
+            let blob = new Blob(['\ufeff' + htmlContent], {
+                type: 'application/msword'
+            });
             let url = URL.createObjectURL(blob);
             let a = document.createElement('a');
-            a.href = url; a.download = 'Calculator_Results.doc';
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            a.href = url;
+            a.download = 'Calculator_Results.doc';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
         function exportToPDF() {
-            const opt = { margin: 10, filename: 'Calculator_Results.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+            const opt = {
+                margin:       10,
+                filename:     'Calculator_Results.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
             html2pdf().from(calculatorContainer).set(opt).save();
         }
 
-        function exportToTXT() {
-            let text = "";
-            rows.forEach((r, i) => {
-                text += `${i + 1}. [${r.textExpression}] = ${r.expression} ← ${r.result}\n`;
-            });
-            let blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url; a.download = 'Calculator_Results.txt';
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        }
-
         function exportToImage() {
+            const dropdown = document.getElementById('exportDropdown');
+            dropdown.classList.remove('active');
+            dropdown.style.display = 'none';
+
             html2canvas(calculatorContainer).then(canvas => {
                 let link = document.createElement('a');
                 link.download = 'Calculator_Results.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
+                
+                dropdown.style.display = 'inline-block';
             });
         }
 
-        // التشغيل الأولي الافتراضي مع التركيز حصرياً على حقل العمليات الحسابية (calc)
-        renderCalculator('calc');
+        renderCalculator('text');
     </script>
 </body>
 </html>
