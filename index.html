@@ -2,7 +2,6 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <!-- تم تعديل الـ viewport لتثبيت مقاسات العرض ومنع التصغير في وضع سطح المكتب -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>آلة حاسبة الأسطر المتعددة</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -46,6 +45,17 @@
             top: 0;
             left: 0;
             z-index: 9999;
+        }
+
+        /* فئة مخصصة لتعديل ارتفاع الآلة الحاسبة ليصبح نصف الشاشة فقط في الهواتف */
+        .calculator-container.mobile-half-screen {
+            height: 50vh !important;
+            max-height: 50vh !important;
+            top: auto !important;
+            bottom: 0 !important;
+            border-top: 2px solid #38bdf8;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
         }
 
         .sticky-top-section {
@@ -920,14 +930,37 @@
 
         let isSelectionModeActive = false;
 
-        function isMobileDevice() {
-            const hasTouchScreen = (('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) || ('msMaxTouchPoints' in navigator && navigator.msMaxTouchPoints > 0));
-            const isUserAgentMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            const isSmallScreen = window.innerWidth <= 1024;
-            return isUserAgentMobile || (hasTouchScreen && isSmallScreen);
+        // دالة مخصصة للتحقق الدقيق من الجهاز (كمبيوتر، تابلت، موبايل) عند الفتح
+        function detectDeviceType() {
+            const ua = navigator.userAgent;
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const minDim = Math.min(width, height);
+
+            // التحقق مما إذا كان الجهاز آيباد أو تابلت أندرويد
+            const isIPad = /iPad/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isAndroidTablet = /Android/.test(ua) && !/Mobile/.test(ua);
+            const isLargeScreenTablet = (isIPad || isAndroidTablet) || (minDim >= 600 && /Mobi|Android|iPhone|iPod/.test(ua));
+
+            // التحقق من الكمبيوتر (Desktop)
+            const isDesktop = !(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) && width > 1024;
+
+            if (isDesktop) {
+                return 'desktop';
+            } else if (isLargeScreenTablet) {
+                return 'tablet';
+            } else {
+                return 'mobile';
+            }
         }
 
-        const isMobile = isMobileDevice();
+        // تطبيق شرط الارتفاع (نصف الشاشة للموبايل فقط عند الفتح)
+        const deviceType = detectDeviceType();
+        if (deviceType === 'mobile') {
+            calculatorContainer.classList.add('mobile-half-screen');
+        }
+
+        const isMobile = deviceType === 'mobile' || deviceType === 'tablet';
 
         if (isMobile) {
             topActionBtn.style.display = 'inline-flex';
@@ -2219,7 +2252,7 @@
 
         function exportToTXT() {
             const text = generateShareSummaryText();
-            let blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+            let blob = new Blob([text], { type: "text/plain;charset=utf-8"});
             let url = URL.createObjectURL(blob);
             let a = document.createElement('a');
             a.href = url;
