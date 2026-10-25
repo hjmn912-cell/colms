@@ -58,7 +58,7 @@
         .resize-edge.bottom { bottom: 0; left: 0; width: 100%; height: 12px; cursor: s-resize; }
         .resize-edge.corner-br { bottom: 0; right: 0; width: 20px; height: 20px; cursor: nwse-resize; }
 
-        /* سطر المعاينة العلوي الخاص بالموبايل (مكان الهيدر عند الكتابة) */
+        /* سطر المعاينة العلوي للموبايل (يعرض ما تكتبه فقط بدون أي إضافات) */
         .mobile-preview-top-bar {
             display: none;
             background-color: #020617;
@@ -816,7 +816,7 @@
         <!-- النقطة المؤشرة الزرقاء في أعلى اليسار للتحقق من التحديث -->
         <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
 
-        <!-- سطر المعاينة العلوي الذكي للموبايل في وضع المتصفح العادي -->
+        <!-- سطر المعاينة العلوي للموبايل (يعرض ما تكتبه فقط بدون أي إضافات) -->
         <div id="mobilePreviewTopBar" class="mobile-preview-top-bar"></div>
 
         <div class="sticky-top-section" id="stickyTopSection">
@@ -984,7 +984,6 @@
             topNotesFocusBtn.style.display = 'inline-flex';
         }
 
-        // إظهار سطر المعاينة العلوي فقط في وضع متصفح الموبايل العادي
         if (isMobileNormal) {
             mobilePreviewTopBar.style.display = 'block';
         }
@@ -1111,7 +1110,6 @@
             grandTotalEl.style.display = document.getElementById('hideGrandTotalCheckbox').checked ? 'none' : 'block';
             grandTotalCurrencyEl.style.display = document.getElementById('hideGrandCurrencyCheckbox').checked ? 'none' : 'block';
 
-            // إذا تم إخفاء الهيدر بالكامل أو استخدام وضع الإخفاء، يتم إخفاء سطر المعاينة العلوي أيضاً تلقائياً كما طلبت
             if (isMobileNormal) {
                 if (hideOptions && hideRefresh && hideExport && document.getElementById('hideGrandTotalCheckbox').checked) {
                     mobilePreviewTopBar.style.display = 'none';
@@ -1235,19 +1233,14 @@
             }
         });
 
+        // يعرض ما تكتبه فقط بدون أي كلمات إضافية مثل "السطر كذا"
         function updateMobilePreviewText() {
             if (!isMobileNormal) return;
             const currentRow = rows[activeRowIndex];
             if (!currentRow) return;
 
             let currentText = activeFieldIndex === 'text' ? currentRow.textExpression : currentRow.expression.replace(/\*/g, 'x');
-            let labelType = activeFieldIndex === 'text' ? 'ملاحظة' : 'عملية حسابية';
-            
-            if (currentText.trim() !== '') {
-                mobilePreviewTopBar.innerText = `[${labelType} سطر ${activeRowIndex + 1}]: ${currentText}`;
-            } else {
-                mobilePreviewTopBar.innerText = `السطر ${activeRowIndex + 1} (ابدأ الكتابة...)`;
-            }
+            mobilePreviewTopBar.innerText = currentText;
         }
 
         function insertValueForField(index, field, val) {
