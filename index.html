@@ -84,7 +84,6 @@
             margin-right: 15px;
         }
 
-        /* الكومبو بوكس الصغير جداً بدون اسم */
         .mobile-combo-box {
             background-color: #1e293b;
             color: #38bdf8;
@@ -98,6 +97,29 @@
             height: 28px;
             width: 32px;
             text-align: center;
+        }
+
+        /* كومبو بوكس إخفاء المايكات المصغر للكمبيوتر (بحجم زر العين تماماً) */
+        .desktop-mic-combo {
+            background-color: #1e293b;
+            color: #38bdf8;
+            border: 1px solid #38bdf8;
+            padding: 0 4px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            outline: none;
+            height: 32px;
+            width: 32px;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .desktop-mic-combo:hover {
+            background-color: #38bdf8;
+            color: #0b0f19;
         }
 
         /* الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد */
@@ -480,7 +502,7 @@
             min-width: 0;
         }
 
-        /* تم التعديل هنا لزيادة عرض خلية الملاحظات */
+        /* خلية الملاحظات (أعرض) */
         .text-input-wrapper {
             display: flex;
             align-items: center;
@@ -489,7 +511,7 @@
             min-width: 0;
         }
 
-        /* تم التعديل هنا لتقليل عرض خلية العملية الحسابية */
+        /* خلية العملية الحسابية (أقل عرضاً) */
         .calc-input-wrapper {
             display: flex;
             align-items: center;
@@ -959,6 +981,13 @@
 
                     <span class="designer-credit">designed by Sami Arouj</span>
                     
+                    <!-- كومبو بوكس إخفاء/إظهار المايكات للكمبيوتر (موجود في الأعلى ناحية اليمين وبحجم زر العين تماماً) -->
+                    <select id="desktopMicCombo" class="desktop-mic-combo" title="إظهار أو إخفاء المايكات" onchange="handleDesktopMicComboChange(this)">
+                        <option value="" selected>🎤</option>
+                        <option value="show">إظهار المايكات</option>
+                        <option value="hide">إخفاء المايكات</option>
+                    </select>
+
                     <button type="button" id="toggleHideBtn" class="toggle-hide-btn" title="تحديد العناصر المراد إخفاؤها" onclick="toggleHideSelectionMode()">
                         👁️
                     </button>
@@ -1008,6 +1037,7 @@
         const previewTextContent = document.getElementById('previewTextContent');
         const previewResultContent = document.getElementById('previewResultContent');
         const mobileControlCombo = document.getElementById('mobileControlCombo');
+        const desktopMicCombo = document.getElementById('desktopMicCombo');
         const floatingKeyboardNewRowBtn = document.getElementById('floatingKeyboardNewRowBtn');
         const stickyTopSection = document.getElementById('stickyTopSection');
         const grandTotalEl = document.getElementById('grandTotal');
@@ -1027,7 +1057,7 @@
 
         let isSelectionModeActive = false;
         
-        let globalHideMics = true;
+        let globalHideMics = false; // افتراضياً ظاهرة للكمبيوتر ما لم يتم إخفاؤها
         let globalHideTools = true;
 
         function detectMobileEnvironment() {
@@ -1051,9 +1081,13 @@
         const isMobileNormal = env === 'mobile-normal';
         const isMobileAny = env !== 'desktop';
 
+        // إخفاء أو إظهار الكومبو بوكس الخاص بالكمبيوتر حسب البيئة
         if (isMobileAny) {
             topActionBtn.style.display = 'inline-flex';
             topNotesFocusBtn.style.display = 'inline-flex';
+            if (desktopMicCombo) desktopMicCombo.style.display = 'none';
+        } else {
+            if (desktopMicCombo) desktopMicCombo.style.display = 'inline-flex';
         }
 
         if (isMobileNormal) {
@@ -1109,6 +1143,17 @@
                 globalHideMics = !globalHideMics;
             } else if (val === 'toggle_tools') {
                 globalHideTools = !globalHideTools;
+            }
+            selectEl.selectedIndex = 0;
+            renderCalculator();
+        }
+
+        function handleDesktopMicComboChange(selectEl) {
+            const val = selectEl.value;
+            if (val === 'show') {
+                globalHideMics = false;
+            } else if (val === 'hide') {
+                globalHideMics = true;
             }
             selectEl.selectedIndex = 0;
             renderCalculator();
@@ -2040,8 +2085,17 @@
 
                 micWrapper.appendChild(micBtn);
 
-                rowMain.appendChild(inputsGroup);
-                rowMain.appendChild(micWrapper);
+                // بناء السطر بناءً على جهاز الكمبيوتر أو الموبايل
+                // للكمبيوتر: المايك في الناحية الشمال (أقصى اليسار)
+                if (!isMobileAny) {
+                    rowMain.appendChild(inputsGroup);
+                    rowMain.appendChild(micWrapper);
+                } else {
+                    // للموبايل: المايك في مكانه الأصلي مع إخفائه افتراضياً حسب رغبتك السابقة
+                    rowMain.appendChild(inputsGroup);
+                    rowMain.appendChild(micWrapper);
+                }
+
                 rowDiv.appendChild(rowMain);
 
                 if (index === activeRowIndex && (row.isTextPadVisible || row.isCalcPadVisible)) {
