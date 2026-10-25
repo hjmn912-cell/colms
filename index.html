@@ -498,7 +498,6 @@
             min-width: 0;
         }
 
-        /* خلية الملاحظات (الأعرض دائماً) */
         .text-input-wrapper {
             display: flex;
             align-items: center;
@@ -507,7 +506,6 @@
             min-width: 0;
         }
 
-        /* خلية العملية الحسابية (أقل عرضاً من الملاحظات) */
         .calc-input-wrapper {
             display: flex;
             align-items: center;
@@ -771,7 +769,6 @@
             display: none !important;
         }
 
-        /* تحكم في إخفاء أدوات السطر */
         .calc-row.hidden-row-tools .row-mobile-arrow-btn,
         .calc-row.hidden-row-tools .row-calc-arrow-btn {
             display: none !important;
@@ -1088,20 +1085,10 @@
         const isMobileNormal = env === 'mobile-normal';
         const isMobileAny = env !== 'desktop';
 
-        // إعدادات البداية الافتراضية بناءً على نوع المتصفح (موبايل أم كمبيوتر)
-        if (isMobileAny) {
-            hideAllMicsCheckbox.checked = true;       // إخفاء جميع المايكات افتراضياً في الموبايل
-            hideOtherToolsCheckbox.checked = false;    // إخفاء الأدوات الأخرى غير معلم عليها افتراضياً
-            hideRowToolsCheckbox.checked = true;      // إخفاء أدوات السطر معلم عليها افتراضياً في الموبايل
-            topActionBtn.style.display = 'inline-flex';
-            topNotesFocusBtn.style.display = 'inline-flex';
-            if (desktopMicCombo) desktopMicCombo.style.display = 'none';
-        } else {
-            hideAllMicsCheckbox.checked = false;     // ظاهرة في الكمبيوتر
-            hideOtherToolsCheckbox.checked = false;   // ظاهرة في الكمبيوتر
-            hideRowToolsCheckbox.checked = false;     // ظاهرة في الكمبيوتر
-            if (desktopMicCombo) desktopMicCombo.style.display = 'inline-flex';
-        }
+        // جعل الخيارات الثلاثة (إخفاء المايكات، الأدوات الأخرى، أدوات السطر) غير مفعلة افتراضياً
+        hideAllMicsCheckbox.checked = false;
+        hideOtherToolsCheckbox.checked = false;
+        hideRowToolsCheckbox.checked = false;
 
         if (isMobileNormal) {
             mobilePreviewTopBar.style.display = 'flex';
@@ -1280,7 +1267,6 @@
             refreshBtnEl.style.display = hideRefresh ? 'none' : 'inline-flex';
             exportDropdownEl.style.display = hideExport ? 'none' : 'inline-block';
             
-            // إخفاء الأدوات الأخرى (زر العين، مفتاح التقارير، وزر الإنتر 🚀)
             if (hideOtherTools) {
                 toggleHideBtnEl.style.display = 'none';
                 const nextRowBtn = document.querySelector('.top-next-row-btn');
@@ -1680,40 +1666,54 @@
             return keypadDiv;
         }
 
-        // إيماءات الخلايا: لمسة واحدة لا تفتح كيبورد، الكيبورد يفتح بدوسة طويلة (Long Press)
+        // إيماءات الخلايا المحدثة بدقة تامة للموبايل والكمبيوتر
         function setupCellGestures(element, index, field) {
             let longPressTimer = null;
-            let isLongPressFired = false;
+            let lastTapTime = 0;
+            let clickCount = 0;
+            let clickTimer = null;
 
             if (isMobileAny) {
+                // الموبايل: لمسة واحدة لا تفعل شيئاً (تمنع فتح الكيبورد أو نقل التركيز غير المرغوب)
                 element.addEventListener('touchstart', (e) => {
-                    isLongPressFired = false;
-                    activeRowIndex = index;
-                    activeFieldIndex = field;
-                    updateActiveRowClasses();
-                    updateMobilePreviewText();
-
-                    // الدوسة الطويلة تفتح كيبورد النظام على الموبايل
                     longPressTimer = setTimeout(() => {
-                        isLongPressFired = true;
+                        // ضغطة طويلة (Long Press) -> فتح كيبورد الموبايل
                         openSystemKeyboard(index, field);
-                    }, 500);
-
+                    }, 600);
                 }, { passive: true });
 
                 element.addEventListener('touchend', (e) => {
                     clearTimeout(longPressTimer);
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTapTime;
+
+                    if (tapLength < 350 && tapLength > 0) {
+                        e.preventDefault();
+                        // لمستان (Double Tap) -> فتح الآلة المصغرة
+                        openCalcPadForField(index, field);
+                        lastTapTime = 0;
+                    } else {
+                        lastTapTime = currentTime;
+                    }
                 });
 
                 element.addEventListener('touchmove', () => {
                     clearTimeout(longPressTimer);
                 });
             } else {
-                element.addEventListener('mousedown', (e) => {
-                    activeRowIndex = index;
-                    activeFieldIndex = field;
-                    updateActiveRowClasses();
-                    updateMobilePreviewText();
+                // الكمبيوتر: ثلاث لمسات/نقرات (Triple Click) لتفتح الآلة المصغرة
+                element.addEventListener('click', (e) => {
+                    clickCount++;
+                    if (clickCount === 1) {
+                        clickTimer = setTimeout(() => {
+                            clickCount = 0;
+                        }, 400);
+                    } else if (clickCount === 3) {
+                        clearTimeout(clickTimer);
+                        clickCount = 0;
+                        e.preventDefault();
+                        openCalcPadForField(index, field);
+                    }
                 });
             }
         }
@@ -2086,10 +2086,10 @@
                 }
             });
 
-            // التركيز التلقائي للكمبيوتر فقط، ولن يفتح كيبورد الموبايل تلقائياً
-            if (!isMobileAny && focusTarget) {
+            // التركيز التلقائي (Focus) مفعل فوراً للكمبيوتر على العمليات الحسابية بدون أي ضغطات
+            if (!isMobileAny) {
                 setTimeout(() => {
-                    const targetEl = screenContainer.querySelector(`.calc-row.active .${focusTarget === 'text' ? 'text-input' : 'calc-input'}`);
+                    const targetEl = screenContainer.querySelector(`.calc-row.active .calc-input`);
                     if (targetEl) targetEl.focus();
                 }, 10);
             }
