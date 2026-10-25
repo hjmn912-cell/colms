@@ -100,7 +100,7 @@
             text-align: center;
         }
 
-        /* الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد - تم تغيير الأيقونة للأيقونة الجديدة */
+        /* الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد */
         .floating-keyboard-action-btn {
             position: fixed;
             bottom: 260px;
@@ -355,7 +355,6 @@
             box-shadow: 0 0 8px rgba(234, 179, 8, 0.6);
         }
 
-        /* تصغير زر تصدير ومشاركة ليكون بحجم زر العين والريفرش وبدون نص */
         .export-dropdown {
             position: relative;
             display: inline-block;
@@ -449,7 +448,7 @@
             display: flex;
             flex-direction: column;
             background-color: #1e293b;
-            padding: 8px 10px;
+            padding: 8px 6px; /* تقليص الحشوة الجانبية للسطر ليقترب من الحواف */
             border-radius: 8px;
             border: 1px solid transparent;
             transition: border-color 0.15s ease;
@@ -468,40 +467,40 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             width: 100%;
         }
 
         .inputs-group {
             display: flex;
-            gap: 8px;
+            gap: 4px;
             flex-grow: 1;
             align-items: center;
             width: 100%;
             min-width: 0;
         }
 
-        /* عمود الملاحظات يأخذ مساحة أكبر وتمدد ذكي لملء الفراغ */
         .text-input-wrapper {
             display: flex;
             align-items: center;
             gap: 4px;
-            flex: 2.5; 
+            flex: 2; 
             min-width: 0;
         }
 
+        /* تمدد خلية العمليات الحسابية لتأخذ المساحة الأكبر وتلصق بالحافة اليسرى تقريباً */
         .calc-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 4px;
-            flex: 1.2; 
+            gap: 2px;
+            flex: 2.5; 
             min-width: 0;
         }
 
         .mic-wrapper {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
         }
 
         .global-select-checkbox, .calc-select-checkbox {
@@ -516,9 +515,9 @@
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid #38bdf8;
             color: #38bdf8;
-            font-size: 0.85rem;
-            width: 26px;
-            height: 26px;
+            font-size: 0.8rem;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: none;
             align-items: center;
@@ -707,7 +706,7 @@
             background: rgba(255, 255, 255, 0.03);
             border: 2px solid #334155;
             border-radius: 6px;
-            padding: 6px 8px;
+            padding: 6px 6px;
             color: #38bdf8;
             font-size: 1.3rem;
             font-weight: bold;
@@ -749,7 +748,6 @@
             pointer-events: none !important;
         }
 
-        /* الفئات الافتراضية للإخفاء */
         .calc-row.hidden-mic .mic-wrapper {
             display: none !important;
         }
@@ -762,22 +760,22 @@
         .calc-output-container {
             display: flex;
             align-items: baseline;
-            gap: 4px;
-            min-width: 90px;
+            gap: 3px;
+            min-width: 75px;
             text-align: left;
             white-space: nowrap;
             flex-shrink: 0;
         }
 
         .calc-output {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: #10b981;
             white-space: nowrap;
         }
 
         .row-currency {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #38bdf8;
             font-weight: 600;
             white-space: nowrap;
@@ -791,9 +789,9 @@
             background: transparent;
             border: none;
             color: #6b7280;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
-            padding: 2px 4px;
+            padding: 2px 2px;
             border-radius: 6px;
             transition: all 0.2s;
             white-space: nowrap;
@@ -856,7 +854,7 @@
                 justify-content: space-between;
             }
             .calc-output-container {
-                min-width: 70px;
+                min-width: 60px;
             }
             .text-input, .calc-input, .calc-output {
                 font-size: 1.15rem;
@@ -879,7 +877,7 @@
         <!-- النقطة المؤشرة الزرقاء في أعلى اليسار للتحقق من التحديث -->
         <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
 
-        <!-- الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد - أيقونة جديدة 🚀 -->
+        <!-- الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد 🚀 -->
         <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية وفتح الكيبورد" onclick="handleSmartNextCellClick()">🚀</button>
 
         <!-- سطر المعاينة العلوي للموبايل -->
@@ -967,7 +965,7 @@
                     <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
                     <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
                     
-                    <!-- زر الانتقال للخلية التي تحتها مباشرة وفتح الكيبورد بأيقونة جديدة 🚀 -->
+                    <!-- زر الانتقال للخلية التي تحتها مباشرة وفتح الكيبورد 🚀 -->
                     <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة وفتح كيبورد الموبايل" onclick="handleSmartNextCellClick()">🚀</button>
 
                     <span class="designer-credit">designed by Sami Arouj</span>
@@ -1087,19 +1085,15 @@
             }
         });
 
-        // السلوك المطلوب بالضبط للزر (🚀): الانتقال للخلية التي تحتها مباشرة بنفس العمود وفتح كيبورد الموبايل
         function handleSmartNextCellClick() {
             evaluateRow(activeRowIndex);
             closeAllPads();
 
-            // معرفة الخلية الحالية بالتحديد
-            let currentColumn = activeFieldIndex || 'text'; // لو مش محددة يفتح في الملاحظات
+            let currentColumn = activeFieldIndex || 'text';
 
-            // إذا كنا في الأسطر الوسطى، ننتقل للسطر الذي يليه بنفس العمود مباشرة
             if (activeRowIndex < rows.length - 1) {
                 activeRowIndex++;
             } else {
-                // إذا كنا في آخر سطر، ننشئ سطر جديد وننزل عليه لنفس العمود
                 rows.push({ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
                     isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
@@ -1111,7 +1105,6 @@
             renderCalculator(activeFieldIndex);
             scrollToActiveRow();
 
-            // فتح كيبورد الموبايل فوراً في الخلية التي تحتها مباشرة
             setTimeout(() => {
                 const targetEl = screenContainer.querySelector(`.calc-row.active .${activeFieldIndex === 'text' ? 'text-input' : 'calc-input'}`);
                 if (targetEl) {
@@ -1135,7 +1128,6 @@
             renderCalculator();
         }
 
-        // تفعيل السحب والتوسيع من الحواف
         let currentResizeDirection = null;
         let startX = 0, startY = 0;
         let startW = 0, startH = 0, startT = 0, startL = 0;
@@ -1218,7 +1210,7 @@
             }
         ];
         let activeRowIndex = 0;
-        let activeFieldIndex = 'text'; // الافتراضي أول ما يفتح يروح على الملاحظات
+        let activeFieldIndex = 'text';
 
         let activeSpeechRecognition = null;
         let isMicContinuousMode = false;
