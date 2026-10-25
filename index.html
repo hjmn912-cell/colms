@@ -466,7 +466,7 @@
             display: flex;
             flex-direction: column;
             background-color: #1e293b;
-            padding: 8px 6px;
+            padding: 10px 8px;
             border-radius: 8px;
             border: 1px solid transparent;
             transition: border-color 0.15s ease;
@@ -485,31 +485,33 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             width: 100%;
         }
 
         .inputs-group {
             display: flex;
-            gap: 4px;
+            gap: 6px;
             flex-grow: 1;
             align-items: center;
             width: 100%;
             min-width: 0;
         }
 
+        /* خلية الملاحظات (أعرض وأكبر بوضوح) */
         .text-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 4px;
-            flex: 3.5; 
+            gap: 6px;
+            flex: 4; 
             min-width: 0;
         }
 
+        /* خلية العملية الحسابية (أقل عرضاً بالنسبة للملاحظات) */
         .calc-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 2px;
+            gap: 3px;
             flex: 1.5; 
             min-width: 0;
         }
@@ -723,7 +725,7 @@
             background: rgba(255, 255, 255, 0.03);
             border: 2px solid #334155;
             border-radius: 6px;
-            padding: 6px 6px;
+            padding: 8px 8px;
             color: #38bdf8;
             font-size: 1.3rem;
             font-weight: bold;
@@ -737,13 +739,13 @@
             flex: 1;
             resize: none;
             overflow-y: hidden;
-            min-height: 38px;
+            min-height: 42px;
             line-height: 1.2;
         }
 
         .calc-input {
             width: 100%;
-            height: 38px;
+            height: 42px;
             direction: ltr;
             text-align: right;
             font-size: 1.4rem;
@@ -777,15 +779,15 @@
         .calc-output-container {
             display: flex;
             align-items: baseline;
-            gap: 3px;
-            min-width: 75px;
+            gap: 4px;
+            min-width: 85px;
             text-align: left;
             white-space: nowrap;
             flex-shrink: 0;
         }
 
         .calc-output {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: #10b981;
             white-space: nowrap;
@@ -871,12 +873,12 @@
                 justify-content: space-between;
             }
             .calc-output-container {
-                min-width: 60px;
+                min-width: 65px;
             }
             .text-input, .calc-input, .calc-output {
                 font-size: 1.15rem;
-                height: 36px;
-                min-height: 36px;
+                height: 38px;
+                min-height: 38px;
             }
         }
     </style>
@@ -1080,14 +1082,16 @@
         const isMobileNormal = env === 'mobile-normal';
         const isMobileAny = env !== 'desktop';
 
-        // تعيين القيمة الافتراضية لإخفاء جميع المايكات بناءً على الموبايل
+        // إعدادات البداية بناءً على نوع المتصفح (موبايل أم كمبيوتر)
         if (isMobileAny) {
-            hideAllMicsCheckbox.checked = true;
+            hideAllMicsCheckbox.checked = true; // المايكات مخفية افتراضياً في الموبايل
+            hideOtherToolsCheckbox.checked = true; // إخفاء الأدوات الثلاث في الصف افتراضياً للموبايل
             topActionBtn.style.display = 'inline-flex';
             topNotesFocusBtn.style.display = 'inline-flex';
             if (desktopMicCombo) desktopMicCombo.style.display = 'none';
         } else {
-            hideAllMicsCheckbox.checked = false;
+            hideAllMicsCheckbox.checked = false; // المايكات ظاهرة في الكمبيوتر
+            hideOtherToolsCheckbox.checked = false; // الأدوات ظاهرة في الكمبيوتر
             if (desktopMicCombo) desktopMicCombo.style.display = 'inline-flex';
         }
 
@@ -1110,7 +1114,7 @@
             evaluateRow(activeRowIndex);
             closeAllPads();
 
-            let currentColumn = activeFieldIndex || 'text';
+            let currentColumn = activeFieldIndex || 'calc';
 
             if (activeRowIndex < rows.length - 1) {
                 activeRowIndex++;
@@ -1234,7 +1238,8 @@
             }
         ];
         let activeRowIndex = 0;
-        let activeFieldIndex = 'text';
+        // التركيز الافتراضي: في الكمبيوتر يكون على العمليات الحسابية (calc)، وفي الموبايل على (text)
+        let activeFieldIndex = isMobileAny ? 'text' : 'calc';
 
         let activeSpeechRecognition = null;
         let isMicContinuousMode = false;
@@ -1268,7 +1273,6 @@
             refreshBtnEl.style.display = hideRefresh ? 'none' : 'inline-flex';
             exportDropdownEl.style.display = hideExport ? 'none' : 'inline-block';
             
-            // إخفاء الأدوات الأخرى (زر العين وزر الـ 🚀 والـ 📊 حسب الطلب)
             if (hideOtherTools) {
                 toggleHideBtnEl.style.display = 'none';
                 const nextRowBtn = document.querySelector('.top-next-row-btn');
@@ -2104,7 +2108,8 @@
                 }
             });
 
-            if (!isMobileAny && focusTarget) {
+            // ضبط التركيز التلقائي (Focus) بناءً على ما إذا كان المتصفح كمبيوتر أم موبايل
+            if (focusTarget) {
                 setTimeout(() => {
                     const targetEl = screenContainer.querySelector(`.calc-row.active .${focusTarget === 'text' ? 'text-input' : 'calc-input'}`);
                     if (targetEl) targetEl.focus();
@@ -2288,8 +2293,8 @@
                     isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                 }];
                 activeRowIndex = 0;
-                activeFieldIndex = 'calc';
-                renderCalculator('calc');
+                activeFieldIndex = isMobileAny ? 'text' : 'calc';
+                renderCalculator(activeFieldIndex);
             }
             else if (key === 'Backspace') {
                 const activeInput = document.activeElement;
@@ -2299,8 +2304,8 @@
                         rows.splice(activeRowIndex, 1);
                         activeRowIndex--;
                         closeAllPads();
-                        activeFieldIndex = 'calc';
-                        renderCalculator('calc');
+                        activeFieldIndex = isMobileAny ? 'text' : 'calc';
+                        renderCalculator(activeFieldIndex);
                     }
                 }
             }
@@ -2349,7 +2354,7 @@
                 }
                 closeAllPads();
             }
-            renderCalculator('calc');
+            renderCalculator(activeFieldIndex);
             updateMobilePreviewText();
         }
 
@@ -2648,7 +2653,8 @@
             });
         }
 
-        renderCalculator('text');
+        // تشغيل وعرض التطبيق مع التركيز التلقائي المطلوب (العمليات الحسابية للكمبيوتر، والملاحظات للموبايل)
+        renderCalculator(activeFieldIndex);
     </script>
 </body>
 </html>
