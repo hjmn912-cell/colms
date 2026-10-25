@@ -448,7 +448,7 @@
             display: flex;
             flex-direction: column;
             background-color: #1e293b;
-            padding: 8px 6px; /* تقليص الحشوة الجانبية للسطر ليقترب من الحواف */
+            padding: 8px 6px;
             border-radius: 8px;
             border: 1px solid transparent;
             transition: border-color 0.15s ease;
@@ -480,20 +480,21 @@
             min-width: 0;
         }
 
+        /* تم التعديل هنا لزيادة عرض خلية الملاحظات */
         .text-input-wrapper {
             display: flex;
             align-items: center;
             gap: 4px;
-            flex: 2; 
+            flex: 3.5; 
             min-width: 0;
         }
 
-        /* تمدد خلية العمليات الحسابية لتأخذ المساحة الأكبر وتلصق بالحافة اليسرى تقريباً */
+        /* تم التعديل هنا لتقليل عرض خلية العملية الحسابية */
         .calc-input-wrapper {
             display: flex;
             align-items: center;
             gap: 2px;
-            flex: 2.5; 
+            flex: 1.5; 
             min-width: 0;
         }
 
@@ -868,22 +869,17 @@
 
     <div class="calculator-container" id="calculatorContainer">
         
-        <!-- حواف السحب والتوسيع (مثل نوافذ الويندوز) -->
         <div class="resize-edge right" id="edgeRight"></div>
         <div class="resize-edge left" id="edgeLeft"></div>
         <div class="resize-edge bottom" id="edgeBottom"></div>
         <div class="resize-edge corner-br" id="edgeCornerBR"></div>
 
-        <!-- النقطة المؤشرة الزرقاء في أعلى اليسار للتحقق من التحديث -->
         <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
 
-        <!-- الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد 🚀 -->
         <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية وفتح الكيبورد" onclick="handleSmartNextCellClick()">🚀</button>
 
-        <!-- سطر المعاينة العلوي للموبايل -->
         <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
             <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
-                <!-- كومبو بوكس صغير جداً بدون اسم -->
                 <select id="mobileControlCombo" class="mobile-combo-box" onchange="handleMobileComboChange(this)">
                     <option value="" disabled selected>⚙️</option>
                     <option value="toggle_mics">إظهار/إخفاء المايكات</option>
@@ -897,7 +893,6 @@
         <div class="sticky-top-section" id="stickyTopSection">
             <div class="top-controls-wrapper">
                 <div class="left-controls-group">
-                    <!-- الخيارات -->
                     <div style="display: flex; align-items: center; gap: 4px;">
                         <input type="checkbox" id="hideOptionsCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
                         <div class="options-dropdown" id="optionsDropdown">
@@ -913,7 +908,6 @@
                         </div>
                     </div>
 
-                    <!-- زر إعادة التحميل -->
                     <div style="display: flex; align-items: center; gap: 4px;">
                         <input type="checkbox" id="hideRefreshCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
                         <button class="refresh-btn" id="refreshBtnEl" type="button" title="إعادة تحميل الصفحة" onclick="location.reload()">
@@ -924,7 +918,6 @@
 
                 <div class="totals-summary-bar">
                     <div class="sub-totals-row">
-                        <!-- مجموع العمليات الموجبة -->
                         <div style="display: flex; align-items: center; gap: 4px;">
                             <input type="checkbox" id="hidePositiveCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
                             <div class="summary-item">
@@ -933,7 +926,6 @@
                             </div>
                         </div>
 
-                        <!-- مجموع العمليات السالبة -->
                         <div style="display: flex; align-items: center; gap: 4px;">
                             <input type="checkbox" id="hideNegativeCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
                             <div class="summary-item">
@@ -944,12 +936,10 @@
                     </div>
 
                     <div class="total-value-container">
-                        <!-- الإجمالي النهائي -->
                         <div style="display: flex; align-items: center; gap: 4px;">
                             <input type="checkbox" id="hideGrandTotalCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
                             <div id="grandTotal" class="total-value">0</div>
                         </div>
-                        <!-- كلمة جنيه المجاورة للإجمالي النهائي -->
                         <div style="display: flex; align-items: center; gap: 4px;">
                             <input type="checkbox" id="hideGrandCurrencyCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
                             <div id="grandTotalCurrency" class="total-currency">جنيه</div>
@@ -965,17 +955,14 @@
                     <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
                     <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
                     
-                    <!-- زر الانتقال للخلية التي تحتها مباشرة وفتح الكيبورد 🚀 -->
                     <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة وفتح كيبورد الموبايل" onclick="handleSmartNextCellClick()">🚀</button>
 
                     <span class="designer-credit">designed by Sami Arouj</span>
                     
-                    <!-- زر إخفاء/إظهار الشامل -->
                     <button type="button" id="toggleHideBtn" class="toggle-hide-btn" title="تحديد العناصر المراد إخفاؤها" onclick="toggleHideSelectionMode()">
                         👁️
                     </button>
 
-                    <!-- زر التصدير ومشاركة (مصغر وبدون نص) -->
                     <div style="display: flex; align-items: center; gap: 4px;">
                         <input type="checkbox" id="hideExportCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
                         <div class="export-dropdown" id="exportDropdown">
@@ -1073,7 +1060,6 @@
             mobilePreviewTopBar.style.display = 'flex';
         }
 
-        // كشف فتح كيبورد الموبايل
         let initialWindowHeight = window.innerHeight;
         window.addEventListener('resize', () => {
             if (isMobileAny) {
@@ -1724,7 +1710,6 @@
             });
         }
 
-        // إيماءة السحب (Swipe) يميناً أو يساراً لحذف السطر
         function setupRowSwipeToDelete(rowDiv, index) {
             let startX = 0;
             let currentX = 0;
