@@ -47,36 +47,33 @@
             z-index: 9999;
         }
 
-        /* تقسيم الشاشة للموبايل: نصف علوي للتحكم والإجماليات، ونصف سفلي للأسطر تبدأ فوراً تحته */
+        /* 
+          تقسيم صارم للهواتف: النصف العلوي (50vh) للهيدر والتحكم،
+          والنصف السفلي (50vh) يبدأ فيه السطر الأول مباشرة تحت الهيدر بدون أي فراغات.
+        */
         .calculator-container.mobile-split-screen {
-            display: flex !important;
-            flex-direction: column !important;
+            display: grid !important;
+            grid-template-rows: auto 1fr !important;
             height: 100vh !important;
             max-height: 100vh !important;
         }
 
         .mobile-split-screen .sticky-top-section {
-            height: 50vh !important;
             max-height: 50vh !important;
             overflow-y: auto !important;
-            display: flex !important;
-            flex-direction: column !important;
             flex-shrink: 0 !important;
         }
 
         .mobile-split-screen .calculator-screen {
             height: 50vh !important;
             max-height: 50vh !important;
-            flex-grow: unset !important;
-            flex-shrink: 0 !important;
+            flex-grow: 1 !important;
             overflow-y: auto !important;
-            padding-bottom: 120px !important;
+            padding-bottom: 150px !important;
         }
 
         .sticky-top-section {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            position: relative;
             background-color: #030712;
             width: 100%;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
@@ -382,7 +379,6 @@
             overflow-x: hidden;
             gap: 8px;
             width: 100%;
-            padding-bottom: 250px;
             -webkit-overflow-scrolling: touch;
         }
 
@@ -808,8 +804,8 @@
 
     <div class="calculator-container" id="calculatorContainer">
         
-        <!-- النقطة المؤشرة الخضراء في أعلى اليسار للتحقق من التحديث -->
-        <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #10b981; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #10b981;" title="مؤشر التحديث النشط"></div>
+        <!-- النقطة المؤشرة الزرقاء في أعلى اليسار للتحقق من التحديث -->
+        <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
 
         <div class="sticky-top-section">
             <div class="top-controls-wrapper">
@@ -969,7 +965,7 @@
             }
         }
 
-        // تطبيق تقسيم الشاشة للهواتف (سواء وضع عادي أو سطح مكتب)
+        // تطبيق التقسيم للهواتف ووضع سطح المكتب الخاص بالموبايل
         const deviceType = detectDeviceType();
         if (deviceType === 'mobile') {
             calculatorContainer.classList.add('mobile-split-screen');
