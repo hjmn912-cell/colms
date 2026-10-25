@@ -212,7 +212,7 @@
             right: 0;
             top: 110%;
             background-color: #1e293b;
-            min-width: 200px;
+            min-width: 210px;
             box-shadow: 0px 8px 16px rgba(0,0,0,0.5);
             border-radius: 6px;
             z-index: 2000;
@@ -498,7 +498,7 @@
             min-width: 0;
         }
 
-        /* خلية الملاحظات (أعرض وأكبر لتكون هي الأكبر دائماً) */
+        /* خلية الملاحظات (الأعرض دائماً) */
         .text-input-wrapper {
             display: flex;
             align-items: center;
@@ -507,7 +507,7 @@
             min-width: 0;
         }
 
-        /* خلية العمليات الحسابية (عريضة ولكنها أقل عرضاً من الملاحظات) */
+        /* خلية العملية الحسابية (أقل عرضاً من الملاحظات) */
         .calc-input-wrapper {
             display: flex;
             align-items: center;
@@ -771,8 +771,9 @@
             display: none !important;
         }
 
-        .calc-row.hidden-tools .row-mobile-arrow-btn,
-        .calc-row.hidden-tools .row-calc-arrow-btn {
+        /* تحكم في إخفاء أدوات السطر */
+        .calc-row.hidden-row-tools .row-mobile-arrow-btn,
+        .calc-row.hidden-row-tools .row-calc-arrow-btn {
             display: none !important;
         }
 
@@ -928,6 +929,10 @@
                                     <input type="checkbox" id="hideOtherToolsCheckbox" onchange="updateGlobalHides()">
                                     إخفاء الأدوات الأخرى
                                 </label>
+                                <label class="option-toggle-label">
+                                    <input type="checkbox" id="hideRowToolsCheckbox" onchange="renderCalculator()">
+                                    إخفاء أدوات السطر
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -979,7 +984,7 @@
                     <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
                     <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
                     
-                    <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة وفتح كيبورد الموبايل" onclick="handleSmartNextCellClick()">🚀</button>
+                    <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة" onclick="handleSmartNextCellClick()">🚀</button>
 
                     <span class="designer-credit">designed by Sami Arouj</span>
                     
@@ -1046,6 +1051,7 @@
         const showCurrencyCheckbox = document.getElementById('showCurrencyCheckbox');
         const hideAllMicsCheckbox = document.getElementById('hideAllMicsCheckbox');
         const hideOtherToolsCheckbox = document.getElementById('hideOtherToolsCheckbox');
+        const hideRowToolsCheckbox = document.getElementById('hideRowToolsCheckbox');
         const showPositiveCheckbox = document.getElementById('showPositiveCheckbox');
         const showNegativeCheckbox = document.getElementById('showNegativeCheckbox');
         const positiveTotalValEl = document.getElementById('positiveTotalVal');
@@ -1082,16 +1088,18 @@
         const isMobileNormal = env === 'mobile-normal';
         const isMobileAny = env !== 'desktop';
 
-        // إعدادات البداية بناءً على نوع المتصفح (موبايل أم كمبيوتر)
+        // إعدادات البداية الافتراضية بناءً على نوع المتصفح (موبايل أم كمبيوتر)
         if (isMobileAny) {
-            hideAllMicsCheckbox.checked = true; // المايكات مخفية في الموبايل
-            hideOtherToolsCheckbox.checked = true; // إخفاء الأزرار الثلاثة داخل إخفاء الأدوات الأخرى افتراضياً للموبايل
+            hideAllMicsCheckbox.checked = true;       // إخفاء جميع المايكات افتراضياً في الموبايل
+            hideOtherToolsCheckbox.checked = false;    // إخفاء الأدوات الأخرى غير معلم عليها افتراضياً
+            hideRowToolsCheckbox.checked = true;      // إخفاء أدوات السطر معلم عليها افتراضياً في الموبايل
             topActionBtn.style.display = 'inline-flex';
             topNotesFocusBtn.style.display = 'inline-flex';
             if (desktopMicCombo) desktopMicCombo.style.display = 'none';
         } else {
-            hideAllMicsCheckbox.checked = false; // ظاهرة في الكمبيوتر
-            hideOtherToolsCheckbox.checked = false; // ظاهرة في الكمبيوتر
+            hideAllMicsCheckbox.checked = false;     // ظاهرة في الكمبيوتر
+            hideOtherToolsCheckbox.checked = false;   // ظاهرة في الكمبيوتر
+            hideRowToolsCheckbox.checked = false;     // ظاهرة في الكمبيوتر
             if (desktopMicCombo) desktopMicCombo.style.display = 'inline-flex';
         }
 
@@ -1238,7 +1246,6 @@
             }
         ];
         let activeRowIndex = 0;
-        // التركيز الافتراضي: للكمبيوتر على العمليات الحسابية (calc)، وللموبايل لا يتم عمل التركيز التلقائي لإتاحة التحكم اليدوي بالكيبورد
         let activeFieldIndex = 'calc';
 
         let activeSpeechRecognition = null;
@@ -1273,6 +1280,7 @@
             refreshBtnEl.style.display = hideRefresh ? 'none' : 'inline-flex';
             exportDropdownEl.style.display = hideExport ? 'none' : 'inline-block';
             
+            // إخفاء الأدوات الأخرى (زر العين، مفتاح التقارير، وزر الإنتر 🚀)
             if (hideOtherTools) {
                 toggleHideBtnEl.style.display = 'none';
                 const nextRowBtn = document.querySelector('.top-next-row-btn');
@@ -1672,12 +1680,10 @@
             return keypadDiv;
         }
 
+        // إيماءات الخلايا: لمسة واحدة لا تفتح كيبورد، الكيبورد يفتح بدوسة طويلة (Long Press)
         function setupCellGestures(element, index, field) {
-            let lastTapTime = 0;
             let longPressTimer = null;
             let isLongPressFired = false;
-            let clickCount = 0;
-            let clickTimer = null;
 
             if (isMobileAny) {
                 element.addEventListener('touchstart', (e) => {
@@ -1687,27 +1693,16 @@
                     updateActiveRowClasses();
                     updateMobilePreviewText();
 
+                    // الدوسة الطويلة تفتح كيبورد النظام على الموبايل
                     longPressTimer = setTimeout(() => {
                         isLongPressFired = true;
                         openSystemKeyboard(index, field);
-                    }, 400);
+                    }, 500);
 
                 }, { passive: true });
 
                 element.addEventListener('touchend', (e) => {
                     clearTimeout(longPressTimer);
-                    if (isLongPressFired) return;
-
-                    const currentTime = new Date().getTime();
-                    const tapLength = currentTime - lastTapTime;
-
-                    if (tapLength < 350 && tapLength > 0) {
-                        e.preventDefault();
-                        openCalcPadForField(index, field);
-                        lastTapTime = 0;
-                    } else {
-                        lastTapTime = currentTime;
-                    }
                 });
 
                 element.addEventListener('touchmove', () => {
@@ -1719,27 +1714,8 @@
                     activeFieldIndex = field;
                     updateActiveRowClasses();
                     updateMobilePreviewText();
-
-                    clickCount++;
-                    if (clickCount === 1) {
-                        clickTimer = setTimeout(() => {
-                            clickCount = 0;
-                        }, 400);
-                    } else if (clickCount === 3) {
-                        clearTimeout(clickTimer);
-                        clickCount = 0;
-                        e.preventDefault();
-                        openCalcPadForField(index, field);
-                    }
                 });
             }
-
-            element.addEventListener('dblclick', (e) => {
-                e.preventDefault();
-                if (isMobileAny) {
-                    openCalcPadForField(index, field);
-                }
-            });
         }
 
         function setupRowSwipeToDelete(rowDiv, index) {
@@ -1791,6 +1767,7 @@
             let negativeSum = 0;
             const showCurrency = showCurrencyCheckbox.checked;
             const hideAllMics = hideAllMicsCheckbox.checked;
+            const hideRowTools = hideRowToolsCheckbox.checked;
 
             rows.forEach((row, index) => {
                 const rowDiv = document.createElement('div');
@@ -1798,6 +1775,7 @@
                 if (!row.isCalcVisible) rowClasses += ' hidden-calc';
                 if (!row.isTextVisible) rowClasses += ' hidden-text';
                 if (hideAllMics) rowClasses += ' hidden-mic';
+                if (hideRowTools) rowClasses += ' hidden-row-tools';
                 rowDiv.className = rowClasses;
 
                 setupRowSwipeToDelete(rowDiv, index);
@@ -2108,7 +2086,7 @@
                 }
             });
 
-            // التركيز التلقائي (Focus) يتم فقط للكمبيوتر، بينما الموبايل لا يفتح الكيبورد تلقائياً
+            // التركيز التلقائي للكمبيوتر فقط، ولن يفتح كيبورد الموبايل تلقائياً
             if (!isMobileAny && focusTarget) {
                 setTimeout(() => {
                     const targetEl = screenContainer.querySelector(`.calc-row.active .${focusTarget === 'text' ? 'text-input' : 'calc-input'}`);
@@ -2653,7 +2631,6 @@
             });
         }
 
-        // تشغيل وعرض التطبيق مع التركيز التلقائي للكمبيوتر، ومنع ظهور الكيبورد التلقائي للموبايل
         renderCalculator('calc');
     </script>
 </body>
