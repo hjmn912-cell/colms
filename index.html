@@ -498,21 +498,21 @@
             min-width: 0;
         }
 
-        /* خلية الملاحظات (أعرض وأكبر بوضوح) */
+        /* خلية الملاحظات (أعرض وأكبر لتكون هي الأكبر دائماً) */
         .text-input-wrapper {
             display: flex;
             align-items: center;
             gap: 6px;
-            flex: 4; 
+            flex: 3.2; 
             min-width: 0;
         }
 
-        /* خلية العملية الحسابية (أقل عرضاً بالنسبة للملاحظات) */
+        /* خلية العمليات الحسابية (عريضة ولكنها أقل عرضاً من الملاحظات) */
         .calc-input-wrapper {
             display: flex;
             align-items: center;
             gap: 3px;
-            flex: 1.5; 
+            flex: 2.2; 
             min-width: 0;
         }
 
@@ -1084,14 +1084,14 @@
 
         // إعدادات البداية بناءً على نوع المتصفح (موبايل أم كمبيوتر)
         if (isMobileAny) {
-            hideAllMicsCheckbox.checked = true; // المايكات مخفية افتراضياً في الموبايل
-            hideOtherToolsCheckbox.checked = true; // إخفاء الأدوات الثلاث في الصف افتراضياً للموبايل
+            hideAllMicsCheckbox.checked = true; // المايكات مخفية في الموبايل
+            hideOtherToolsCheckbox.checked = true; // إخفاء الأزرار الثلاثة داخل إخفاء الأدوات الأخرى افتراضياً للموبايل
             topActionBtn.style.display = 'inline-flex';
             topNotesFocusBtn.style.display = 'inline-flex';
             if (desktopMicCombo) desktopMicCombo.style.display = 'none';
         } else {
-            hideAllMicsCheckbox.checked = false; // المايكات ظاهرة في الكمبيوتر
-            hideOtherToolsCheckbox.checked = false; // الأدوات ظاهرة في الكمبيوتر
+            hideAllMicsCheckbox.checked = false; // ظاهرة في الكمبيوتر
+            hideOtherToolsCheckbox.checked = false; // ظاهرة في الكمبيوتر
             if (desktopMicCombo) desktopMicCombo.style.display = 'inline-flex';
         }
 
@@ -1238,8 +1238,8 @@
             }
         ];
         let activeRowIndex = 0;
-        // التركيز الافتراضي: في الكمبيوتر يكون على العمليات الحسابية (calc)، وفي الموبايل على (text)
-        let activeFieldIndex = isMobileAny ? 'text' : 'calc';
+        // التركيز الافتراضي: للكمبيوتر على العمليات الحسابية (calc)، وللموبايل لا يتم عمل التركيز التلقائي لإتاحة التحكم اليدوي بالكيبورد
+        let activeFieldIndex = 'calc';
 
         let activeSpeechRecognition = null;
         let isMicContinuousMode = false;
@@ -2108,8 +2108,8 @@
                 }
             });
 
-            // ضبط التركيز التلقائي (Focus) بناءً على ما إذا كان المتصفح كمبيوتر أم موبايل
-            if (focusTarget) {
+            // التركيز التلقائي (Focus) يتم فقط للكمبيوتر، بينما الموبايل لا يفتح الكيبورد تلقائياً
+            if (!isMobileAny && focusTarget) {
                 setTimeout(() => {
                     const targetEl = screenContainer.querySelector(`.calc-row.active .${focusTarget === 'text' ? 'text-input' : 'calc-input'}`);
                     if (targetEl) targetEl.focus();
@@ -2293,8 +2293,8 @@
                     isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                 }];
                 activeRowIndex = 0;
-                activeFieldIndex = isMobileAny ? 'text' : 'calc';
-                renderCalculator(activeFieldIndex);
+                activeFieldIndex = 'calc';
+                renderCalculator('calc');
             }
             else if (key === 'Backspace') {
                 const activeInput = document.activeElement;
@@ -2304,8 +2304,8 @@
                         rows.splice(activeRowIndex, 1);
                         activeRowIndex--;
                         closeAllPads();
-                        activeFieldIndex = isMobileAny ? 'text' : 'calc';
-                        renderCalculator(activeFieldIndex);
+                        activeFieldIndex = 'calc';
+                        renderCalculator('calc');
                     }
                 }
             }
@@ -2354,7 +2354,7 @@
                 }
                 closeAllPads();
             }
-            renderCalculator(activeFieldIndex);
+            renderCalculator('calc');
             updateMobilePreviewText();
         }
 
@@ -2653,8 +2653,8 @@
             });
         }
 
-        // تشغيل وعرض التطبيق مع التركيز التلقائي المطلوب (العمليات الحسابية للكمبيوتر، والملاحظات للموبايل)
-        renderCalculator(activeFieldIndex);
+        // تشغيل وعرض التطبيق مع التركيز التلقائي للكمبيوتر، ومنع ظهور الكيبورد التلقائي للموبايل
+        renderCalculator('calc');
     </script>
 </body>
 </html>
