@@ -2,7 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <!-- تم تعديل الـ viewport لتثبيت مقاسات العرض ومنع التصغير في وضع سطح المكتب -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>آلة حاسبة الأسطر المتعددة</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -950,7 +951,6 @@
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
 
-        // متغيرات للتحكم بوضع التعرف الصوتي المباشر والربط بالنقر المزدوج
         let activeSpeechRecognition = null;
         let isMicContinuousMode = false;
         let currentActiveMicBtn = null;
@@ -1698,18 +1698,17 @@
                 micBtn.title = 'انقر مرة واحدة للتحدث المؤقت، أو انقر مرتين متتاليتين للتشغيل المستمر';
                 micBtn.type = 'button';
 
-                // التعامل مع النقرة الفردية والنقرة المزدوجة على المايك
                 micBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     if (micClickTimer === null) {
                         micClickTimer = setTimeout(() => {
                             micClickTimer = null;
-                            handleMicClick(index, micBtn, false); // نقرة واحدة (عادية)
+                            handleMicClick(index, micBtn, false);
                         }, 300);
                     } else {
                         clearTimeout(micClickTimer);
                         micClickTimer = null;
-                        handleMicClick(index, micBtn, true); // نقرتين متتاليتين (مستمر)
+                        handleMicClick(index, micBtn, true);
                     }
                 });
 
@@ -1847,15 +1846,13 @@
             }
         }
 
-        // دالة التعامل مع كليك المايك (نقرة واحدة أم نقرتين متتاليتين)
         function handleMicClick(index, micBtn, isDoubleClick) {
             if (activeSpeechRecognition) {
-                // إذا كان شغالاً بالفعل وقمنا بالضغط عليه مرة أخرى ينطفئ فوراً
                 stopActiveMic();
                 return;
             }
 
-            isMicContinuousMode = isDoubleClick; // إن كانت دبل كليك يفعّل الوضع المستمر
+            isMicContinuousMode = isDoubleClick;
             startSpeechRecognition(index, micBtn);
         }
 
@@ -1922,7 +1919,6 @@
             };
 
             recognition.onend = () => {
-                // إذا كان المايك في وضع "النقرتين المتتاليتين" يستمر ولا يتوقف تلقائياً
                 if (isMicContinuousMode && activeSpeechRecognition === recognition) {
                     try {
                         recognition.start();
