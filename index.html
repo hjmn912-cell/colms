@@ -48,28 +48,32 @@
         }
 
         /* 
-          تقسيم صارم للهواتف: النصف العلوي (50vh) للهيدر والتحكم،
-          والنصف السفلي (50vh) يبدأ فيه السطر الأول مباشرة تحت الهيدر بدون أي فراغات.
+          مقبض السحب (Resize Handle) الفاصل بين الهيدر والأسطر
         */
-        .calculator-container.mobile-split-screen {
-            display: grid !important;
-            grid-template-rows: auto 1fr !important;
-            height: 100vh !important;
-            max-height: 100vh !important;
+        .resize-handle {
+            display: none;
+            width: 100%;
+            height: 14px;
+            background-color: #1f2937;
+            cursor: row-resize;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1001;
+            user-select: none;
+            touch-action: none;
         }
 
-        .mobile-split-screen .sticky-top-section {
-            max-height: 50vh !important;
-            overflow-y: auto !important;
-            flex-shrink: 0 !important;
+        .resize-handle::after {
+            content: '';
+            width: 40px;
+            height: 4px;
+            background-color: #38bdf8;
+            border-radius: 2px;
         }
 
-        .mobile-split-screen .calculator-screen {
-            height: 50vh !important;
-            max-height: 50vh !important;
-            flex-grow: 1 !important;
-            overflow-y: auto !important;
-            padding-bottom: 150px !important;
+        .calculator-container.mobile-resizable-mode .resize-handle {
+            display: flex;
         }
 
         .sticky-top-section {
@@ -78,6 +82,8 @@
             width: 100%;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
             flex-shrink: 0;
+            overflow-y: auto;
+            max-height: 80vh;
         }
 
         .top-controls-wrapper {
@@ -807,7 +813,7 @@
         <!-- النقطة المؤشرة الزرقاء في أعلى اليسار للتحقق من التحديث -->
         <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
 
-        <div class="sticky-top-section">
+        <div class="sticky-top-section" id="stickyTopSection">
             <div class="top-controls-wrapper">
                 <div class="left-controls-group">
                     <!-- الخيارات -->
@@ -917,6 +923,9 @@
             </div>
         </div>
 
+        <!-- مقبض السحب لتغيير الحجم على الموبايل -->
+        <div class="resize-handle" id="resizeHandle" title="اسحب لأعلى أو لأسفل لتغيير الحجم"></div>
+
         <div id="screenContainer" class="calculator-screen"></div>
 
         <div class="keyboard-hint">
@@ -926,6 +935,8 @@
 
     <script>
         const screenContainer = document.getElementById('screenContainer');
+        const stickyTopSection = document.getElementById('stickyTopSection');
+        const resizeHandle = document.getElementById('resizeHandle');
         const grandTotalEl = document.getElementById('grandTotal');
         const grandTotalCurrencyEl = document.getElementById('grandTotalCurrency');
         const showCurrencyCheckbox = document.getElementById('showCurrencyCheckbox');
@@ -944,38 +955,72 @@
 
         let isSelectionModeActive = false;
 
-        function detectDeviceType() {
+        function detectMobileEnvironment() {
             const ua = navigator.userAgent;
             const width = window.innerWidth;
-            const height = window.innerHeight;
-            const minDim = Math.min(width, height);
-
-            const isIPad = /iPad/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            const isAndroidTablet = /Android/.test(ua) && !/Mobile/.test(ua);
-            const isLargeScreenTablet = (isIPad || isAndroidTablet) || (minDim >= 600 && /Mobi|Android|iPhone|iPod/.test(ua));
-
-            const isDesktop = !(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) && width > 1024;
-
-            if (isDesktop) {
+            const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || width <= 1024;
+            
+            if (!isMobileDevice) {
                 return 'desktop';
-            } else if (isLargeScreenTablet) {
-                return 'tablet';
+            }
+
+            const isDesktopModeOnMobile = width > 768 && !/Mobi/i.test(ua);
+            if (isDesktopModeOnMobile) {
+                return 'mobile-desktop';
             } else {
-                return 'mobile';
+                return 'mobile-normal';
             }
         }
 
-        // تطبيق التقسيم للهواتف ووضع سطح المكتب الخاص بالموبايل
-        const deviceType = detectDeviceType();
-        if (deviceType === 'mobile') {
-            calculatorContainer.classList.add('mobile-split-screen');
-        }
-
-        const isMobile = deviceType === 'mobile' || deviceType === 'tablet';
+        const env = detectMobileEnvironment();
+        const isMobile = env !== 'desktop';
 
         if (isMobile) {
+            calculatorContainer.classList.add('mobile-resizable-mode');
             topActionBtn.style.display = 'inline-flex';
             topNotesFocusBtn.style.display = 'inline-flex';
+            
+            // تعيين ارتفاع افتراضي أولي (نصف الشاشة تقريباً)
+            stickyTopSection.style.height = (window.innerHeight * 0.5) + 'px';
+        }
+
+        // تفعيل خاصية السحب لتغيير الحجم (Resize by Dragging) على الموبايل والجلسة
+        let isResizing = false;
+        let startY = 0;
+        let startHeight = 0;
+
+        resizeHandle.addEventListener('mousedown', startResize);
+        resizeHandle.addEventListener('touchstart', startResize, { passive: true });
+
+        window.addEventListener('mousemove', onResize);
+        window.addEventListener('touchmove', onResize, { passive: true });
+
+        window.addEventListener('mouseup', stopResize);
+        window.addEventListener('touchend', stopResize);
+
+        function startResize(e) {
+            isResizing = true;
+            startY = e.touches ? e.touches[0].clientY : e.clientY;
+            startHeight = stickyTopSection.offsetHeight;
+        }
+
+        function onResize(e) {
+            if (!isResizing) return;
+            const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+            const diff = currentY - startY;
+            let newHeight = startHeight + diff;
+
+            // تحديد حدود مقبولة للارتفاع (ألا يقل عن 15% وألا يزيد عن 85% من الشاشة)
+            const minHeight = window.innerHeight * 0.15;
+            const maxHeight = window.innerHeight * 0.85;
+
+            if (newHeight >= minHeight && newHeight <= maxHeight) {
+                stickyTopSection.style.height = newHeight + 'px';
+            }
+        }
+
+        function stopResize() {
+            isResizing = false;
         }
 
         let rows = [
