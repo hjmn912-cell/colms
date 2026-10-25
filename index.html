@@ -84,7 +84,7 @@
             margin-right: 15px;
         }
 
-        /* الكومبو بوكس الصغير جداً بدون اسم وأصغر من زر الريفرش */
+        /* الكومبو بوكس الصغير جداً بدون اسم */
         .mobile-combo-box {
             background-color: #1e293b;
             color: #38bdf8;
@@ -323,7 +323,7 @@
             white-space: nowrap;
         }
 
-        .top-action-btn, .top-notes-focus-btn, .toggle-hide-btn {
+        .top-action-btn, .top-notes-focus-btn, .toggle-hide-btn, .top-next-row-btn {
             background-color: #1e293b;
             border: 1px solid #38bdf8;
             color: #38bdf8;
@@ -343,7 +343,7 @@
             display: none;
         }
 
-        .toggle-hide-btn:hover {
+        .toggle-hide-btn:hover, .top-next-row-btn:hover {
             background-color: #38bdf8;
             color: #0b0f19;
         }
@@ -355,6 +355,7 @@
             box-shadow: 0 0 8px rgba(234, 179, 8, 0.6);
         }
 
+        /* تصغير زر تصدير ومشاركة ليكون بحجم زر العين والريفرش وبدون نص */
         .export-dropdown {
             position: relative;
             display: inline-block;
@@ -365,13 +366,14 @@
             background-color: #1e293b;
             color: #38bdf8;
             border: 1px solid #38bdf8;
-            padding: 6px 10px;
+            width: 32px;
+            height: 32px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            justify-content: center;
             transition: background 0.2s;
             white-space: nowrap;
         }
@@ -877,7 +879,7 @@
         <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
 
         <!-- الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد -->
-        <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="التنقل للسطر التالي أو إضافة سطر جديد" onclick="handleFloatingKbdBtnClick()">➕</button>
+        <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال أو إنشاء سطر جديد" onclick="handleFloatingKbdBtnClick()">➕</button>
 
         <!-- سطر المعاينة العلوي للموبايل -->
         <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
@@ -964,6 +966,9 @@
                     <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
                     <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
                     
+                    <!-- زر جديد من الأعلى للنزول للخلية التالية أو سطر جديد وفتح كيبورد الموبايل -->
+                    <button type="button" class="top-next-row-btn" title="الانتقال للخلية/السطر التالي وفتح الكيبورد" onclick="handleTopNextRowBtnClick()">➕</button>
+
                     <span class="designer-credit">designed by Sami Arouj</span>
                     
                     <!-- زر إخفاء/إظهار الشامل -->
@@ -971,12 +976,12 @@
                         👁️
                     </button>
 
-                    <!-- زر التصدير ومشاركة -->
+                    <!-- زر التصدير ومشاركة (مصغر وبدون نص) -->
                     <div style="display: flex; align-items: center; gap: 4px;">
                         <input type="checkbox" id="hideExportCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
                         <div class="export-dropdown" id="exportDropdown">
-                            <button class="export-btn" onclick="toggleExportMenu(event)">
-                                تصدير ومشاركة <span>▼</span>
+                            <button class="export-btn" title="تصدير ومشاركة" onclick="toggleExportMenu(event)">
+                                📊
                             </button>
                             <div class="dropdown-content">
                                 <button onclick="exportToExcel()">📊 إكسيل (Excel)</button>
@@ -1082,29 +1087,49 @@
             }
         });
 
-        // سلوك الأيقونة العائمة عند الكيبورد بناءً على مكانك (آخر سطر أو أسطر وسطى)
-        function handleFloatingKbdBtnClick() {
+        // الوظيفة الذكية للزر العلوي الجديد والزر العيوني للكيبورد
+        function handleTopNextRowBtnClick() {
             evaluateRow(activeRowIndex);
             closeAllPads();
 
-            if (activeRowIndex < rows.length - 1) {
-                // إذا كنت في سطر من الأسطر الوسطى، انتقل للسطر التالي مباشرة
-                activeRowIndex++;
+            if (activeFieldIndex === 'text') {
+                // إذا كنت في عمود الملاحظات، انتقل لعمود العملية الحسابية في نفس السطر أولاً
                 activeFieldIndex = 'calc';
                 renderCalculator('calc');
-                scrollToActiveRow();
             } else {
-                // إذا كنت في السطر الأخير، أضف سطر جديد وافتح الكيبورد فيه
-                rows.push({ 
-                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                });
-                activeRowIndex = rows.length - 1;
-                activeFieldIndex = 'calc';
-                renderCalculator('calc');
-                screenContainer.scrollTop = screenContainer.scrollHeight;
+                // إذا كنت في عمود العملية الحسابية، انتقل للسطر التالي
+                if (activeRowIndex < rows.length - 1) {
+                    activeRowIndex++;
+                    activeFieldIndex = 'text';
+                    renderCalculator('text');
+                    scrollToActiveRow();
+                } else {
+                    // إذا كنت في السطر الأخير، أنشئ سطر جديد وانتقل إليه
+                    rows.push({ 
+                        textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                        isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    });
+                    activeRowIndex = rows.length - 1;
+                    activeFieldIndex = 'text';
+                    renderCalculator('text');
+                    screenContainer.scrollTop = screenContainer.scrollHeight;
+                }
             }
+
+            // فتح الكيبورد في الخلية الجديدة مباشرة
+            setTimeout(() => {
+                const targetEl = screenContainer.querySelector(`.calc-row.active .${activeFieldIndex === 'text' ? 'text-input' : 'calc-input'}`);
+                if (targetEl) {
+                    targetEl.removeAttribute('readonly');
+                    targetEl.removeAttribute('inputmode');
+                    targetEl.focus();
+                }
+            }, 30);
             updateMobilePreviewText();
+        }
+
+        function handleFloatingKbdBtnClick() {
+            handleTopNextRowBtnClick();
         }
 
         function handleMobileComboChange(selectEl) {
@@ -1732,7 +1757,6 @@
                 currentX = e.touches[0].clientX;
                 let diffX = currentX - startX;
                 
-                // تحريك السطر بصرياً مع السحب يميناً أو يساراً
                 if (Math.abs(diffX) > 10) {
                     rowDiv.style.transform = `translateX(${diffX}px)`;
                     rowDiv.style.opacity = `${1 - Math.abs(diffX) / 300}`;
@@ -1745,7 +1769,6 @@
                 let diffX = currentX - startX;
 
                 if (Math.abs(diffX) > 100) {
-                    // إذا تخطى السحب 100 بكسل، احذف السطر
                     rowDiv.style.transition = 'all 0.3s ease';
                     rowDiv.style.transform = diffX > 0 ? 'translateX(100vw)' : 'translateX(-100vw)';
                     rowDiv.style.opacity = '0';
@@ -1753,7 +1776,6 @@
                         deleteRow(index);
                     }, 300);
                 } else {
-                    // إعادة السطر مكانه لو لم يكتمل السحب
                     rowDiv.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
                     rowDiv.style.transform = 'translateX(0px)';
                     rowDiv.style.opacity = '1';
