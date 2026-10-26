@@ -954,7 +954,7 @@
         <div id="screenContainer" class="calculator-screen"></div>
 
         <div class="keyboard-hint">
-            <span>الأسهم</span> للتحرك بين الأسطر والحقول | <span>Home</span> للحساب بالقوة | <span>Page Up</span> لتجاهل ما قبل المؤشر | <span>Enter</span> للسطر التالي أو جديد | <span>3 كليك شمال</span> لفتح الآلة
+            <span>الأسهم</span> للتحرك بين الأسطر والحقول | <span>Home</span> للحساب بالقوة | <span>Page Up</span> لتجاهل ما قبل المؤشر | <span>Enter</span> للسطر التالي أو جديد | <span>ضغط مطول</span> للكيبورد
         </div>
     </div>
 
@@ -1418,7 +1418,6 @@
             updateMobilePreviewText();
         }
 
-        // الوظيفة الجديدة المحدثة لزر (Enter + Open): تنزل للخلية التي تحتها وتفتح الآلة الحاسبة مجدداً
         function addNewRowAndOpenTool(index, field) {
             evaluateRow(index);
             closeAllPads();
@@ -1437,7 +1436,6 @@
             activeRowIndex = targetIndex;
             activeFieldIndex = field;
 
-            // فتح الآلة الحاسبة المصغرة فوراً للسطر الجديد
             if (field === 'text') {
                 rows[targetIndex].isTextPadVisible = true;
             } else {
@@ -1609,6 +1607,7 @@
             let lastTapTime = 0;
 
             if (isMobileAny) {
+                // تفعيل الضغط المطول (600 مللي ثانية) لفتح كيبورد الموبايل الافتراضي
                 element.addEventListener('touchstart', (e) => {
                     longPressTimer = setTimeout(() => {
                         rowIsOpeningPad = true;
@@ -1817,7 +1816,6 @@
                     calcWrapper.appendChild(selectCheckbox);
                 }
 
-                // مايك السطر (في الجهة اليسار بجانب الحقل)
                 const rowMicBtn = document.createElement('button');
                 rowMicBtn.type = 'button';
                 rowMicBtn.className = 'row-mic-btn';
@@ -1837,7 +1835,6 @@
                     inputField.classList.add('calc-border-active');
                 }
 
-                // تفعيل خاصية 3 كليك شمال متتالية لفتح الآلة الحاسبة المصغرة على الكمبيوتر
                 let clickCount = 0;
                 let clickTimer = null;
                 inputField.addEventListener('click', () => {
