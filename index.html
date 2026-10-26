@@ -1045,9 +1045,10 @@
         const isMobileNormal = env === 'mobile-normal';
         const isMobileAny = env !== 'desktop';
 
+        // تعيين القيمة الافتراضية لخيار إخفاء المايكات حسب الجهاز (موبايل = مفعل، كمبيوتر = غير مفعل)
         if (isMobileAny) {
             showCurrencyCheckbox.checked = true;
-            hideAllMicsCheckbox.checked = false;
+            hideAllMicsCheckbox.checked = true;
             hideOtherToolsCheckbox.checked = false;
             hideRowToolsCheckbox.checked = true;
         } else {
@@ -1444,6 +1445,7 @@
             updateMobilePreviewText();
         }
 
+        // عند الضغط على Enter من الآلة الحاسبة المصغرة: ينزل للخلية التي تحتها ويفتح الآلة الحاسبة المصغرة تلقائياً
         function addNewRowFromPad(index, field) {
             evaluateRow(index);
             closeAllPads();
@@ -1458,34 +1460,21 @@
                 activeRowIndex = rows.length - 1;
             }
             activeFieldIndex = field;
+
+            // فتح لوحة الآلة الحاسبة المصغرة تلقائياً في الخلية الجديدة
+            if (field === 'text') {
+                rows[activeRowIndex].isTextPadVisible = true;
+            } else {
+                rows[activeRowIndex].isCalcPadVisible = true;
+            }
+
             renderCalculator(field);
             scrollToActiveRow();
             updateMobilePreviewText();
         }
 
         function addNewRowAndOpenTool(index, field) {
-            evaluateRow(index);
-            closeAllPads();
-
-            if (index < rows.length - 1) {
-                activeRowIndex = index + 1;
-            } else {
-                rows.push({ 
-                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                });
-                activeRowIndex = rows.length - 1;
-            }
-            activeFieldIndex = field;
-            renderCalculator(field);
-            scrollToActiveRow();
-
-            setTimeout(() => {
-                const targetInput = screenContainer.querySelector(`.calc-row.active ${field === 'text' ? '.text-input' : '.calc-input'}`);
-                if (targetInput) targetInput.focus();
-            }, 50);
-
-            updateMobilePreviewText();
+            addNewRowFromPad(index, field);
         }
 
         function formatDisplayValue(val) {
@@ -1650,7 +1639,7 @@
                     if (targetField === 'text') {
                         rows[targetRow].textExpression += (rows[targetRow].textExpression ? ' ' : '') + speechResult;
                         renderCalculator('text');
-                    } else {
+                    } else { حدث
                         rows[targetRow].expression += (rows[targetRow].expression ? '' : '') + speechResult;
                         evaluateRow(targetRow);
                         renderCalculator('calc');
@@ -1669,8 +1658,11 @@
             });
         }
 
+        // إيماءات الخلية (دبل كليك على الموبايل، و 3 دبل كليك/نقرات على الكمبيوتر لفتح الآلة الحاسبة)
         function setupCellGestures(element, index, field) {
             let lastTapTime = 0;
+            let clickCount = 0;
+            let clickTimer = null;
 
             if (isMobileAny) {
                 element.addEventListener('touchend', (e) => {
@@ -1686,10 +1678,22 @@
                     }
                 });
             } else {
+                // للكمبيوتر: تتبع النقرات لفتح الآلة الحاسبة عند النقر 3 مرات متتالية (Triple Click)
                 element.addEventListener('click', (e) => {
                     activeRowIndex = index;
                     activeFieldIndex = field;
                     updateActiveRowClasses();
+
+                    clickCount++;
+                    if (clickCount === 1) {
+                        clickTimer = setTimeout(() => {
+                            clickCount = 0;
+                        }, 400);
+                    } else if (clickCount === 3) {
+                        clearTimeout(clickTimer);
+                        clickCount = 0;
+                        openCalcPadForField(index, field);
+                    }
                 });
             }
         }
