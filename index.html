@@ -919,7 +919,7 @@
                                     إظهار كلمة جنيه
                                 </label>
                                 <label class="option-toggle-label">
-                                    <input type="checkbox" id="hideAllMicsCheckbox" onchange="renderCalculator()">
+                                    <input type="checkbox" id="hideAllMicsCheckbox" checked onchange="renderCalculator()">
                                     إخفاء جميع المايكات
                                 </label>
                                 <label class="option-toggle-label">
@@ -927,7 +927,7 @@
                                     إخفاء الأدوات الأخرى
                                 </label>
                                 <label class="option-toggle-label">
-                                    <input type="checkbox" id="hideRowToolsCheckbox" onchange="renderCalculator()">
+                                    <input type="checkbox" id="hideRowToolsCheckbox" checked onchange="renderCalculator()">
                                     إخفاء أدوات السطر
                                 </label>
                             </div>
@@ -1085,10 +1085,10 @@
         const isMobileNormal = env === 'mobile-normal';
         const isMobileAny = env !== 'desktop';
 
-        // جعل الخيارات الثلاثة (إخفاء المايكات، الأدوات الأخرى، أدوات السطر) غير مفعلة افتراضياً
-        hideAllMicsCheckbox.checked = false;
+        // تفعيل الخيارات الافتراضية المطلوبة: إخفاء جميع المايكات وإخفاء أدوات السطر
+        hideAllMicsCheckbox.checked = true;
         hideOtherToolsCheckbox.checked = false;
-        hideRowToolsCheckbox.checked = false;
+        hideRowToolsCheckbox.checked = true;
 
         if (isMobileNormal) {
             mobilePreviewTopBar.style.display = 'flex';
@@ -1666,7 +1666,7 @@
             return keypadDiv;
         }
 
-        // إيماءات الخلايا المحدثة بدقة تامة للموبايل والكمبيوتر
+        // إيماءات الخلايا المحدثة: الموبايل (ضغطة مطولة للكيبورد، ضغطتين للآلة) | الكمبيوتر (3 ضغطات للآلة)
         function setupCellGestures(element, index, field) {
             let longPressTimer = null;
             let lastTapTime = 0;
@@ -1674,10 +1674,9 @@
             let clickTimer = null;
 
             if (isMobileAny) {
-                // الموبايل: لمسة واحدة لا تفعل شيئاً (تمنع فتح الكيبورد أو نقل التركيز غير المرغوب)
                 element.addEventListener('touchstart', (e) => {
                     longPressTimer = setTimeout(() => {
-                        // ضغطة طويلة (Long Press) -> فتح كيبورد الموبايل
+                        // ضغطة مطولة -> فتح كيبورد الموبايل
                         openSystemKeyboard(index, field);
                     }, 600);
                 }, { passive: true });
@@ -1689,7 +1688,7 @@
 
                     if (tapLength < 350 && tapLength > 0) {
                         e.preventDefault();
-                        // لمستان (Double Tap) -> فتح الآلة المصغرة
+                        // ضغطتان متتاليتان -> فتح الآلة الحاسبة المصغرة
                         openCalcPadForField(index, field);
                         lastTapTime = 0;
                     } else {
@@ -1701,7 +1700,7 @@
                     clearTimeout(longPressTimer);
                 });
             } else {
-                // الكمبيوتر: ثلاث لمسات/نقرات (Triple Click) لتفتح الآلة المصغرة
+                // الكمبيوتر: ثلاث نقرات لتفتح الآلة المصغرة
                 element.addEventListener('click', (e) => {
                     clickCount++;
                     if (clickCount === 1) {
@@ -2086,7 +2085,7 @@
                 }
             });
 
-            // التركيز التلقائي (Focus) مفعل فوراً للكمبيوتر على العمليات الحسابية بدون أي ضغطات
+            // التركيز التلقائي فوراً للكمبيوتر على خلية العملية الحسابية للسطر الأول دون الحاجة لأي ضغطة
             if (!isMobileAny) {
                 setTimeout(() => {
                     const targetEl = screenContainer.querySelector(`.calc-row.active .calc-input`);
