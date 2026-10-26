@@ -919,7 +919,7 @@
                                     إظهار كلمة جنيه
                                 </label>
                                 <label class="option-toggle-label">
-                                    <input type="checkbox" id="hideAllMicsCheckbox" checked onchange="renderCalculator()">
+                                    <input type="checkbox" id="hideAllMicsCheckbox" onchange="renderCalculator()">
                                     إخفاء جميع المايكات
                                 </label>
                                 <label class="option-toggle-label">
@@ -927,7 +927,7 @@
                                     إخفاء الأدوات الأخرى
                                 </label>
                                 <label class="option-toggle-label">
-                                    <input type="checkbox" id="hideRowToolsCheckbox" checked onchange="renderCalculator()">
+                                    <input type="checkbox" id="hideRowToolsCheckbox" onchange="renderCalculator()">
                                     إخفاء أدوات السطر
                                 </label>
                             </div>
@@ -1085,10 +1085,20 @@
         const isMobileNormal = env === 'mobile-normal';
         const isMobileAny = env !== 'desktop';
 
-        // تفعيل الخيارات الافتراضية المطلوبة: إخفاء جميع المايكات وإخفاء أدوات السطر
-        hideAllMicsCheckbox.checked = true;
-        hideOtherToolsCheckbox.checked = false;
-        hideRowToolsCheckbox.checked = true;
+        // تطبيق الخيارات الافتراضية بحسب الجهاز (كمبيوتر أو موبايل)
+        if (isMobileAny) {
+            // خيارات الموبايل الافتراضية
+            showCurrencyCheckbox.checked = true;
+            hideAllMicsCheckbox.checked = true;
+            hideOtherToolsCheckbox.checked = false;
+            hideRowToolsCheckbox.checked = true;
+        } else {
+            // خيارات الكمبيوتر الافتراضية
+            showCurrencyCheckbox.checked = true;
+            hideAllMicsCheckbox.checked = false;
+            hideOtherToolsCheckbox.checked = false;
+            hideRowToolsCheckbox.checked = false;
+        }
 
         if (isMobileNormal) {
             mobilePreviewTopBar.style.display = 'flex';
@@ -1666,7 +1676,7 @@
             return keypadDiv;
         }
 
-        // إيماءات الخلايا المحدثة: الموبايل (ضغطة مطولة للكيبورد، ضغطتين للآلة) | الكمبيوتر (3 ضغطات للآلة)
+        // إيماءات الخلايا المحدثة: الموبايل (لمسة واحدة لا تفتح الكيبورد، ضغطة مطولة تفتح الكيبورد، ضغطتان للآلة) | الكمبيوتر (3 نقرات للآلة)
         function setupCellGestures(element, index, field) {
             let longPressTimer = null;
             let lastTapTime = 0;
@@ -1674,6 +1684,14 @@
             let clickTimer = null;
 
             if (isMobileAny) {
+                // منع فتح الكيبورد باللمسة الواحدة في الموبايل
+                element.addEventListener('focus', (e) => {
+                    // إذا لم تكن قادماً من زر أو كيبورد مصغر، امنع التركيز التلقائي الذي يفتح كيبورد النظام بالموبايل
+                    if (!rowIsOpeningPad) {
+                        element.blur();
+                    }
+                });
+
                 element.addEventListener('touchstart', (e) => {
                     longPressTimer = setTimeout(() => {
                         // ضغطة مطولة -> فتح كيبورد الموبايل
@@ -1716,6 +1734,8 @@
                 });
             }
         }
+
+        let rowIsOpeningPad = false;
 
         function setupRowSwipeToDelete(rowDiv, index) {
             let startX = 0;
@@ -2085,7 +2105,7 @@
                 }
             });
 
-            // التركيز التلقائي فوراً للكمبيوتر على خلية العملية الحسابية للسطر الأول دون الحاجة لأي ضغطة
+            // التركيز التلقائي للكمبيوتر على خلية العملية الحسابية للسطر الأول للكتابة مباشرة بدون أي ضغطة
             if (!isMobileAny) {
                 setTimeout(() => {
                     const targetEl = screenContainer.querySelector(`.calc-row.active .calc-input`);
