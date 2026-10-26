@@ -56,7 +56,7 @@
         .resize-edge.bottom { bottom: 0; left: 0; width: 100%; height: 12px; cursor: s-resize; }
         .resize-edge.corner-br { bottom: 0; right: 0; width: 20px; height: 20px; cursor: nwse-resize; }
 
-        /* تثبيت القطعة العلوية بالكامل (الهيدر وما فوقه) */
+        /* تثبيت القطعة العلوية بالكامل بحيث لا تتأثر بفتح الكيبورد أو التمرير */
         .all-top-header-wrapper {
             position: sticky;
             top: 0;
@@ -847,7 +847,7 @@
 
         <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية وفتح الكيبورد" onclick="handleSmartNextCellClick()">🚀</button>
 
-        <!-- حزمة القطعة العلوية بالكامل (تتضمن شريط المعاينة والهيدر) لتكون ثابتة تماماً لا تتأثر بالتمرير -->
+        <!-- الهيدر والقطعة العلوية ثابتة تماماً -->
         <div class="all-top-header-wrapper">
             <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
                 <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
@@ -980,7 +980,7 @@
         <div id="screenContainer" class="calculator-screen"></div>
 
         <div class="keyboard-hint">
-            <span>ضغطتان</span> للآلة الحاسبة المصغرة | <span>الأسهم</span> و <span>Enter</span> للتنقل وإنشاء السطور بلا حدود
+            <span>موبايل: ضغطتان</span> للآلة الحاسبة | <span>كمبيوتر: 3 كليك</span> للآلة الحاسبة | <span>Enter</span> للتنقل بلا حدود
         </div>
     </div>
 
@@ -1086,9 +1086,7 @@
                 setTimeout(() => {
                     const activeInput = screenContainer.querySelector(`.calc-row.active ${activeFieldIndex === 'text' ? '.text-input' : '.calc-input'}`);
                     if (activeInput) {
-                        rowIsOpeningPad = true;
                         activeInput.focus();
-                        rowIsOpeningPad = false;
                     }
                 }, 50);
             }
@@ -1421,9 +1419,7 @@
             setTimeout(() => {
                 const targetInput = screenContainer.querySelector(`.calc-row.active ${field === 'text' ? '.text-input' : '.calc-input'}`);
                 if (targetInput) {
-                    rowIsOpeningPad = true;
                     targetInput.focus();
-                    rowIsOpeningPad = false;
                 }
             }, 50);
 
@@ -1675,24 +1671,21 @@
                 updateActiveRowClasses();
 
                 if (isMobileAny) {
-                    tapCount++;
-                    if (tapCount === 1) {
-                        tapTimer = setTimeout(() => {
-                            tapCount = 0;
-                        }, 350);
-                    } else if (tapCount === 2) {
-                        clearTimeout(tapTimer);
-                        tapCount = 0;
-                        openCalcPadForField(index, field);
-                    } else if (tapCount >= 3) {
-                        clearTimeout(tapTimer);
-                        tapCount = 0;
-                    }
-                } else {
+                    // الموبايل: ضغطتان تفتح الآلة الحاسبة المصغرة
                     tapCount++;
                     if (tapCount === 1) {
                         tapTimer = setTimeout(() => { tapCount = 0; }, 350);
                     } else if (tapCount === 2) {
+                        clearTimeout(tapTimer);
+                        tapCount = 0;
+                        openCalcPadForField(index, field);
+                    }
+                } else {
+                    // الكمبيوتر: 3 كليك شمال تفتح الآلة الحاسبة المصغرة
+                    tapCount++;
+                    if (tapCount === 1) {
+                        tapTimer = setTimeout(() => { tapCount = 0; }, 400);
+                    } else if (tapCount === 3) {
                         clearTimeout(tapTimer);
                         tapCount = 0;
                         openCalcPadForField(index, field);
