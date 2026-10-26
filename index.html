@@ -500,7 +500,7 @@
             flex-shrink: 0;
         }
 
-        .row-mobile-arrow-btn, .row-calc-arrow-btn, .row-mic-btn {
+        .row-mic-btn {
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid #38bdf8;
             color: #38bdf8;
@@ -516,7 +516,20 @@
             transition: all 0.2s;
         }
 
-        .row-mobile-arrow-btn:active, .row-calc-arrow-btn:active, .row-mic-btn:active {
+        .row-mic-btn.recording {
+            background-color: #ef4444 !important;
+            border-color: #f87171 !important;
+            color: #fff !important;
+            animation: pulseMic 1s infinite;
+        }
+
+        @keyframes pulseMic {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .row-mic-btn:active {
             background-color: #38bdf8;
             color: #0b0f19;
         }
@@ -954,7 +967,7 @@
         <div id="screenContainer" class="calculator-screen"></div>
 
         <div class="keyboard-hint">
-            <span>الأسهم</span> للتحرك بين الأسطر والحقول | <span>Home</span> للحساب بالقوة | <span>Page Up</span> لتجاهل ما قبل المؤشر | <span>Enter</span> للسطر التالي أو جديد | <span>ضغط مطول</span> للكيبورد
+            <span>الأسهم</span> لتنقل طبيعي حر | <span>Home</span> للحساب بالقوة | <span>Page Up</span> لتجاهل ما قبل المؤشر | <span>Enter</span> للسطر التالي
         </div>
     </div>
 
@@ -1479,6 +1492,46 @@
             return { text: val, isNegative: false };
         }
 
+        // تشغيل مايك جهة الشمال بناءً على الخلية النشطة حالياً
+        function startVoiceRecognition(index, micBtnEl) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("متصفحك لا يدعم التعرف على الصوت.");
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ar-EG';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            micBtnEl.classList.add('recording');
+
+            recognition.onresult = (event) => {
+                const speechResult = event.results[0][0].transcript;
+                micBtnEl.classList.remove('recording');
+
+                if (activeFieldIndex === 'text') {
+                    rows[index].textExpression += speechResult;
+                } else {
+                    let cleaned = speechResult
+                        .replace(/في|ضرب|علامة في/g, '*')
+                        .replace(/على|قسمة/g, '/')
+                        .replace(/زائد|جمع/g, '+')
+                        .replace(/ناقص|طرح/g, '-')
+                        .replace(/في المية| بالمية/g, '%');
+                    rows[index].expression += cleaned;
+                    evaluateRow(index);
+                }
+                renderCalculator(activeFieldIndex);
+            };
+
+            recognition.onerror = () => { micBtnEl.classList.remove('recording'); };
+            recognition.onend = () => { micBtnEl.classList.remove('recording'); };
+
+            recognition.start();
+        }
+
         function createMiniKeypad(index, field) {
             const keypadDiv = document.createElement('div');
             keypadDiv.className = 'row-mini-keypad';
@@ -1607,7 +1660,6 @@
             let lastTapTime = 0;
 
             if (isMobileAny) {
-                // تفعيل الضغط المطول (600 مللي ثانية) لفتح كيبورد الموبايل الافتراضي
                 element.addEventListener('touchstart', (e) => {
                     longPressTimer = setTimeout(() => {
                         rowIsOpeningPad = true;
@@ -1730,17 +1782,6 @@
                     textWrapper.appendChild(selectTextCheckbox);
                 }
 
-                const mobileKbdArrowBtn = document.createElement('button');
-                mobileKbdArrowBtn.type = 'button';
-                mobileKbdArrowBtn.className = 'row-mobile-arrow-btn';
-                mobileKbdArrowBtn.innerHTML = '⌨️';
-                mobileKbdArrowBtn.title = 'فتح كيبورد الموبايل للخلية';
-
-                mobileKbdArrowBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    openSystemKeyboard(index, 'text');
-                });
-
                 const textInput = document.createElement('textarea');
                 textInput.className = 'text-input';
                 textInput.value = row.textExpression;
@@ -1770,7 +1811,6 @@
 
                 setupCellGestures(textInput, index, 'text');
 
-                textWrapper.appendChild(mobileKbdArrowBtn);
                 textWrapper.appendChild(textInput);
 
                 const outputContainer = document.createElement('div');
@@ -1816,14 +1856,15 @@
                     calcWrapper.appendChild(selectCheckbox);
                 }
 
+                // مايك جهة الشمال الوحيد في السطر
                 const rowMicBtn = document.createElement('button');
                 rowMicBtn.type = 'button';
                 rowMicBtn.className = 'row-mic-btn';
                 rowMicBtn.innerHTML = '🎤';
-                rowMicBtn.title = 'زر المايك الصوتي';
+                rowMicBtn.title = 'إملاء صوتي للخلية النشطة';
                 rowMicBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    alert(`تفعيل المايك للسطر رقم ${index + 1}`);
+                    startVoiceRecognition(index, rowMicBtn);
                 });
 
                 const inputField = document.createElement('input');
@@ -1840,9 +1881,7 @@
                 inputField.addEventListener('click', () => {
                     clickCount++;
                     if (clickCount === 1) {
-                        clickTimer = setTimeout(() => {
-                            clickCount = 0;
-                        }, 400);
+                        clickTimer = setTimeout(() => { clickCount = 0; }, 400);
                     } else if (clickCount === 3) {
                         clearTimeout(clickTimer);
                         clickCount = 0;
@@ -1941,7 +1980,7 @@
 
             if (!isMobileAny) {
                 setTimeout(() => {
-                    const targetEl = screenContainer.querySelector(`.calc-row.active .calc-input`);
+                    const targetEl = screenContainer.querySelector(`.calc-row.active .${activeFieldIndex === 'text' ? 'text-input' : 'calc-input'}`);
                     if (targetEl) targetEl.focus();
                 }, 10);
             }
@@ -1966,6 +2005,7 @@
             updateMobilePreviewText();
         }
 
+        // حركة الأسهم الطبيعية والحرة بالكامل دون قيود
         function handleKeyNavigation(e, index, currentField) {
             const key = e.key;
 
