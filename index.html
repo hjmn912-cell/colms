@@ -2,17 +2,35 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, 
+
+initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, 
+
+user-scalable=no">
     <title>آلة حاسبة الأسطر المتعددة</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script 
+
+src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.f
+
+ull.min.js"></script>
+    <script 
+
+src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1
+
+/html2pdf.bundle.min.js"></script>
+    <script 
+
+src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/
+
+html2canvas.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, 
+
+sans-serif;
             -webkit-text-size-adjust: 100%;
         }
 
@@ -52,10 +70,18 @@
             position: absolute;
             z-index: 10000;
         }
-        .resize-edge.right { top: 0; right: 0; width: 12px; height: 100%; cursor: e-resize; }
-        .resize-edge.left { top: 0; left: 0; width: 12px; height: 100%; cursor: w-resize; }
-        .resize-edge.bottom { bottom: 0; left: 0; width: 100%; height: 12px; cursor: s-resize; }
-        .resize-edge.corner-br { bottom: 0; right: 0; width: 20px; height: 20px; cursor: nwse-resize; }
+        .resize-edge.right { top: 0; right: 0; width: 12px; 
+
+height: 100%; cursor: e-resize; }
+        .resize-edge.left { top: 0; left: 0; width: 12px; 
+
+height: 100%; cursor: w-resize; }
+        .resize-edge.bottom { bottom: 0; left: 0; width: 100%; 
+
+height: 12px; cursor: s-resize; }
+        .resize-edge.corner-br { bottom: 0; right: 0; width: 
+
+20px; height: 20px; cursor: nwse-resize; }
 
         .mobile-preview-top-bar {
             display: none;
@@ -319,7 +345,9 @@
             white-space: nowrap;
         }
 
-        .top-action-btn, .top-notes-focus-btn, .toggle-hide-btn, .top-next-row-btn {
+        .top-action-btn, .top-notes-focus-btn, .toggle-hide-
+
+btn, .top-next-row-btn {
             background-color: #1e293b;
             border: 1px solid #38bdf8;
             color: #38bdf8;
@@ -715,7 +743,9 @@
             outline: none;
             font-family: inherit;
             width: 100%;
-            transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+            transition: border-color 0.15s, background-color 
+
+0.15s, box-shadow 0.15s;
         }
 
         .text-input {
@@ -737,7 +767,9 @@
         .text-border-active, .calc-border-active {
             border-color: #38bdf8 !important;
             background: rgba(56, 189, 248, 0.1) !important;
-            box-shadow: 0 0 8px rgba(56, 189, 248, 0.4) !important;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.4) !
+
+important;
         }
 
         .calc-row.hidden-calc .calc-input {
@@ -828,59 +860,121 @@
 </head>
 <body>
 
-    <div class="calculator-container" id="calculatorContainer">
+    <div class="calculator-container" 
+
+id="calculatorContainer">
         
         <div class="resize-edge right" id="edgeRight"></div>
         <div class="resize-edge left" id="edgeLeft"></div>
         <div class="resize-edge bottom" id="edgeBottom"></div>
-        <div class="resize-edge corner-br" id="edgeCornerBR"></div>
+        <div class="resize-edge corner-br" 
 
-        <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية وفتح الكيبورد" onclick="handleSmartNextCellClick()">🚀</button>
+id="edgeCornerBR"></div>
 
-        <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
-            <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
-                <select id="mobileControlCombo" class="mobile-combo-box" onchange="handleMobileComboChange(this)">
-                    <option value="" disabled selected>⚙️</option>
-                    <option value="toggle_tools">إظهار/إخفاء الأدوات</option>
+        <button type="button" id="floatingKeyboardNewRowBtn" 
+
+class="floating-keyboard-action-btn" title="الانتقال للخلية التالية وفتح الكيبورد" 
+
+onclick="handleSmartNextCellClick()">🚀</button>
+
+        <div id="mobilePreviewTopBar" class="mobile-preview-
+
+top-bar" style="display:none;">
+            <div style="display: flex; align-items: center; 
+
+gap: 4px; overflow-x: auto; flex: 1;">
+                <select id="mobileControlCombo" 
+
+class="mobile-combo-box" onchange="handleMobileComboChange
+
+(this)">
+                    <option value="" disabled 
+
+selected>⚙️</option>
+                    <option value="toggle_tools">إظهار/إخفاء 
+
+الأدوات</option>
                 </select>
                 <span id="previewTextContent"></span>
             </div>
-            <span id="previewResultContent" class="mobile-preview-result"></span>
+            <span id="previewResultContent" class="mobile-
+
+preview-result"></span>
         </div>
 
         <div class="sticky-top-section" id="stickyTopSection">
             <div class="top-controls-wrapper">
                 <div class="left-controls-group">
-                    <div style="display: flex; align-items: center; gap: 4px;">
-                        <input type="checkbox" id="hideOptionsCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                        <div class="options-dropdown" id="optionsDropdown">
-                            <button class="options-btn" type="button" onclick="toggleOptionsMenu(event)">
+                    <div style="display: flex; align-items: 
+
+center; gap: 4px;">
+                        <input type="checkbox" 
+
+id="hideOptionsCheckbox" class="global-select-checkbox" 
+
+style="display:none;" onchange="updateGlobalHides()">
+                        <div class="options-dropdown" 
+
+id="optionsDropdown">
+                            <button class="options-btn" 
+
+type="button" onclick="toggleOptionsMenu(event)">
                                 الخيارات <span>▼</span>
                             </button>
-                            <div class="options-dropdown-content" id="optionsDropdownContent">
-                                <label class="option-toggle-label">
-                                    <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
+                            <div class="options-dropdown-
+
+content" id="optionsDropdownContent">
+                                <label class="option-toggle-
+
+label">
+                                    <input type="checkbox" 
+
+id="showCurrencyCheckbox" checked onchange="renderCalculator
+
+()">
                                     إظهار كلمة جنيه
                                 </label>
-                                <label class="option-toggle-label">
-                                    <input type="checkbox" id="hideAllMicsCheckbox" onchange="renderCalculator()">
+                                <label class="option-toggle-
+
+label">
+                                    <input type="checkbox" 
+
+id="hideAllMicsCheckbox" onchange="renderCalculator()">
                                     إخفاء المايكات
                                 </label>
-                                <label class="option-toggle-label">
-                                    <input type="checkbox" id="hideOtherToolsCheckbox" onchange="updateGlobalHides()">
+                                <label class="option-toggle-
+
+label">
+                                    <input type="checkbox" 
+
+id="hideOtherToolsCheckbox" onchange="updateGlobalHides()">
                                     إخفاء الأدوات الأخرى
                                 </label>
-                                <label class="option-toggle-label">
-                                    <input type="checkbox" id="hideRowToolsCheckbox" onchange="renderCalculator()">
+                                <label class="option-toggle-
+
+label">
+                                    <input type="checkbox" 
+
+id="hideRowToolsCheckbox" onchange="renderCalculator()">
                                     إخفاء أدوات السطر
                                 </label>
                             </div>
                         </div>
                     </div>
 
-                    <div style="display: flex; align-items: center; gap: 4px;">
-                        <input type="checkbox" id="hideRefreshCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                        <button class="refresh-btn" id="refreshBtnEl" type="button" title="إعادة تحميل الصفحة" onclick="location.reload()">
+                    <div style="display: flex; align-items: 
+
+center; gap: 4px;">
+                        <input type="checkbox" 
+
+id="hideRefreshCheckbox" class="global-select-checkbox" 
+
+style="display:none;" onchange="updateGlobalHides()">
+                        <button class="refresh-btn" 
+
+id="refreshBtnEl" type="button" title="إعادة تحميل الصفحة" 
+
+onclick="location.reload()">
                             🔄
                         </button>
                     </div>
@@ -888,31 +982,67 @@
 
                 <div class="totals-summary-bar">
                     <div class="sub-totals-row">
-                        <div style="display: flex; align-items: center; gap: 4px;">
-                            <input type="checkbox" id="hidePositiveCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                        <div style="display: flex; align-
+
+items: center; gap: 4px;">
+                            <input type="checkbox" 
+
+id="hidePositiveCheckbox" class="global-select-checkbox" 
+
+style="display:none;" onchange="updateGlobalHides()">
                             <div class="summary-item">
-                                <input type="checkbox" id="showPositiveCheckbox" onchange="renderCalculator()">
-                                <span id="positiveTotalVal" class="positive-sum"></span>
+                                <input type="checkbox" 
+
+id="showPositiveCheckbox" onchange="renderCalculator()">
+                                <span id="positiveTotalVal" 
+
+class="positive-sum"></span>
                             </div>
                         </div>
 
-                        <div style="display: flex; align-items: center; gap: 4px;">
-                            <input type="checkbox" id="hideNegativeCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                        <div style="display: flex; align-
+
+items: center; gap: 4px;">
+                            <input type="checkbox" 
+
+id="hideNegativeCheckbox" class="global-select-checkbox" 
+
+style="display:none;" onchange="updateGlobalHides()">
                             <div class="summary-item">
-                                <input type="checkbox" id="showNegativeCheckbox" onchange="renderCalculator()">
-                                <span id="negativeTotalVal" class="negative-sum"></span>
+                                <input type="checkbox" 
+
+id="showNegativeCheckbox" onchange="renderCalculator()">
+                                <span id="negativeTotalVal" 
+
+class="negative-sum"></span>
                             </div>
                         </div>
                     </div>
 
                     <div class="total-value-container">
-                        <div style="display: flex; align-items: center; gap: 4px;">
-                            <input type="checkbox" id="hideGrandTotalCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                            <div id="grandTotal" class="total-value">0</div>
+                        <div style="display: flex; align-
+
+items: center; gap: 4px;">
+                            <input type="checkbox" 
+
+id="hideGrandTotalCheckbox" class="global-select-checkbox" 
+
+style="display:none;" onchange="updateGlobalHides()">
+                            <div id="grandTotal" 
+
+class="total-value">0</div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 4px;">
-                            <input type="checkbox" id="hideGrandCurrencyCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                            <div id="grandTotalCurrency" class="total-currency">جنيه</div>
+                        <div style="display: flex; align-
+
+items: center; gap: 4px;">
+                            <input type="checkbox" 
+
+id="hideGrandCurrencyCheckbox" class="global-select-checkbox" 
+
+style="display:none;" onchange="updateGlobalHides()">
+                            <div id="grandTotalCurrency" 
+
+class="total-currency">جنيه</div>
                         </div>
                     </div>
                 </div>
@@ -921,42 +1051,100 @@
             </div>
 
             <div class="calculator-header">
-                <div class="header-right-group" id="headerRightGroupContainer">
-                    <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
-                    <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
-                    
-                    <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة" onclick="handleSmartNextCellClick()">🚀</button>
+                <div class="header-right-group" 
 
-                    <span class="designer-credit">designed by Sami Arouj</span>
+id="headerRightGroupContainer">
+                    <button type="button" 
+
+id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول 
+
+للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick
+
+()">📝</button>
+                    <button type="button" id="topActionBtn" 
+
+class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" 
+
+onclick="handleTopActionBtnClick()">📄</button>
                     
-                    <button type="button" id="toggleHideBtn" class="toggle-hide-btn" title="تحديد العناصر المراد إخفاؤها" onclick="toggleHideSelectionMode()">
+                    <button type="button" class="top-next-
+
+row-btn" title="الانتقال للخلية التي تحتها مباشرة" 
+
+onclick="handleSmartNextCellClick()">🚀</button>
+
+                    <span class="designer-credit">designed by 
+
+Sami Arouj</span>
+                    
+                    <button type="button" id="toggleHideBtn" 
+
+class="toggle-hide-btn" title="تحديد العناصر المراد إخفاؤها" 
+
+onclick="toggleHideSelectionMode()">
                         👁️
                     </button>
 
-                    <div style="display: flex; align-items: center; gap: 4px;" id="exportDropdownContainer">
-                        <input type="checkbox" id="hideExportCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                        <div class="export-dropdown" id="exportDropdown">
-                            <button class="export-btn" title="تصدير ومشاركة" onclick="toggleExportMenu(event)">
+                    <div style="display: flex; align-items: 
+
+center; gap: 4px;" id="exportDropdownContainer">
+                        <input type="checkbox" 
+
+id="hideExportCheckbox" class="global-select-checkbox" 
+
+style="display:none;" onchange="updateGlobalHides()">
+                        <div class="export-dropdown" 
+
+id="exportDropdown">
+                            <button class="export-btn" 
+
+title="تصدير ومشاركة" onclick="toggleExportMenu(event)">
                                 📊
                             </button>
                             <div class="dropdown-content">
-                                <button onclick="exportToExcel()">📊 إكسيل (Excel)</button>
-                                <button onclick="exportToWord()">📝 وورد (Word)</button>
-                                <button onclick="exportToPDF()">📄 بي دي إف (PDF)</button>
-                                <button onclick="exportToTXT()">📄 تصدير ملف نصي (TXT)</button>
-                                <button onclick="exportToImage()">🖼️ تنزيل صورة</button>
-                                
-                                <div class="dropdown-divider"></div>
-                                
-                                <button onclick="openPhoneWhatsApp()">📱 فتح واتساب الهاتف</button>
-                                <button onclick="openPhoneMessenger()">💬 فتح ماسنجر الهاتف</button>
-                                <button onclick="copyReportTextOnly()">📋 نسخ التقرير نصياً</button>
+                                <button 
 
-                                <div class="dropdown-divider"></div>
+onclick="exportToExcel()">📊 إكسيل (Excel)</button>
+                                <button onclick="exportToWord
 
-                                <button onclick="shareLinkToWhatsApp()">💬 إرسال التقرير للواتساب</button>
-                                <button onclick="shareLinkToMessenger()">⚡ إرسال التقرير للماسنجر</button>
-                                <button onclick="shareLinkToSMS()">📱 إرسال التقرير عبر رسالة نصية (SMS)</button>
+()">📝 وورد (Word)</button>
+                                <button onclick="exportToPDF
+
+()">📄 بي دي إف (PDF)</button>
+                                <button onclick="exportToTXT
+
+()">📄 تصدير ملف نصي (TXT)</button>
+                                <button 
+
+onclick="exportToImage()">🖼️ تنزيل صورة</button>
+                                
+                                <div class="dropdown-
+
+divider"></div>
+                                
+                                <button 
+
+onclick="openPhoneWhatsApp()">📱 فتح واتساب الهاتف</button>
+                                <button 
+
+onclick="openPhoneMessenger()">💬 فتح ماسنجر الهاتف</button>
+                                <button 
+
+onclick="copyReportTextOnly()">📋 نسخ التقرير نصياً</button>
+
+                                <div class="dropdown-
+
+divider"></div>
+
+                                <button 
+
+onclick="shareLinkToWhatsApp()">💬 إرسال التقرير للواتساب</button>
+                                <button 
+
+onclick="shareLinkToMessenger()">⚡ إرسال التقرير للماسنجر</button>
+                                <button 
+
+onclick="shareLinkToSMS()">📱 إرسال التقرير عبر رسالة نصية (SMS)</button>
                             </div>
                         </div>
                     </div>
@@ -964,53 +1152,115 @@
             </div>
         </div>
 
-        <div id="screenContainer" class="calculator-screen"></div>
+        <div id="screenContainer" class="calculator-
+
+screen"></div>
 
         <div class="keyboard-hint">
-            <span>الأسهم</span> لتنقل طبيعي حر | <span>Home</span> للحساب بالقوة | <span>Page Up</span> لتجاهل ما قبل المؤشر | <span>Enter</span> للسطر التالي
+            <span>الأسهم</span> لتنقل طبيعي حر | <span>Home</span> للحساب 
+
+بالقوة | <span>Page Up</span> لتجاهل ما قبل المؤشر | <span>Enter</span> لإنشاء 
+
+ونزول أسطر بلا حدود
         </div>
     </div>
 
     <script>
-        const screenContainer = document.getElementById('screenContainer');
-        const calculatorContainer = document.getElementById('calculatorContainer');
-        const mobilePreviewTopBar = document.getElementById('mobilePreviewTopBar');
-        const previewTextContent = document.getElementById('previewTextContent');
-        const previewResultContent = document.getElementById('previewResultContent');
-        const mobileControlCombo = document.getElementById('mobileControlCombo');
-        const floatingKeyboardNewRowBtn = document.getElementById('floatingKeyboardNewRowBtn');
-        const stickyTopSection = document.getElementById('stickyTopSection');
-        const grandTotalEl = document.getElementById('grandTotal');
-        const grandTotalCurrencyEl = document.getElementById('grandTotalCurrency');
-        const showCurrencyCheckbox = document.getElementById('showCurrencyCheckbox');
-        const hideAllMicsCheckbox = document.getElementById('hideAllMicsCheckbox');
-        const hideOtherToolsCheckbox = document.getElementById('hideOtherToolsCheckbox');
-        const hideRowToolsCheckbox = document.getElementById('hideRowToolsCheckbox');
-        const showPositiveCheckbox = document.getElementById('showPositiveCheckbox');
-        const showNegativeCheckbox = document.getElementById('showNegativeCheckbox');
-        const positiveTotalValEl = document.getElementById('positiveTotalVal');
-        const negativeTotalValEl = document.getElementById('negativeTotalVal');
-        const topActionBtn = document.getElementById('topActionBtn');
-        const topNotesFocusBtn = document.getElementById('topNotesFocusBtn');
-        const toggleHideBtn = document.getElementById('toggleHideBtn');
+        const screenContainer = document.getElementById
 
-        const optionsDropdownEl = document.getElementById('optionsDropdown');
-        const refreshBtnEl = document.getElementById('refreshBtnEl');
-        const exportDropdownEl = document.getElementById('exportDropdown');
-        const toggleHideBtnEl = document.getElementById('toggleHideBtn');
+('screenContainer');
+        const calculatorContainer = document.getElementById
+
+('calculatorContainer');
+        const mobilePreviewTopBar = document.getElementById
+
+('mobilePreviewTopBar');
+        const previewTextContent = document.getElementById
+
+('previewTextContent');
+        const previewResultContent = document.getElementById
+
+('previewResultContent');
+        const mobileControlCombo = document.getElementById
+
+('mobileControlCombo');
+        const floatingKeyboardNewRowBtn = 
+
+document.getElementById('floatingKeyboardNewRowBtn');
+        const stickyTopSection = document.getElementById
+
+('stickyTopSection');
+        const grandTotalEl = document.getElementById
+
+('grandTotal');
+        const grandTotalCurrencyEl = document.getElementById
+
+('grandTotalCurrency');
+        const showCurrencyCheckbox = document.getElementById
+
+('showCurrencyCheckbox');
+        const hideAllMicsCheckbox = document.getElementById
+
+('hideAllMicsCheckbox');
+        const hideOtherToolsCheckbox = 
+
+document.getElementById('hideOtherToolsCheckbox');
+        const hideRowToolsCheckbox = document.getElementById
+
+('hideRowToolsCheckbox');
+        const showPositiveCheckbox = document.getElementById
+
+('showPositiveCheckbox');
+        const showNegativeCheckbox = document.getElementById
+
+('showNegativeCheckbox');
+        const positiveTotalValEl = document.getElementById
+
+('positiveTotalVal');
+        const negativeTotalValEl = document.getElementById
+
+('negativeTotalVal');
+        const topActionBtn = document.getElementById
+
+('topActionBtn');
+        const topNotesFocusBtn = document.getElementById
+
+('topNotesFocusBtn');
+        const toggleHideBtn = document.getElementById
+
+('toggleHideBtn');
+
+        const optionsDropdownEl = document.getElementById
+
+('optionsDropdown');
+        const refreshBtnEl = document.getElementById
+
+('refreshBtnEl');
+        const exportDropdownEl = document.getElementById
+
+('exportDropdown');
+        const toggleHideBtnEl = document.getElementById
+
+('toggleHideBtn');
 
         let isSelectionModeActive = false;
         
         function detectMobileEnvironment() {
             const ua = navigator.userAgent;
             const width = window.innerWidth;
-            const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || width <= 1024;
+            const isMobileDevice = /Android|webOS|iPhone|
+
+iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || width 
+
+<= 1024;
             
             if (!isMobileDevice) {
                 return 'desktop';
             }
 
-            const isDesktopModeOnMobile = width > 768 && !/Mobi/i.test(ua);
+            const isDesktopModeOnMobile = width > 768 && 
+
+!/Mobi/i.test(ua);
             if (isDesktopModeOnMobile) {
                 return 'mobile-desktop';
             } else {
@@ -1024,7 +1274,7 @@
 
         if (isMobileAny) {
             showCurrencyCheckbox.checked = true;
-            hideAllMicsCheckbox.checked = false;
+            hideAllMicsCheckbox.checked = true; 
             hideOtherToolsCheckbox.checked = false;
             hideRowToolsCheckbox.checked = true;
         } else {
@@ -1041,10 +1291,16 @@
         let initialWindowHeight = window.innerHeight;
         window.addEventListener('resize', () => {
             if (isMobileAny) {
-                if (window.innerHeight < initialWindowHeight - 120) {
-                    floatingKeyboardNewRowBtn.style.display = 'flex';
+                if (window.innerHeight < initialWindowHeight - 
+
+120) {
+                    floatingKeyboardNewRowBtn.style.display = 
+
+'flex';
                 } else {
-                    floatingKeyboardNewRowBtn.style.display = 'none';
+                    floatingKeyboardNewRowBtn.style.display = 
+
+'none';
                 }
             }
         });
@@ -1059,8 +1315,14 @@
                 activeRowIndex++;
             } else {
                 rows.push({ 
-                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    textExpression: '', expression: '', 
+
+result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, 
+
+isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: 
+
+false
                 });
                 activeRowIndex = rows.length - 1;
             }
@@ -1071,7 +1333,13 @@
 
             if (isMobileAny) {
                 setTimeout(() => {
-                    const activeInput = screenContainer.querySelector(`.calc-row.active ${activeFieldIndex === 'text' ? '.text-input' : '.calc-input'}`);
+                    const activeInput = 
+
+screenContainer.querySelector(`.calc-row.active 
+
+${activeFieldIndex === 'text' ? '.text-input' : '.calc-
+
+input'}`);
                     if (activeInput) {
                         rowIsOpeningPad = true;
                         activeInput.focus();
@@ -1086,7 +1354,9 @@
         function handleMobileComboChange(selectEl) {
             const val = selectEl.value;
             if (val === 'toggle_tools') {
-                hideOtherToolsCheckbox.checked = !hideOtherToolsCheckbox.checked;
+                hideOtherToolsCheckbox.checked = !
+
+hideOtherToolsCheckbox.checked;
                 updateGlobalHides();
             }
             selectEl.selectedIndex = 0;
@@ -1099,8 +1369,12 @@
 
         function initResize(dir, e) {
             currentResizeDirection = dir;
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const clientX = e.touches ? e.touches[0].clientX : 
+
+e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : 
+
+e.clientY;
             startX = clientX;
             startY = clientY;
             startW = calculatorContainer.offsetWidth;
@@ -1109,28 +1383,62 @@
             startL = calculatorContainer.offsetLeft;
         }
 
-        document.getElementById('edgeRight').addEventListener('mousedown', (e) => initResize('right', e));
-        document.getElementById('edgeRight').addEventListener('touchstart', (e) => initResize('right', e), { passive: true });
+        document.getElementById('edgeRight').addEventListener
 
-        document.getElementById('edgeLeft').addEventListener('mousedown', (e) => initResize('left', e));
-        document.getElementById('edgeLeft').addEventListener('touchstart', (e) => initResize('left', e), { passive: true });
+('mousedown', (e) => initResize('right', e));
+        document.getElementById('edgeRight').addEventListener
 
-        document.getElementById('edgeBottom').addEventListener('mousedown', (e) => initResize('bottom', e));
-        document.getElementById('edgeBottom').addEventListener('touchstart', (e) => initResize('bottom', e), { passive: true });
+('touchstart', (e) => initResize('right', e), { passive: true 
 
-        document.getElementById('edgeCornerBR').addEventListener('mousedown', (e) => initResize('cornerBR', e));
-        document.getElementById('edgeCornerBR').addEventListener('touchstart', (e) => initResize('cornerBR', e), { passive: true });
+});
+
+        document.getElementById('edgeLeft').addEventListener
+
+('mousedown', (e) => initResize('left', e));
+        document.getElementById('edgeLeft').addEventListener
+
+('touchstart', (e) => initResize('left', e), { passive: true 
+
+});
+
+        document.getElementById
+
+('edgeBottom').addEventListener('mousedown', (e) => 
+
+initResize('bottom', e));
+        document.getElementById
+
+('edgeBottom').addEventListener('touchstart', (e) => 
+
+initResize('bottom', e), { passive: true });
+
+        document.getElementById
+
+('edgeCornerBR').addEventListener('mousedown', (e) => 
+
+initResize('cornerBR', e));
+        document.getElementById
+
+('edgeCornerBR').addEventListener('touchstart', (e) => 
+
+initResize('cornerBR', e), { passive: true });
 
         window.addEventListener('mousemove', doResize);
-        window.addEventListener('touchmove', doResize, { passive: true });
+        window.addEventListener('touchmove', doResize, { 
+
+passive: true });
 
         window.addEventListener('mouseup', stopResize);
         window.addEventListener('touchend', stopResize);
 
         function doResize(e) {
             if (!currentResizeDirection) return;
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const clientX = e.touches ? e.touches[0].clientX : 
+
+e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : 
+
+e.clientY;
             
             const dx = clientX - startX;
             const dy = clientY - startY;
@@ -1142,17 +1450,27 @@
                 let newW = Math.max(250, startW - dx);
                 let newL = startL + dx;
                 if (newW > 250) {
-                    calculatorContainer.style.width = newW + 'px';
-                    calculatorContainer.style.left = newL + 'px';
+                    calculatorContainer.style.width = newW + 
+
+'px';
+                    calculatorContainer.style.left = newL + 
+
+'px';
                 }
             } else if (currentResizeDirection === 'bottom') {
                 let newH = Math.max(200, startH + dy);
-                calculatorContainer.style.height = newH + 'px';
-            } else if (currentResizeDirection === 'cornerBR') {
+                calculatorContainer.style.height = newH + 
+
+'px';
+            } else if (currentResizeDirection === 'cornerBR') 
+
+{
                 let newW = Math.max(250, startW + dx);
                 let newH = Math.max(200, startH + dy);
                 calculatorContainer.style.width = newW + 'px';
-                calculatorContainer.style.height = newH + 'px';
+                calculatorContainer.style.height = newH + 
+
+'px';
             }
         }
 
@@ -1180,9 +1498,13 @@
         function toggleHideSelectionMode() {
             isSelectionModeActive = !isSelectionModeActive;
             
-            const checkboxes = document.querySelectorAll('.global-select-checkbox');
+            const checkboxes = document.querySelectorAll
+
+('.global-select-checkbox');
             checkboxes.forEach(cb => {
-                cb.style.display = isSelectionModeActive ? 'inline-block' : 'none';
+                cb.style.display = isSelectionModeActive ? 
+
+'inline-block' : 'none';
             });
 
             if (isSelectionModeActive) {
@@ -1195,38 +1517,90 @@
         }
 
         function updateGlobalHides() {
-            const hideOptions = document.getElementById('hideOptionsCheckbox').checked;
-            const hideRefresh = document.getElementById('hideRefreshCheckbox').checked;
-            const hideExport = document.getElementById('hideExportCheckbox').checked;
-            const hideOtherTools = hideOtherToolsCheckbox.checked;
+            const hideOptions = document.getElementById
+
+('hideOptionsCheckbox').checked;
+            const hideRefresh = document.getElementById
+
+('hideRefreshCheckbox').checked;
+            const hideExport = document.getElementById
+
+('hideExportCheckbox').checked;
+            const hideOtherTools = 
+
+hideOtherToolsCheckbox.checked;
             
-            optionsDropdownEl.style.display = hideOptions ? 'none' : 'inline-block';
-            refreshBtnEl.style.display = hideRefresh ? 'none' : 'inline-flex';
-            exportDropdownEl.style.display = hideExport ? 'none' : 'inline-block';
+            optionsDropdownEl.style.display = hideOptions ? 
+
+'none' : 'inline-block';
+            refreshBtnEl.style.display = hideRefresh ? 'none' 
+
+: 'inline-flex';
+            exportDropdownEl.style.display = hideExport ? 
+
+'none' : 'inline-block';
             
             if (hideOtherTools) {
                 toggleHideBtnEl.style.display = 'none';
-                const nextRowBtn = document.querySelector('.top-next-row-btn');
-                if (nextRowBtn) nextRowBtn.style.display = 'none';
+                const nextRowBtn = document.querySelector
+
+('.top-next-row-btn');
+                if (nextRowBtn) nextRowBtn.style.display = 
+
+'none';
                 exportDropdownEl.style.display = 'none';
             } else {
                 toggleHideBtnEl.style.display = 'inline-flex';
-                const nextRowBtn = document.querySelector('.top-next-row-btn');
-                if (nextRowBtn) nextRowBtn.style.display = 'inline-flex';
-                if (!hideExport) exportDropdownEl.style.display = 'inline-block';
+                const nextRowBtn = document.querySelector
+
+('.top-next-row-btn');
+                if (nextRowBtn) nextRowBtn.style.display = 
+
+'inline-flex';
+                if (!hideExport) 
+
+exportDropdownEl.style.display = 'inline-block';
             }
             
-            document.getElementById('positiveTotalVal').parentElement.parentElement.style.display = document.getElementById('hidePositiveCheckbox').checked ? 'none' : 'flex';
-            document.getElementById('negativeTotalVal').parentElement.parentElement.style.display = document.getElementById('hideNegativeCheckbox').checked ? 'none' : 'flex';
+            document.getElementById
+
+('positiveTotalVal').parentElement.parentElement.style.display 
+
+= document.getElementById('hidePositiveCheckbox').checked ? 
+
+'none' : 'flex';
+            document.getElementById
+
+('negativeTotalVal').parentElement.parentElement.style.display 
+
+= document.getElementById('hideNegativeCheckbox').checked ? 
+
+'none' : 'flex';
             
-            grandTotalEl.style.display = document.getElementById('hideGrandTotalCheckbox').checked ? 'none' : 'block';
-            grandTotalCurrencyEl.style.display = document.getElementById('hideGrandCurrencyCheckbox').checked ? 'none' : 'block';
+            grandTotalEl.style.display = 
+
+document.getElementById('hideGrandTotalCheckbox').checked ? 
+
+'none' : 'block';
+            grandTotalCurrencyEl.style.display = 
+
+document.getElementById('hideGrandCurrencyCheckbox').checked ? 
+
+'none' : 'block';
 
             if (isMobileNormal) {
-                if (hideOptions && hideRefresh && hideExport && document.getElementById('hideGrandTotalCheckbox').checked) {
-                    mobilePreviewTopBar.style.display = 'none';
+                if (hideOptions && hideRefresh && hideExport 
+
+&& document.getElementById('hideGrandTotalCheckbox').checked) 
+
+{
+                    mobilePreviewTopBar.style.display = 
+
+'none';
                 } else {
-                    mobilePreviewTopBar.style.display = 'flex';
+                    mobilePreviewTopBar.style.display = 
+
+'flex';
                 }
             }
         }
@@ -1249,13 +1623,21 @@
                 scrollToActiveRow();
             } else {
                 rows.push({ 
-                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    textExpression: '', expression: '', 
+
+result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, 
+
+isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: 
+
+false
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = 'calc';
                 renderCalculator('calc');
-                screenContainer.scrollTop = screenContainer.scrollHeight;
+                screenContainer.scrollTop = 
+
+screenContainer.scrollHeight;
             }
         }
 
@@ -1270,13 +1652,21 @@
                 scrollToActiveRow();
             } else {
                 rows.push({ 
-                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    textExpression: '', expression: '', 
+
+result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, 
+
+isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: 
+
+false
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = 'text';
                 renderCalculator('text');
-                screenContainer.scrollTop = screenContainer.scrollHeight;
+                screenContainer.scrollTop = 
+
+screenContainer.scrollHeight;
             }
         }
 
@@ -1304,43 +1694,69 @@
                     rows[activeRowIndex].expression = '';
                     rows[activeRowIndex].result = 0;
                     rows[activeRowIndex].forceCalc = false;
-                    rows[activeRowIndex].ignoreBeforeIndex = 0;
+                    rows[activeRowIndex].ignoreBeforeIndex = 
+
+0;
                 }
                 renderCalculator(activeFieldIndex);
             }
         }
 
         function scrollToActiveRow() {
-            const activeRowEl = screenContainer.children[activeRowIndex];
+            const activeRowEl = screenContainer.children
+
+[activeRowIndex];
             if (activeRowEl) {
-                activeRowEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                activeRowEl.scrollIntoView({ behavior: 
+
+'smooth', block: 'nearest' });
             }
         }
 
         function toggleOptionsMenu(e) {
             e.stopPropagation();
-            const dropdown = document.getElementById('optionsDropdownContent');
-            const exportDropdown = document.querySelector('#exportDropdown .dropdown-content');
-            if (exportDropdown) exportDropdown.parentElement.classList.remove('active');
+            const dropdown = document.getElementById
+
+('optionsDropdownContent');
+            const exportDropdown = document.querySelector
+
+('#exportDropdown .dropdown-content');
+            if (exportDropdown) 
+
+exportDropdown.parentElement.classList.remove('active');
             dropdown.classList.toggle('active');
         }
 
         function toggleExportMenu(e) {
             e.stopPropagation();
-            const dropdown = document.getElementById('exportDropdown');
-            const optionsDropdown = document.getElementById('optionsDropdownContent');
-            if (optionsDropdown) optionsDropdown.classList.remove('active');
+            const dropdown = document.getElementById
+
+('exportDropdown');
+            const optionsDropdown = document.getElementById
+
+('optionsDropdownContent');
+            if (optionsDropdown) 
+
+optionsDropdown.classList.remove('active');
             dropdown.classList.toggle('active');
         }
 
         window.addEventListener('click', (e) => {
-            const optionsDropdown = document.getElementById('optionsDropdownContent');
-            const exportDropdown = document.getElementById('exportDropdown');
+            const optionsDropdown = document.getElementById
+
+('optionsDropdownContent');
+            const exportDropdown = document.getElementById
+
+('exportDropdown');
             
-            if (optionsDropdown && !optionsDropdown.contains(e.target) && !e.target.closest('.options-btn')) {
+            if (optionsDropdown && !optionsDropdown.contains
+
+(e.target) && !e.target.closest('.options-btn')) {
                 optionsDropdown.classList.remove('active');
             }
-            if (exportDropdown && !exportDropdown.contains(e.target)) {
+            if (exportDropdown && !exportDropdown.contains
+
+(e.target)) {
                 exportDropdown.classList.remove('active');
             }
         });
@@ -1350,13 +1766,25 @@
             const currentRow = rows[activeRowIndex];
             if (!currentRow) return;
 
-            let currentText = activeFieldIndex === 'text' ? currentRow.textExpression : currentRow.expression.replace(/\*/g, 'x');
+            let currentText = activeFieldIndex === 'text' ? 
+
+currentRow.textExpression : currentRow.expression.replace(/
+
+\*/g, 'x');
             previewTextContent.innerText = currentText;
 
-            if (currentRow.result !== '' && currentRow.result !== 0) {
-                const formatted = formatDisplayValue(currentRow.result);
-                const showCurrency = showCurrencyCheckbox.checked;
-                previewResultContent.innerText = `${formatted.text} ${showCurrency ? 'جنيه' : ''}`;
+            if (currentRow.result !== '' && currentRow.result 
+
+!== 0) {
+                const formatted = formatDisplayValue
+
+(currentRow.result);
+                const showCurrency = 
+
+showCurrencyCheckbox.checked;
+                previewResultContent.innerText = `
+
+${formatted.text} ${showCurrency ? 'جنيه' : ''}`;
             } else {
                 previewResultContent.innerText = '';
             }
@@ -1384,13 +1812,17 @@
             if (field === 'text') {
                 let text = rows[index].textExpression;
                 if (text.length > 0) {
-                    rows[index].textExpression = text.substring(0, text.length - 1);
+                    rows[index].textExpression = 
+
+text.substring(0, text.length - 1);
                     renderCalculator('text');
                 }
             } else {
                 let expr = rows[index].expression;
                 if (expr.length > 0) {
-                    rows[index].expression = expr.substring(0, expr.length - 1);
+                    rows[index].expression = expr.substring(0, 
+
+expr.length - 1);
                     rows[index].forceCalc = false;
                     evaluateRow(index);
                     renderCalculator('calc');
@@ -1406,7 +1838,11 @@
             renderCalculator(field);
             
             setTimeout(() => {
-                const targetInput = screenContainer.querySelector(`.calc-row.active ${field === 'text' ? '.text-input' : '.calc-input'}`);
+                const targetInput = 
+
+screenContainer.querySelector(`.calc-row.active ${field === 
+
+'text' ? '.text-input' : '.calc-input'}`);
                 if (targetInput) {
                     rowIsOpeningPad = true;
                     targetInput.focus();
@@ -1440,8 +1876,14 @@
                 targetIndex = index + 1;
             } else {
                 rows.push({ 
-                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    textExpression: '', expression: '', 
+
+result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, 
+
+isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: 
+
+false
                 });
                 targetIndex = rows.length - 1;
             }
@@ -1471,13 +1913,21 @@
                 scrollToActiveRow();
             } else {
                 rows.push({ 
-                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    textExpression: '', expression: '', 
+
+result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, 
+
+isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: 
+
+false
                 });
                 activeRowIndex = rows.length - 1;
                 activeFieldIndex = field;
                 renderCalculator(field);
-                screenContainer.scrollTop = screenContainer.scrollHeight;
+                screenContainer.scrollTop = 
+
+screenContainer.scrollHeight;
             }
             updateMobilePreviewText();
         }
@@ -1485,16 +1935,19 @@
         function formatDisplayValue(val) {
             if (typeof val === 'number') {
                 if (val < 0) {
-                    return { text: `(${Math.abs(val)})`, isNegative: true };
+                    return { text: `(${Math.abs(val)})`, 
+
+isNegative: true };
                 }
                 return { text: `${val}`, isNegative: false };
             }
             return { text: val, isNegative: false };
         }
 
-        // تشغيل مايك جهة الشمال بناءً على الخلية النشطة حالياً
         function startVoiceRecognition(index, micBtnEl) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const SpeechRecognition = window.SpeechRecognition 
+
+|| window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
                 alert("متصفحك لا يدعم التعرف على الصوت.");
                 return;
@@ -1508,11 +1961,15 @@
             micBtnEl.classList.add('recording');
 
             recognition.onresult = (event) => {
-                const speechResult = event.results[0][0].transcript;
+                const speechResult = event.results[0]
+
+[0].transcript;
                 micBtnEl.classList.remove('recording');
 
                 if (activeFieldIndex === 'text') {
-                    rows[index].textExpression += speechResult;
+                    rows[index].textExpression += 
+
+speechResult;
                 } else {
                     let cleaned = speechResult
                         .replace(/في|ضرب|علامة في/g, '*')
@@ -1526,8 +1983,12 @@
                 renderCalculator(activeFieldIndex);
             };
 
-            recognition.onerror = () => { micBtnEl.classList.remove('recording'); };
-            recognition.onend = () => { micBtnEl.classList.remove('recording'); };
+            recognition.onerror = () => { 
+
+micBtnEl.classList.remove('recording'); };
+            recognition.onend = () => { 
+
+micBtnEl.classList.remove('recording'); };
 
             recognition.start();
         }
@@ -1564,30 +2025,52 @@
             let startX = 0, startY = 0;
             let currentX = 0, currentY = 0;
 
-            keypadDiv.addEventListener('mousedown', startKeypadDrag);
-            window.addEventListener('mousemove', onKeypadDrag);
-            window.addEventListener('mouseup', stopKeypadDrag);
+            keypadDiv.addEventListener('mousedown', 
 
-            keypadDiv.addEventListener('touchstart', startKeypadDrag, { passive: true });
-            window.addEventListener('touchmove', onKeypadDrag, { passive: true });
-            window.addEventListener('touchend', stopKeypadDrag);
+startKeypadDrag);
+            window.addEventListener('mousemove', 
+
+onKeypadDrag);
+            window.addEventListener('mouseup', 
+
+stopKeypadDrag);
+
+            keypadDiv.addEventListener('touchstart', 
+
+startKeypadDrag, { passive: true });
+            window.addEventListener('touchmove', onKeypadDrag, 
+
+{ passive: true });
+            window.addEventListener('touchend', 
+
+stopKeypadDrag);
 
             function startKeypadDrag(e) {
                 if (e.target.closest('button')) return;
                 isDraggingKeypad = true;
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                const clientX = e.touches ? e.touches
+
+[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches
+
+[0].clientY : e.clientY;
                 startX = clientX - currentX;
                 startY = clientY - currentY;
             }
 
             function onKeypadDrag(e) {
                 if (!isDraggingKeypad) return;
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                const clientX = e.touches ? e.touches
+
+[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches
+
+[0].clientY : e.clientY;
                 currentX = clientX - startX;
                 currentY = clientY - startY;
-                keypadDiv.style.transform = `translate(${currentX}px, ${currentY}px)`;
+                keypadDiv.style.transform = `translate
+
+(${currentX}px, ${currentY}px)`;
             }
 
             function stopKeypadDrag() {
@@ -1607,14 +2090,20 @@
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'mini-key-btn';
-                if (['+', '-', 'x', 'X', '*', '/', '%'].includes(k)) btn.classList.add('op');
+                if (['+', '-', 'x', 'X', '*', '/', 
+
+'%'].includes(k)) btn.classList.add('op');
                 if (k === '⌫') btn.classList.add('backspace');
                 if (k === '⌨ Keyboard') {
                     btn.classList.add('kbd-key');
                     btn.style.gridColumn = 'span 1';
                 }
-                if (k === '⬆ Up' || k === '⬇ Down') btn.classList.add('nav-key');
-                if (k === '🗑 Del') btn.classList.add('clear-key');
+                if (k === '⬆ Up' || k === '⬇ Down') 
+
+btn.classList.add('nav-key');
+                if (k === '🗑 Del') btn.classList.add('clear-
+
+key');
                 if (k === 'Enter') {
                     btn.classList.add('enter-key');
                     btn.style.gridColumn = 'span 1';
@@ -1625,7 +2114,9 @@
                 }
 
                 if (k === 'Enter') btn.innerText = 'Enter ↵';
-                else if (k === 'Enter+Open') btn.innerText = 'Enter + Open 🚀';
+                else if (k === 'Enter+Open') btn.innerText = 
+
+'Enter + Open 🚀';
                 else btn.innerText = k;
                 
                 btn.addEventListener('click', () => {
@@ -1660,7 +2151,9 @@
             let lastTapTime = 0;
 
             if (isMobileAny) {
-                element.addEventListener('touchstart', (e) => {
+                element.addEventListener('touchstart', (e) => 
+
+{
                     longPressTimer = setTimeout(() => {
                         rowIsOpeningPad = true;
                         activeRowIndex = index;
@@ -1674,7 +2167,9 @@
                 element.addEventListener('touchend', (e) => {
                     clearTimeout(longPressTimer);
                     const currentTime = new Date().getTime();
-                    const tapLength = currentTime - lastTapTime;
+                    const tapLength = currentTime - 
+
+lastTapTime;
 
                     if (tapLength < 350 && tapLength > 0) {
                         e.preventDefault();
@@ -1703,7 +2198,11 @@
             let isSwiping = false;
 
             rowDiv.addEventListener('touchstart', (e) => {
-                if (e.target.closest('button') || e.target.closest('textarea') || e.target.closest('input')) return;
+                if (e.target.closest('button') || 
+
+e.target.closest('textarea') || e.target.closest('input')) 
+
+return;
                 startX = e.touches[0].clientX;
                 isSwiping = true;
             }, { passive: true });
@@ -1714,8 +2213,12 @@
                 let diffX = currentX - startX;
                 
                 if (Math.abs(diffX) > 10) {
-                    rowDiv.style.transform = `translateX(${diffX}px)`;
-                    rowDiv.style.opacity = `${1 - Math.abs(diffX) / 300}`;
+                    rowDiv.style.transform = `translateX
+
+(${diffX}px)`;
+                    rowDiv.style.opacity = `${1 - Math.abs
+
+(diffX) / 300}`;
                 }
             }, { passive: true });
 
@@ -1725,15 +2228,23 @@
                 let diffX = currentX - startX;
 
                 if (Math.abs(diffX) > 100) {
-                    rowDiv.style.transition = 'all 0.25s ease';
-                    rowDiv.style.transform = diffX > 0 ? 'translateX(100vw)' : 'translateX(-100vw)';
+                    rowDiv.style.transition = 'all 0.25s 
+
+ease';
+                    rowDiv.style.transform = diffX > 0 ? 
+
+'translateX(100vw)' : 'translateX(-100vw)';
                     rowDiv.style.opacity = '0';
                     setTimeout(() => {
                         deleteRow(index);
                     }, 250);
                 } else {
-                    rowDiv.style.transition = 'transform 0.15s ease, opacity 0.15s ease';
-                    rowDiv.style.transform = 'translateX(0px)';
+                    rowDiv.style.transition = 'transform 0.15s 
+
+ease, opacity 0.15s ease';
+                    rowDiv.style.transform = 'translateX
+
+(0px)';
                     rowDiv.style.opacity = '1';
                 }
             });
@@ -1750,10 +2261,18 @@
 
             rows.forEach((row, index) => {
                 const rowDiv = document.createElement('div');
-                let rowClasses = `calc-row ${index === activeRowIndex ? 'active' : ''}`;
-                if (!row.isCalcVisible) rowClasses += ' hidden-calc';
-                if (!row.isTextVisible) rowClasses += ' hidden-text';
-                if (hideRowTools) rowClasses += ' hidden-row-tools';
+                let rowClasses = `calc-row ${index === 
+
+activeRowIndex ? 'active' : ''}`;
+                if (!row.isCalcVisible) rowClasses += ' 
+
+hidden-calc';
+                if (!row.isTextVisible) rowClasses += ' 
+
+hidden-text';
+                if (hideRowTools) rowClasses += ' hidden-row-
+
+tools';
                 if (hideAllMics) rowClasses += ' hidden-mics';
                 rowDiv.className = rowClasses;
 
@@ -1762,39 +2281,65 @@
                 const rowMain = document.createElement('div');
                 rowMain.className = 'calc-row-main';
 
-                const inputsGroup = document.createElement('div');
+                const inputsGroup = document.createElement
+
+('div');
                 inputsGroup.className = 'inputs-group';
 
-                const textWrapper = document.createElement('div');
+                const textWrapper = document.createElement
+
+('div');
                 textWrapper.className = 'text-input-wrapper';
 
                 if (isSelectionModeActive) {
-                    const selectTextCheckbox = document.createElement('input');
+                    const selectTextCheckbox = 
+
+document.createElement('input');
                     selectTextCheckbox.type = 'checkbox';
-                    selectTextCheckbox.className = 'calc-select-checkbox';
-                    selectTextCheckbox.checked = !row.isTextVisible;
-                    selectTextCheckbox.title = 'علم هنا لإخفاء ملاحظات هذا السطر';
+                    selectTextCheckbox.className = 'calc-
+
+select-checkbox';
+                    selectTextCheckbox.checked = !
+
+row.isTextVisible;
+                    selectTextCheckbox.title = 'علم هنا لإخفاء ملاحظات هذا 
+
+السطر';
                     
-                    selectTextCheckbox.addEventListener('change', (e) => {
+                    selectTextCheckbox.addEventListener
+
+('change', (e) => {
                         row.isTextVisible = !e.target.checked;
                     });
                     
-                    textWrapper.appendChild(selectTextCheckbox);
+                    textWrapper.appendChild
+
+(selectTextCheckbox);
                 }
 
-                const textInput = document.createElement('textarea');
+                const textInput = document.createElement
+
+('textarea');
                 textInput.className = 'text-input';
                 textInput.value = row.textExpression;
                 textInput.rows = 1;
 
-                if (index === activeRowIndex && activeFieldIndex === 'text') {
-                    textInput.classList.add('text-border-active');
+                if (index === activeRowIndex && 
+
+activeFieldIndex === 'text') {
+                    textInput.classList.add('text-border-
+
+active');
                 }
 
                 textInput.addEventListener('input', (e) => {
-                    rows[index].textExpression = e.target.value;
+                    rows[index].textExpression = 
+
+e.target.value;
                     e.target.style.height = 'auto';
-                    e.target.style.height = (e.target.scrollHeight) + 'px';
+                    e.target.style.height = 
+
+(e.target.scrollHeight) + 'px';
                     updateMobilePreviewText();
                 });
 
@@ -1813,23 +2358,37 @@
 
                 textWrapper.appendChild(textInput);
 
-                const outputContainer = document.createElement('div');
-                outputContainer.className = 'calc-output-container';
+                const outputContainer = 
 
-                const outputDiv = document.createElement('div');
+document.createElement('div');
+                outputContainer.className = 'calc-output-
+
+container';
+
+                const outputDiv = document.createElement
+
+('div');
                 outputDiv.className = 'calc-output';
 
-                const currencySpan = document.createElement('span');
+                const currencySpan = document.createElement
+
+('span');
                 currencySpan.className = 'row-currency';
-                currencySpan.innerText = showCurrency ? 'جنيه' : '';
+                currencySpan.innerText = showCurrency ? 'جنيه' : 
+
+'';
 
                 if (row.result !== '' && row.result !== 0) {
-                    const formatted = formatDisplayValue(row.result);
+                    const formatted = formatDisplayValue
+
+(row.result);
                     outputDiv.innerText = formatted.text;
                     if (formatted.isNegative) {
                         outputDiv.classList.add('negative');
                     } else {
-                        outputDiv.classList.remove('negative');
+                        outputDiv.classList.remove
+
+('negative');
                     }
                 } else {
                     outputDiv.innerText = '';
@@ -1839,25 +2398,38 @@
                 outputContainer.appendChild(outputDiv);
                 outputContainer.appendChild(currencySpan);
 
-                const calcWrapper = document.createElement('div');
+                const calcWrapper = document.createElement
+
+('div');
                 calcWrapper.className = 'calc-input-wrapper';
 
                 if (isSelectionModeActive) {
-                    const selectCheckbox = document.createElement('input');
+                    const selectCheckbox = 
+
+document.createElement('input');
                     selectCheckbox.type = 'checkbox';
-                    selectCheckbox.className = 'calc-select-checkbox';
-                    selectCheckbox.checked = !row.isCalcVisible;
-                    selectCheckbox.title = 'علم هنا لإخفاء نص العملية الحسابية لهذا السطر';
+                    selectCheckbox.className = 'calc-select-
+
+checkbox';
+                    selectCheckbox.checked = !
+
+row.isCalcVisible;
+                    selectCheckbox.title = 'علم هنا لإخفاء نص العملية الحسابية لهذا 
+
+السطر';
                     
-                    selectCheckbox.addEventListener('change', (e) => {
+                    selectCheckbox.addEventListener('change', 
+
+(e) => {
                         row.isCalcVisible = !e.target.checked;
                     });
                     
                     calcWrapper.appendChild(selectCheckbox);
                 }
 
-                // مايك جهة الشمال الوحيد في السطر
-                const rowMicBtn = document.createElement('button');
+                const rowMicBtn = document.createElement
+
+('button');
                 rowMicBtn.type = 'button';
                 rowMicBtn.className = 'row-mic-btn';
                 rowMicBtn.innerHTML = '🎤';
@@ -1867,13 +2439,21 @@
                     startVoiceRecognition(index, rowMicBtn);
                 });
 
-                const inputField = document.createElement('input');
+                const inputField = document.createElement
+
+('input');
                 inputField.type = 'text';
                 inputField.className = 'calc-input';
-                inputField.value = row.expression.replace(/\*/g, 'x');
+                inputField.value = row.expression.replace(/
 
-                if (index === activeRowIndex && activeFieldIndex === 'calc') {
-                    inputField.classList.add('calc-border-active');
+\*/g, 'x');
+
+                if (index === activeRowIndex && 
+
+activeFieldIndex === 'calc') {
+                    inputField.classList.add('calc-border-
+
+active');
                 }
 
                 let clickCount = 0;
@@ -1881,7 +2461,9 @@
                 inputField.addEventListener('click', () => {
                     clickCount++;
                     if (clickCount === 1) {
-                        clickTimer = setTimeout(() => { clickCount = 0; }, 400);
+                        clickTimer = setTimeout(() => { 
+
+clickCount = 0; }, 400);
                     } else if (clickCount === 3) {
                         clearTimeout(clickTimer);
                         clickCount = 0;
@@ -1890,14 +2472,20 @@
                 });
 
                 inputField.addEventListener('input', (e) => {
-                    let rawVal = e.target.value.replace(/x|X|×/g, '*');
-                    let displayVal = rawVal.replace(/\*/g, 'x');
+                    let rawVal = e.target.value.replace(/x|X|
+
+×/g, '*');
+                    let displayVal = rawVal.replace(/\*/g, 
+
+'x');
                     
                     e.target.value = displayVal;
                     rows[index].expression = rawVal;
 
                     rows[index].forceCalc = false;
-                    if (e.target.value.length < rows[index].ignoreBeforeIndex) {
+                    if (e.target.value.length < rows
+
+[index].ignoreBeforeIndex) {
                         rows[index].ignoreBeforeIndex = 0;
                     }
                     evaluateRow(index);
@@ -1911,7 +2499,9 @@
                     updateMobilePreviewText();
                 });
 
-                inputField.addEventListener('keydown', (e) => {
+                inputField.addEventListener('keydown', (e) => 
+
+{
                     if (e.key === 'Home') {
                         e.preventDefault();
                         rows[index].forceCalc = true;
@@ -1921,7 +2511,9 @@
                     }
                     else if (e.key === 'PageUp') {
                         e.preventDefault();
-                        rows[index].ignoreBeforeIndex = inputField.selectionStart;
+                        rows[index].ignoreBeforeIndex = 
+
+inputField.selectionStart;
                         evaluateRow(index);
                         renderCalculator('calc');
                     }
@@ -1947,28 +2539,44 @@
                 rowMain.appendChild(inputsGroup);
                 rowDiv.appendChild(rowMain);
 
-                if (index === activeRowIndex && (row.isTextPadVisible || row.isCalcPadVisible)) {
-                    const keypadContainer = document.createElement('div');
-                    keypadContainer.className = 'row-keypad-container';
+                if (index === activeRowIndex && 
+
+(row.isTextPadVisible || row.isCalcPadVisible)) {
+                    const keypadContainer = 
+
+document.createElement('div');
+                    keypadContainer.className = 'row-keypad-
+
+container';
 
                     if (row.isTextPadVisible) {
-                        keypadContainer.appendChild(createMiniKeypad(index, 'text'));
+                        keypadContainer.appendChild
+
+(createMiniKeypad(index, 'text'));
                     }
                     if (row.isCalcPadVisible) {
-                        keypadContainer.appendChild(createMiniKeypad(index, 'calc'));
+                        keypadContainer.appendChild
+
+(createMiniKeypad(index, 'calc'));
                     }
 
-                    screenContainer.appendChild(keypadContainer);
+                    screenContainer.appendChild
+
+(keypadContainer);
                 }
 
                 screenContainer.appendChild(rowDiv);
 
                 setTimeout(() => {
                     textInput.style.height = 'auto';
-                    textInput.style.height = (textInput.scrollHeight) + 'px';
+                    textInput.style.height = 
+
+(textInput.scrollHeight) + 'px';
                 }, 0);
 
-                if (typeof row.result === 'number' && !isNaN(row.result)) {
+                if (typeof row.result === 'number' && !isNaN
+
+(row.result)) {
                     totalSum += row.result;
                     if (row.result > 0) {
                         positiveSum += row.result;
@@ -1978,16 +2586,33 @@
                 }
             });
 
+            // إبقاء التركيز والـ Focus دائماً على الخلية النشطة تلقائياً دون الحاجة للماوس
             if (!isMobileAny) {
                 setTimeout(() => {
-                    const targetEl = screenContainer.querySelector(`.calc-row.active .${activeFieldIndex === 'text' ? 'text-input' : 'calc-input'}`);
-                    if (targetEl) targetEl.focus();
+                    const targetEl = 
+
+screenContainer.querySelector(`.calc-row.active .
+
+${activeFieldIndex === 'text' ? 'text-input' : 'calc-input'}
+
+`);
+                    if (targetEl && document.activeElement !== 
+
+targetEl) {
+                        targetEl.focus();
+                    }
                 }, 10);
             }
 
-            const formattedTotal = formatDisplayValue(Number.isInteger(totalSum) ? totalSum : parseFloat(totalSum.toFixed(6)));
+            const formattedTotal = formatDisplayValue
+
+(Number.isInteger(totalSum) ? totalSum : parseFloat
+
+(totalSum.toFixed(6)));
             grandTotalEl.innerText = formattedTotal.text;
-            grandTotalCurrencyEl.innerText = showCurrency ? 'جنيه' : '';
+            grandTotalCurrencyEl.innerText = showCurrency ? '
+
+جنيه' : '';
             
             if (formattedTotal.isNegative) {
                 grandTotalEl.classList.add('negative');
@@ -1995,17 +2620,29 @@
                 grandTotalEl.classList.remove('negative');
             }
 
-            const posFormatted = formatDisplayValue(Number.isInteger(positiveSum) ? positiveSum : parseFloat(positiveSum.toFixed(6)));
-            const negFormatted = formatDisplayValue(Number.isInteger(negativeSum) ? negativeSum : parseFloat(negativeSum.toFixed(6)));
+            const posFormatted = formatDisplayValue
 
-            positiveTotalValEl.innerText = showPositiveCheckbox.checked ? posFormatted.text : '';
-            negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
+(Number.isInteger(positiveSum) ? positiveSum : parseFloat
+
+(positiveSum.toFixed(6)));
+            const negFormatted = formatDisplayValue
+
+(Number.isInteger(negativeSum) ? negativeSum : parseFloat
+
+(negativeSum.toFixed(6)));
+
+            positiveTotalValEl.innerText = 
+
+showPositiveCheckbox.checked ? posFormatted.text : '';
+            negativeTotalValEl.innerText = 
+
+showNegativeCheckbox.checked ? negFormatted.text : '';
             
             updateGlobalHides();
             updateMobilePreviewText();
         }
 
-        // حركة الأسهم الطبيعية والحرة بالكامل دون قيود
+        // دالة التنقل والـ Enter المحدثة لإنشاء بلا حدود والتحرك بالأسهم دون ماوس نهائياً
         function handleKeyNavigation(e, index, currentField) {
             const key = e.key;
 
@@ -2014,106 +2651,261 @@
                 evaluateRow(index);
                 closeAllPads();
 
+                // الانتقال للسطر التالي أو إنشاء سطر جديد تلقائياً مع كل ضغطة Enter بلا حدود
                 if (index < rows.length - 1) {
                     activeRowIndex = index + 1;
-                    activeFieldIndex = currentField;
-                    renderCalculator(currentField);
-                    scrollToActiveRow();
                 } else {
                     rows.push({ 
-                        textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                        isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                        textExpression: '', expression: '', 
+
+result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                        isCalcVisible: true, isTextVisible: 
+
+true, isMicVisible: true, isCalcPadVisible: false, 
+
+isTextPadVisible: false
                     });
                     activeRowIndex = rows.length - 1;
-                    activeFieldIndex = currentField;
-                    renderCalculator(currentField);
-                    screenContainer.scrollTop = screenContainer.scrollHeight;
                 }
+                activeFieldIndex = currentField;
+                renderCalculator(currentField);
+                scrollToActiveRow();
             }
             else if (key === 'ArrowDown') {
+                e.preventDefault();
                 if (index < rows.length - 1) {
-                    e.preventDefault();
-                    closeAllPads();
                     activeRowIndex = index + 1;
-                    activeFieldIndex = currentField;
-                    renderCalculator(currentField);
-                    scrollToActiveRow();
+                } else {
+                    rows.push({ 
+                        textExpression: '', expression: '', 
+
+result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                        isCalcVisible: true, isTextVisible: 
+
+true, isMicVisible: true, isCalcPadVisible: false, 
+
+isTextPadVisible: false
+                    });
+                    activeRowIndex = rows.length - 1;
+                    screenContainer.scrollTop = 
+
+screenContainer.scrollHeight;
                 }
+                renderCalculator(currentField);
+                scrollToActiveRow();
             } 
             else if (key === 'ArrowUp') {
+                e.preventDefault();
                 if (index > 0) {
-                    e.preventDefault();
-                    closeAllPads();
                     activeRowIndex = index - 1;
-                    activeFieldIndex = currentField;
                     renderCalculator(currentField);
                     scrollToActiveRow();
                 }
             } 
             else if (key === 'ArrowRight') {
+                e.preventDefault();
                 if (currentField === 'calc') {
-                    e.preventDefault();
                     activeFieldIndex = 'text';
-                    renderCalculator('text');
+                } else if (index > 0) {
+                    activeRowIndex = index - 1;
+                    activeFieldIndex = 'calc';
+                    scrollToActiveRow();
                 }
+                renderCalculator(activeFieldIndex);
             } 
             else if (key === 'ArrowLeft') {
+                e.preventDefault();
                 if (currentField === 'text') {
-                    e.preventDefault();
                     activeFieldIndex = 'calc';
-                    renderCalculator('calc');
+                } else if (index < rows.length - 1) {
+                    activeRowIndex = index + 1;
+                    activeFieldIndex = 'text';
+                    scrollToActiveRow();
                 }
+                renderCalculator(activeFieldIndex);
             }
             updateMobilePreviewText();
         }
 
-        window.addEventListener('keydown', (event) => {
-            const key = event.key;
+        // تحكم عام وشامل لضمان تفعيل الأسهم على مستوى النافذة في حال فقدان التركيز الفردي
+        // التحكم الشامل والمباشر بلوحة المفاتيح والأسهم والإنتر دون أي تدخل من الماوس
+window.addEventListener('keydown', (event) => {
+    const key = event.key;
+    const activeInput = document.activeElement;
+    const isAnInputFocused = activeInput && 
 
-            if (key === 'Escape') {
-                rows = [{ 
-                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                }];
-                activeRowIndex = 0;
+(activeInput.classList.contains('calc-input') || 
+
+activeInput.classList.contains('text-input'));
+
+    // زر Enter: ينشئ سطر جديد وينزل إليه فوراً بلا حدود، بغض النظر عن مكان المؤشر
+    if (key === 'Enter') {
+        event.preventDefault();
+        evaluateRow(activeRowIndex);
+        closeAllPads();
+
+        if (activeRowIndex < rows.length - 1) {
+            activeRowIndex++;
+        } else {
+            rows.push({ 
+                textExpression: '', expression: '', result: 0, 
+
+forceCalc: false, ignoreBeforeIndex: 0, 
+                isCalcVisible: true, isTextVisible: true, 
+
+isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: 
+
+false
+            });
+            activeRowIndex = rows.length - 1;
+        }
+        renderCalculator(activeFieldIndex);
+        scrollToActiveRow();
+        updateMobilePreviewText();
+        return;
+    }
+
+    // زر السهم الأسفل (ArrowDown): ينزل للسطر التالي فوراً
+    if (key === 'ArrowDown') {
+        event.preventDefault();
+        if (activeRowIndex < rows.length - 1) {
+            activeRowIndex++;
+        } else {
+            rows.push({ 
+                textExpression: '', expression: '', result: 0, 
+
+forceCalc: false, ignoreBeforeIndex: 0, 
+                isCalcVisible: true, isTextVisible: true, 
+
+isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: 
+
+false
+            });
+            activeRowIndex = rows.length - 1;
+            screenContainer.scrollTop = 
+
+screenContainer.scrollHeight;
+        }
+        renderCalculator(activeFieldIndex);
+        scrollToActiveRow();
+        updateMobilePreviewText();
+        return;
+    }
+
+    // زر السهم الأرفع/الأعلى (ArrowUp): يصعد للسطر السابق فوراً
+    if (key === 'ArrowUp') {
+        event.preventDefault();
+        if (activeRowIndex > 0) {
+            activeRowIndex--;
+            renderCalculator(activeFieldIndex);
+            scrollToActiveRow();
+        }
+        updateMobilePreviewText();
+        return;
+    }
+
+    // زر السهم الأيمن (ArrowRight): التنقل لعمود الملاحظات أو السطر السابق
+    if (key === 'ArrowRight') {
+        event.preventDefault();
+        if (activeFieldIndex === 'calc') {
+            activeFieldIndex = 'text';
+        } else if (activeRowIndex > 0) {
+            activeRowIndex--;
+            activeFieldIndex = 'calc';
+            scrollToActiveRow();
+        }
+        renderCalculator(activeFieldIndex);
+        updateMobilePreviewText();
+        return;
+    }
+
+    // زر السهم الأيسر (ArrowLeft): التنقل لعمود العملية الحسابية أو السطر التالي
+    if (key === 'ArrowLeft') {
+        event.preventDefault();
+        if (activeFieldIndex === 'text') {
+            activeFieldIndex = 'calc';
+        } else if (activeRowIndex < rows.length - 1) {
+            activeRowIndex++;
+            activeFieldIndex = 'text';
+            scrollToActiveRow();
+        }
+        renderCalculator(activeFieldIndex);
+        updateMobilePreviewText();
+        return;
+    }
+
+    if (key === 'Escape') {
+        rows = [{ 
+            textExpression: '', expression: '', result: 0, 
+
+forceCalc: false, ignoreBeforeIndex: 0, 
+            isCalcVisible: true, isTextVisible: true, 
+
+isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: 
+
+false
+        }];
+        activeRowIndex = 0;
+        activeFieldIndex = 'calc';
+        renderCalculator('calc');
+    }
+    else if (key === 'Backspace') {
+        if (isAnInputFocused) {
+            if (activeInput.value === '' && activeRowIndex > 
+
+0) {
+                event.preventDefault();
+                rows.splice(activeRowIndex, 1);
+                activeRowIndex--;
+                closeAllPads();
                 activeFieldIndex = 'calc';
                 renderCalculator('calc');
             }
-            else if (key === 'Backspace') {
-                const activeInput = document.activeElement;
-                if (activeInput && (activeInput.classList.contains('calc-input') || activeInput.classList.contains('text-input'))) {
-                    if (activeInput.value === '' && activeRowIndex > 0) {
-                        event.preventDefault();
-                        rows.splice(activeRowIndex, 1);
-                        activeRowIndex--;
-                        closeAllPads();
-                        activeFieldIndex = 'calc';
-                        renderCalculator('calc');
-                    }
-                }
-            }
-            updateMobilePreviewText();
-        });
+        }
+    }
+});
 
         function updateActiveRowClasses() {
-            const rowDivs = screenContainer.querySelectorAll('.calc-row');
+            const rowDivs = screenContainer.querySelectorAll
+
+('.calc-row');
             rowDivs.forEach((rowDiv, i) => {
-                const textInput = rowDiv.querySelector('.text-input');
-                const calcInput = rowDiv.querySelector('.calc-input');
+                const textInput = rowDiv.querySelector
+
+('.text-input');
+                const calcInput = rowDiv.querySelector
+
+('.calc-input');
 
                 if (i === activeRowIndex) {
                     rowDiv.classList.add('active');
-                    if (activeFieldIndex === 'text' && textInput) {
-                        textInput.classList.add('text-border-active');
-                        if (calcInput) calcInput.classList.remove('calc-border-active');
-                    } else if (activeFieldIndex === 'calc' && calcInput) {
-                        calcInput.classList.add('calc-border-active');
-                        if (textInput) textInput.classList.remove('text-border-active');
+                    if (activeFieldIndex === 'text' && 
+
+textInput) {
+                        textInput.classList.add('text-border-
+
+active');
+                        if (calcInput) 
+
+calcInput.classList.remove('calc-border-active');
+                    } else if (activeFieldIndex === 'calc' && 
+
+calcInput) {
+                        calcInput.classList.add('calc-border-
+
+active');
+                        if (textInput) 
+
+textInput.classList.remove('text-border-active');
                     }
                 } else {
                     rowDiv.classList.remove('active');
-                    if (textInput) textInput.classList.remove('text-border-active');
-                    if (calcInput) calcInput.classList.remove('calc-border-active');
+                    if (textInput) textInput.classList.remove
+
+('text-border-active');
+                    if (calcInput) calcInput.classList.remove
+
+('calc-border-active');
                 }
             });
         }
@@ -2153,7 +2945,9 @@
 
             let expr = fullExpr;
             if (currentRow.ignoreBeforeIndex > 0) {
-                expr = fullExpr.substring(currentRow.ignoreBeforeIndex).trim();
+                expr = fullExpr.substring
+
+(currentRow.ignoreBeforeIndex).trim();
             }
 
             if (expr === '') {
@@ -2166,20 +2960,30 @@
                 .replace(/x|X|×|\*/g, '*')
                 .replace(/÷/g, '/');
 
-            let hasAttachedTextBeforeOrAfter = /(\d+[a-zA-Zأ-ي\u0600-\u06FF])|([a-zA-Zأ-ي\u0600-\u06FF]\d+)/.test(sanitizedExpr);
+            let hasAttachedTextBeforeOrAfter = /(\d+[a-zA-Z
 
-            if (hasAttachedTextBeforeOrAfter && !currentRow.forceCalc) {
+أ-ي\u0600-\u06FF])|([a-zA-Zأ-ي\u0600-\u06FF]\d+)/.test
+
+(sanitizedExpr);
+
+            if (hasAttachedTextBeforeOrAfter && !
+
+currentRow.forceCalc) {
                 currentRow.result = 0;
                 updateGrandTotalOnly();
                 return;
             }
 
-            let percentMatch = sanitizedExpr.match(/^([\d.]+)\s*([\+\-\*\/])\s*([\d.]+)%$/);
+            let percentMatch = sanitizedExpr.match(/^
+
+([\d.]+)\s*([\+\-\*\/])\s*([\d.]+)%$/);
             if (percentMatch) {
                 let baseNum = parseFloat(percentMatch[1]);
                 let operator = percentMatch[2];
                 let percentVal = parseFloat(percentMatch[3]);
-                let calculatedPercent = baseNum * (percentVal / 100);
+                let calculatedPercent = baseNum * (percentVal 
+
+/ 100);
                 let res = 0;
 
                 if (operator === '+') {
@@ -2189,33 +2993,51 @@
                 } else if (operator === '*') {
                     res = calculatedPercent;
                 } else if (operator === '/') {
-                    res = calculatedPercent !== 0 ? baseNum / calculatedPercent : 0;
+                    res = calculatedPercent !== 0 ? baseNum / 
+
+calculatedPercent : 0;
                 }
 
-                currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
+                currentRow.result = Number.isInteger(res) ? 
+
+res : parseFloat(res.toFixed(6));
                 updateGrandTotalOnly();
                 return;
             }
 
-            let validMathPattern = /^[0-9+\-*/.\s()a-zA-Zأ-ي\u0600-\u06FF%]+$/;
+            let validMathPattern = /^[0-9+\-*/.\s()a-zA-Z
+
+أ-ي\u0600-\u06FF%]+$/;
 
             if (validMathPattern.test(sanitizedExpr)) {
                 try {
-                    let singleNegativeMatch = sanitizedExpr.match(/^-\s*([\d.]+)$/);
+                    let singleNegativeMatch = 
+
+sanitizedExpr.match(/^-\s*([\d.]+)$/);
                     if (singleNegativeMatch) {
-                        let res = -parseFloat(singleNegativeMatch[1]);
-                        currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
+                        let res = -parseFloat
+
+(singleNegativeMatch[1]);
+                        currentRow.result = Number.isInteger
+
+(res) ? res : parseFloat(res.toFixed(6));
                         updateGrandTotalOnly();
                         return;
                     }
 
-                    let evalSafeExpr = sanitizedExpr.replace(/[^0-9+\-*/().]/g, '');
-                    let res = Function('"use strict"; return (' + evalSafeExpr + ')')();
+                    let evalSafeExpr = sanitizedExpr.replace
+
+(/[^0-9+\-*/().]/g, '');
+                    let res = Function('"use strict"; return 
+
+(' + evalSafeExpr + ')')();
 
                     if (isNaN(res) || !isFinite(res)) {
                         currentRow.result = 0;
                     } else {
-                        currentRow.result = Number.isInteger(res) ? res : parseFloat(res.toFixed(6));
+                        currentRow.result = Number.isInteger
+
+(res) ? res : parseFloat(res.toFixed(6));
                     }
                 } catch (e) {
                     currentRow.result = 0;
@@ -2234,26 +3056,44 @@
             const showCurrency = showCurrencyCheckbox.checked;
 
             rows.forEach((row, index) => {
-                const rowDivs = screenContainer.querySelectorAll('.calc-row');
-                if (rowDivs[index]) {
-                    const outputDiv = rowDivs[index].querySelector('.calc-output');
-                    const currencySpan = rowDivs[index].querySelector('.row-currency');
+                const rowDivs = 
 
-                    if (row.result !== '' && row.result !== 0) {
-                        const formatted = formatDisplayValue(row.result);
+screenContainer.querySelectorAll('.calc-row');
+                if (rowDivs[index]) {
+                    const outputDiv = rowDivs
+
+[index].querySelector('.calc-output');
+                    const currencySpan = rowDivs
+
+[index].querySelector('.row-currency');
+
+                    if (row.result !== '' && row.result !== 0) 
+
+{
+                        const formatted = formatDisplayValue
+
+(row.result);
                         outputDiv.innerText = formatted.text;
-                        currencySpan.innerText = showCurrency ? 'جنيه' : '';
+                        currencySpan.innerText = showCurrency 
+
+? 'جنيه' : '';
                         if (formatted.isNegative) {
-                            outputDiv.classList.add('negative');
+                            outputDiv.classList.add
+
+('negative');
                         } else {
-                            outputDiv.classList.remove('negative');
+                            outputDiv.classList.remove
+
+('negative');
                         }
                     } else {
                         outputDiv.innerText = '';
                         currencySpan.innerText = '';
                     }
                 }
-                if (typeof row.result === 'number' && !isNaN(row.result)) {
+                if (typeof row.result === 'number' && !isNaN
+
+(row.result)) {
                     totalSum += row.result;
                     if (row.result > 0) {
                         positiveSum += row.result;
@@ -2263,9 +3103,15 @@
                 }
             });
 
-            const formattedTotal = formatDisplayValue(Number.isInteger(totalSum) ? totalSum : parseFloat(totalSum.toFixed(6)));
+            const formattedTotal = formatDisplayValue
+
+(Number.isInteger(totalSum) ? totalSum : parseFloat
+
+(totalSum.toFixed(6)));
             grandTotalEl.innerText = formattedTotal.text;
-            grandTotalCurrencyEl.innerText = showCurrency ? 'جنيه' : '';
+            grandTotalCurrencyEl.innerText = showCurrency ? '
+
+جنيه' : '';
 
             if (formattedTotal.isNegative) {
                 grandTotalEl.classList.add('negative');
@@ -2273,12 +3119,25 @@
                 grandTotalEl.classList.remove('negative');
             }
 
-            const posFormatted = formatDisplayValue(Number.isInteger(positiveSum) ? positiveSum : parseFloat(positiveSum.toFixed(6)));
-            const negFormatted = formatDisplayValue(Number.isInteger(negativeSum) ? negativeSum : parseFloat(negativeSum.toFixed(6)));
+            const posFormatted = formatDisplayValue
 
-            positiveTotalValEl.innerText = showPositiveCheckbox.checked ? posFormatted.text : '';
-            negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
+(Number.isInteger(positiveSum) ? positiveSum : parseFloat
+
+(positiveSum.toFixed(6)));
+            const negFormatted = formatDisplayValue
+
+(Number.isInteger(negativeSum) ? negativeSum : parseFloat
+
+(negativeSum.toFixed(6)));
+
+            positiveTotalValEl.innerText = 
+
+showPositiveCheckbox.checked ? posFormatted.text : '';
+            negativeTotalValEl.innerText = 
+
+showNegativeCheckbox.checked ? negFormatted.text : '';
             
+            updateGlobalHides();
             updateMobilePreviewText();
         }
 
@@ -2287,23 +3146,37 @@
             let text = "";
 
             rows.forEach((r, i) => {
-                let note = (r.isTextVisible && r.textExpression) ? `[${r.textExpression}]` : `[سطر ${i+1}]`;
-                let calc = (r.isCalcVisible && r.expression) ? `= ${r.expression.replace(/\*/g, 'x')}` : '';
-                let res = r.result !== 0 ? `← ${r.result} ${showCurrency ? 'جنيه' : ''}` : '';
+                let note = (r.isTextVisible && 
+
+r.textExpression) ? `[${r.textExpression}]` : `[سطر ${i+1}]`;
+                let calc = (r.isCalcVisible && r.expression) ? 
+
+`= ${r.expression.replace(/\*/g, 'x')}` : '';
+                let res = r.result !== 0 ? `← ${r.result} 
+
+${showCurrency ? 'جنيه' : ''}` : '';
                 
                 text += `${i + 1}. ${note} ${calc} ${res}\n`;
             });
 
             text += "-------------------------\n";
             if (grandTotalEl.style.display !== 'none') {
-                text += `💰 *الإجمالي النهائي:* ${grandTotalEl.innerText} ${grandTotalCurrencyEl.style.display !== 'none' && showCurrency ? 'جنيه' : ''}\n`;
+                text += `💰 *الإجمالي النهائي:* 
+
+${grandTotalEl.innerText} ${grandTotalCurrencyEl.style.display 
+
+!== 'none' && showCurrency ? 'جنيه' : ''}\n`;
             }
             return text;
         }
 
         function copyTextToClipboard(text, successMessage) {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
+            if (navigator.clipboard && 
+
+navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => 
+
+{
                     if (successMessage) alert(successMessage);
                 }).catch(() => {
                     fallbackCopyText(text, successMessage);
@@ -2333,32 +3206,50 @@
 
         function copyReportTextOnly() {
             const text = generateShareSummaryText();
-            copyTextToClipboard(text, "تم نسخ التقرير نصياً بنجاح! يمكنك لصقه في أي مكان الآن.");
+            copyTextToClipboard(text, "تم نسخ التقرير نصياً بنجاح! يمكنك لصقه في أي 
+
+مكان الآن.");
         }
 
         function shareLinkToWhatsApp() {
             const text = generateShareSummaryText();
-            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيفتح موقع/تطبيق الواتساب الآن.");
-            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيفتح 
+
+موقع/تطبيق الواتساب الآن.");
+            const whatsappUrl = 
+
+`https://api.whatsapp.com/send?text=${encodeURIComponent
+
+(text)}`;
             window.open(whatsappUrl, '_blank');
         }
 
         function shareLinkToMessenger() {
             const text = generateShareSummaryText();
-            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيفتح موقع الماسنجر الآن، قم بالدخول للمحادثة واضغط لصق (Ctrl + V).");
-            window.open('https://www.messenger.com/', '_blank');
+            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيفتح موقع 
+
+الماسنجر الآن، قم بالدخول للمحادثة واضغط لصق (Ctrl + V).");
+            window.open('https://www.messenger.com/', 
+
+'_blank');
         }
 
         function shareLinkToSMS() {
             const text = generateShareSummaryText();
-            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيتم فتح برنامج الرسائل النصية (SMS) الآن.");
-            const smsUrl = `sms:?body=${encodeURIComponent(text)}`;
+            copyTextToClipboard(text, "تم نسخ التقرير للحافظة بنجاح!\nسيتم فتح برنامج 
+
+الرسائل النصية (SMS) الآن.");
+            const smsUrl = `sms:?body=${encodeURIComponent
+
+(text)}`;
             window.open(smsUrl, '_blank');
         }
 
         function exportToTXT() {
             const text = generateShareSummaryText();
-            let blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+            let blob = new Blob([text], { type: 
+
+"text/plain;charset=utf-8" });
             let url = URL.createObjectURL(blob);
             let a = document.createElement('a');
             a.href = url;
@@ -2372,28 +3263,54 @@
             const showCurrency = showCurrencyCheckbox.checked;
             let dataToExport = rows.map((r, i) => ({
                 "السطر": i + 1,
-                "العمود النصي / الملاحظات (اليمين)": r.isTextVisible ? r.textExpression : '',
-                "النتيجة (الوسط)": showCurrency ? `${r.result} جنيه` : r.result,
-                "العملية الحسابية (يسار)": r.isCalcVisible ? r.expression.replace(/\*/g, 'x') : ''
+                "العمود النصي / الملاحظات (اليمين)": r.isTextVisible ? 
+
+r.textExpression : '',
+                "النتيجة (الوسط)": showCurrency ? `${r.result} جنيه` : 
+
+r.result,
+                "العملية الحسابية (يسار)": r.isCalcVisible ? 
+
+r.expression.replace(/\*/g, 'x') : ''
             }));
             
-            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const worksheet = XLSX.utils.json_to_sheet
+
+(dataToExport);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "النتائج");
-            XLSX.writeFile(workbook, "Calculator_Results.xlsx");
+            XLSX.utils.book_append_sheet(workbook, worksheet, 
+
+"النتائج");
+            XLSX.writeFile(workbook, 
+
+"Calculator_Results.xlsx");
         }
 
         function exportToWord() {
             const showCurrency = showCurrencyCheckbox.checked;
-            let htmlContent = `<html dir="rtl"><head><meta charset='utf-8'></head><body>`;
-            htmlContent += `<table border="1" style="border-collapse:collapse; width:100%;">`;
-            htmlContent += `<tr><th>السطر</th><th>الملاحظات (اليمين)</th><th>النتيجة (الوسط)</th><th>العملية الحسابية (اليسار)</th></tr>`;
+            let htmlContent = `<html dir="rtl"><head><meta 
+
+charset='utf-8'></head><body>`;
+            htmlContent += `<table border="1" style="border-
+
+collapse:collapse; width:100%;">`;
+            htmlContent += `<tr><th>السطر</th><th>الملاحظات (اليمين)
+
+</th><th>النتيجة (الوسط)</th><th>العملية الحسابية (اليسار)</th></tr>`;
             
             rows.forEach((r, i) => {
-                let textText = r.isTextVisible ? r.textExpression : '';
-                let exprText = r.isCalcVisible ? r.expression.replace(/\*/g, 'x') : '';
-                let resText = showCurrency ? `${r.result} جنيه` : r.result;
-                htmlContent += `<tr><td>${i+1}</td><td>${textText}</td><td>${resText}</td><td>${exprText}</td></tr>`;
+                let textText = r.isTextVisible ? 
+
+r.textExpression : '';
+                let exprText = r.isCalcVisible ? 
+
+r.expression.replace(/\*/g, 'x') : '';
+                let resText = showCurrency ? `${r.result} جنيه` 
+
+: r.result;
+                htmlContent += `<tr><td>${i+1}</td><td>
+
+${textText}</td><td>${resText}</td><td>${exprText}</td></tr>`;
             });
             
             htmlContent += `</table></body></html>`;
@@ -2416,13 +3333,19 @@
                 filename:     'Calculator_Results.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                jsPDF:        { unit: 'mm', format: 'a4', 
+
+orientation: 'portrait' }
             };
-            html2pdf().from(calculatorContainer).set(opt).save();
+            html2pdf().from(calculatorContainer).set
+
+(opt).save();
         }
 
         function exportToImage() {
-            const dropdown = document.getElementById('exportDropdown');
+            const dropdown = document.getElementById
+
+('exportDropdown');
             dropdown.classList.remove('active');
             dropdown.style.display = 'none';
 
