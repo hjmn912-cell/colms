@@ -1444,6 +1444,7 @@
             updateMobilePreviewText();
         }
 
+        // زر Enter: ينزل للخلية التي تحتها فقط بدون فتح الآلة الحاسبة
         function addNewRowFromPad(index, field) {
             evaluateRow(index);
             closeAllPads();
@@ -1464,7 +1465,7 @@
             updateMobilePreviewText();
         }
 
-        // تعديل وظيفة Enter + Open لتنزل في الخلية التي تحتها وتفتح الآلة الحاسبة المصغرة فوراً
+        // زر Enter + Open: ينزل للخلية التي تحتها ويفتح الآلة الحاسبة المصغرة فيها فوراً
         function addNewRowAndOpenTool(index, field) {
             evaluateRow(index);
             closeAllPads();
@@ -1480,7 +1481,6 @@
             }
             activeFieldIndex = field;
 
-            // فتح الآلة الحاسبة المصغرة للخلية الجديدة تلقائياً
             if (field === 'text') {
                 rows[activeRowIndex].isTextPadVisible = true;
             } else {
@@ -1663,7 +1663,7 @@
             });
         }
 
-        // تحديث إيماءات الخلية: (دبل كليك على الموبايل، و 3 نقرات متتالية Triple Click على الكمبيوتر لفتح الآلة الحاسبة)
+        // إيماءات الخلية (دبل كليك للموبايل، وثلاث نقرات متتالية Triple Click للكمبيوتر)
         function setupCellGestures(element, index, field) {
             let lastTapTime = 0;
             let clickCount = 0;
@@ -1683,7 +1683,6 @@
                     }
                 });
             } else {
-                // للكمبيوتر: فتح الآلة الحاسبة المصغرة عند النقر 3 مرات متتالية (Triple Click)
                 element.addEventListener('click', (e) => {
                     activeRowIndex = index;
                     activeFieldIndex = field;
@@ -1703,7 +1702,6 @@
             }
         }
 
-        // تحديث إيماءة السحب يميناً أو يساراً لحذف السطر في الموبايل
         function setupRowSwipeToDelete(rowDiv, index) {
             let startX = 0;
             let currentX = 0;
@@ -1731,7 +1729,6 @@
                 isSwiping = false;
                 let diffX = currentX - startX;
 
-                // السحب مسافة كافية يميناً أو يساراً سيحذف السطر
                 if (Math.abs(diffX) > 80) {
                     rowDiv.style.transition = 'all 0.25s ease';
                     rowDiv.style.transform = diffX > 0 ? 'translateX(100vw)' : 'translateX(-100vw)';
