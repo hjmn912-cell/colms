@@ -45,7 +45,6 @@
             top: 0;
             left: 0;
             z-index: 9999;
-            /* تم إزالة touch-action: none لإظهار القائمة الافتراضية للنصوص في الموبايل */
         }
 
         .resize-edge {
@@ -715,7 +714,7 @@
             font-family: inherit;
             width: 100%;
             transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
-            -webkit-user-select: text; /* السماح بالتحديد والكتابة الطبيعية في الموبايل */
+            -webkit-user-select: text;
             user-select: text;
         }
 
@@ -968,7 +967,7 @@
         <div id="screenContainer" class="calculator-screen"></div>
 
         <div class="keyboard-hint">
-            <span>الأسهم</span> لتنقل حر | <span>Enter</span> لإنشاء ونزول أسطر بلا حدود بدون ماوس
+            <span>ضغطتان</span> للآلة الحاسبة المصغرة | <span>الأسهم</span> و <span>Enter</span> للتنقل وإنشاء السطور بلا حدود
         </div>
     </div>
 
@@ -1654,11 +1653,40 @@
         }
 
         function setupCellGestures(element, index, field) {
-            // تم إزالة منع السلوك الافتراضي لكي تظهر قائمة النسخ والقص المعتادة عند الضغط المطول
+            let tapCount = 0;
+            let tapTimer = null;
+
             element.addEventListener('click', (e) => {
                 activeRowIndex = index;
                 activeFieldIndex = field;
                 updateActiveRowClasses();
+
+                if (isMobileAny) {
+                    tapCount++;
+                    if (tapCount === 1) {
+                        tapTimer = setTimeout(() => {
+                            tapCount = 0;
+                        }, 350);
+                    } else if (tapCount === 2) {
+                        clearTimeout(tapTimer);
+                        tapCount = 0;
+                        openCalcPadForField(index, field);
+                    } else if (tapCount >= 3) {
+                        clearTimeout(tapTimer);
+                        tapCount = 0;
+                        // 3 ضغطات على الموبايل تترك المتصفح يظهر خيارات التحديد والنسخ الطبيعية
+                    }
+                } else {
+                    // للكمبيوتر: ضغطتان تفتح الآلة الحاسبة المصغرة
+                    tapCount++;
+                    if (tapCount === 1) {
+                        tapTimer = setTimeout(() => { tapCount = 0; }, 350);
+                    } else if (tapCount === 2) {
+                        clearTimeout(tapTimer);
+                        tapCount = 0;
+                        openCalcPadForField(index, field);
+                    }
+                }
             });
         }
 
@@ -1929,7 +1957,7 @@
             updateMobilePreviewText();
         }
 
-        // التحكم العام والكامل بلوحة المفاتيح والأسهم والإنتر
+        // التحكم العام والشامل بلوحة المفاتيح والأسهم والإنتر
         window.addEventListener('keydown', (event) => {
             const key = event.key;
             const activeInput = document.activeElement;
@@ -2154,7 +2182,7 @@
                 return;
             }
 
-            let validMathPattern = /^[0-9+\-*/.\s()a-zA-Zأ-ي\u0600-\u06FF%]+$/;
+            let validMathPattern = /^[0-9+\-*/().\s()a-zA-Zأ-ي\u0600-\u06FF%]+$/;
 
             if (validMathPattern.test(sanitizedExpr)) {
                 try {
