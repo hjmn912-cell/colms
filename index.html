@@ -487,12 +487,12 @@
         .calc-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 6px;
             flex: 2.2; 
             min-width: 0;
         }
 
-        /* تنسيق أيقونة المايك في السطر */
+        /* تنسيق أيقونة المايك في جهة الشمال (بجوار خانة الحسابات) */
         .mic-wrapper {
             display: flex;
             align-items: center;
@@ -501,10 +501,10 @@
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid #38bdf8;
             color: #38bdf8;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             flex-shrink: 0;
             transition: all 0.2s;
         }
@@ -860,7 +860,7 @@
         <div class="resize-edge bottom" id="edgeBottom"></div>
         <div class="resize-edge corner-br" id="edgeCornerBR"></div>
 
-        <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية" onclick="handleSmartNextCellClick()">🚀</button>
+        <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية" onclick="handleRocketNextCellClick()">🚀</button>
 
         <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
             <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
@@ -887,7 +887,6 @@
                                     <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
                                     إظهار كلمة جنيه
                                 </label>
-                                <!-- خيار إخفاء جميع المايكات متاح هنا -->
                                 <label class="option-toggle-label">
                                     <input type="checkbox" id="hideAllMicsCheckbox" onchange="renderCalculator()">
                                     إخفاء جميع المايكات
@@ -951,7 +950,8 @@
                     <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي" onclick="handleTopNotesFocusClick()">📝</button>
                     <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي" onclick="handleTopActionBtnClick()">📄</button>
                     
-                    <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة" onclick="handleSmartNextCellClick()">🚀</button>
+                    <!-- زر الصاروخ العلوي -->
+                    <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة وفتح الكيبورد" onclick="handleRocketNextCellClick()">🚀</button>
 
                     <span class="designer-credit">designed by Sami Arouj</span>
                     
@@ -1075,7 +1075,8 @@
             }
         });
 
-        function handleSmartNextCellClick() {
+        // دالة زر الصاروخ (الانتقال للخلية التي تحتها وفتح كيبورد الموبايل)
+        function handleRocketNextCellClick() {
             evaluateRow(activeRowIndex);
             closeAllPads();
 
@@ -1094,6 +1095,15 @@
             activeFieldIndex = currentColumn;
             renderCalculator(activeFieldIndex);
             scrollToActiveRow();
+
+            // تركيز إضافي لفتح الكيبورد افتراضياً للموبايل أو الخلية النشطة
+            setTimeout(() => {
+                const targetInput = screenContainer.querySelector(`.calc-row.active ${activeFieldIndex === 'text' ? '.text-input' : '.calc-input'}`);
+                if (targetInput) {
+                    targetInput.focus();
+                }
+            }, 50);
+
             updateMobilePreviewText();
         }
 
@@ -1435,57 +1445,6 @@
             updateMobilePreviewText();
         }
 
-        function addNewRowFromPad(index, field) {
-            evaluateRow(index);
-            closeAllPads();
-
-            if (index < rows.length - 1) {
-                activeRowIndex = index + 1;
-                activeFieldIndex = field;
-                renderCalculator(field);
-                scrollToActiveRow();
-            } else {
-                rows.push({ 
-                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                });
-                activeRowIndex = rows.length - 1;
-                activeFieldIndex = field;
-                renderCalculator(field);
-                screenContainer.scrollTop = screenContainer.scrollHeight;
-            }
-            updateMobilePreviewText();
-        }
-
-        function addNewRowAndOpenTool(index, field) {
-            evaluateRow(index);
-            closeAllPads();
-
-            let targetIndex;
-            if (index < rows.length - 1) {
-                targetIndex = index + 1;
-            } else {
-                rows.push({ 
-                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                });
-                targetIndex = rows.length - 1;
-            }
-
-            activeRowIndex = targetIndex;
-            activeFieldIndex = field;
-
-            if (field === 'text') {
-                renderCalculator(field);
-            } else {
-                rows[targetIndex].isCalcPadVisible = true;
-                renderCalculator(field);
-            }
-
-            scrollToActiveRow();
-            updateMobilePreviewText();
-        }
-
         function formatDisplayValue(val) {
             if (typeof val === 'number') {
                 if (val < 0) {
@@ -1617,8 +1576,8 @@
             return keypadDiv;
         }
 
-        // دالة تفعيل المايك (التعرف على الصوت) لكل سطر
-        function setupSpeechRecognition(micElement, index) {
+        // دالة تفعيل المايك (التعرف على الصوت) في الخلية النشطة حالياً أينما كانت
+        function setupSpeechRecognition(micElement, index, targetField) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
                 micElement.title = "خاصية الإدخال الصوتي غير متوفرة في متصفحك";
@@ -1633,6 +1592,10 @@
 
             micElement.addEventListener('click', (e) => {
                 e.stopPropagation();
+                // تحديد السطر والحقل الحالي الذي يقف عليه المستخدم أو السطر المرتبط بهذا المايك
+                activeRowIndex = index;
+                activeFieldIndex = targetField;
+                
                 micElement.classList.add('recording');
                 try {
                     recognition.start();
@@ -1643,8 +1606,14 @@
 
             recognition.onresult = (event) => {
                 const speechResult = event.results[0][0].transcript;
-                rows[index].textExpression += (rows[index].textExpression ? ' ' : '') + speechResult;
-                renderCalculator('text');
+                if (targetField === 'text') {
+                    rows[index].textExpression += (rows[index].textExpression ? ' ' : '') + speechResult;
+                    renderCalculator('text');
+                } else {
+                    rows[index].expression += (rows[index].expression ? '' : '') + speechResult;
+                    evaluateRow(index);
+                    renderCalculator('calc');
+                }
                 updateMobilePreviewText();
                 micElement.classList.remove('recording');
             };
@@ -1660,15 +1629,8 @@
 
         function setupCellGestures(element, index, field) {
             let lastTapTime = 0;
-            let clickCount = 0;
-            let clickTimer = null;
 
             if (isMobileAny) {
-                // للموبايل فقط
-                element.addEventListener('touchstart', (e) => {
-                    // تفاعل اللمس الطبيعي
-                }, { passive: true });
-
                 element.addEventListener('touchend', (e) => {
                     const currentTime = new Date().getTime();
                     const tapLength = currentTime - lastTapTime;
@@ -1682,7 +1644,6 @@
                     }
                 });
             } else {
-                // للكمبيوتر: السماح بالكتابة الحرة تماماً دون أي تقييد
                 element.addEventListener('click', (e) => {
                     activeRowIndex = index;
                     activeFieldIndex = field;
@@ -1776,13 +1737,6 @@
                     textWrapper.appendChild(selectTextCheckbox);
                 }
 
-                // زر المايك في السطر
-                const micWrapper = document.createElement('div');
-                micWrapper.className = 'mic-wrapper';
-                micWrapper.innerHTML = '🎤';
-                micWrapper.title = 'إدخال صوتی';
-                setupSpeechRecognition(micWrapper, index);
-
                 const textInput = document.createElement('textarea');
                 textInput.className = 'text-input';
                 textInput.value = row.textExpression;
@@ -1811,8 +1765,6 @@
                 });
 
                 setupCellGestures(textInput, index, 'text');
-
-                textWrapper.appendChild(micWrapper);
                 textWrapper.appendChild(textInput);
 
                 const outputContainer = document.createElement('div');
@@ -1914,8 +1866,15 @@
                 });
 
                 setupCellGestures(inputField, index, 'calc');
-
                 calcWrapper.appendChild(inputField);
+
+                // إضافة أيقونة المايك في الجهة الشمال (بجوار خانة الحسابات)
+                const micWrapper = document.createElement('div');
+                micWrapper.className = 'mic-wrapper';
+                micWrapper.innerHTML = '🎤';
+                micWrapper.title = 'إدخال صوتي للعملية الحسابية';
+                setupSpeechRecognition(micWrapper, index, 'calc');
+                calcWrapper.appendChild(micWrapper);
 
                 inputsGroup.appendChild(textWrapper);
                 inputsGroup.appendChild(outputContainer);
