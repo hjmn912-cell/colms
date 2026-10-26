@@ -1073,7 +1073,6 @@
             }
         });
 
-        // زر الصاروخ للانتقال للخلية التالية وفتح الكيبورد
         function handleRocketNextCellClick() {
             evaluateRow(activeRowIndex);
             closeAllPads();
@@ -1573,8 +1572,8 @@
             return keypadDiv;
         }
 
-        // دالة المايك: تعمل بناءً على آخر خلية نشطة (سواء كانت في نفس السطر أو أي مكان حسب آخر ضغطة تركيز)
-        function setupSpeechRecognition(micElement, index) {
+        // دالة المايك: تكتب في الخلية النشطة حالياً (آخر مكان تم الضغط عليه أو الكتابة فيه)
+        function setupSpeechRecognition(micElement) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
                 micElement.title = "خاصية الإدخال الصوتي غير متوفرة في متصفحك";
@@ -1589,7 +1588,7 @@
 
             micElement.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // المايك يوجه التسجيل للسطر والخانة النشطة حالياً (حيث يقف المؤشر)
+                
                 let targetRow = activeRowIndex;
                 let targetField = activeFieldIndex || 'calc';
 
@@ -1870,7 +1869,7 @@
                 micWrapper.className = 'mic-wrapper';
                 micWrapper.innerHTML = '🎤';
                 micWrapper.title = 'إدخال صوتي للخلية النشطة';
-                setupSpeechRecognition(micWrapper, index);
+                setupSpeechRecognition(micWrapper);
                 calcWrapper.appendChild(micWrapper);
 
                 inputsGroup.appendChild(textWrapper);
