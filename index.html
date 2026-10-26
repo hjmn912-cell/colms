@@ -492,7 +492,7 @@
             min-width: 0;
         }
 
-        /* تنسيق أيقونة المايك في جهة الشمال (بجوار خانة الحسابات) */
+        /* تنسيق أيقونة المايك في الشمال */
         .mic-wrapper {
             display: flex;
             align-items: center;
@@ -769,7 +769,6 @@
             pointer-events: none !important;
         }
 
-        /* تحكم في إخفاء المايكات للسطر */
         .calc-row.hidden-mic .mic-wrapper {
             display: none !important;
         }
@@ -860,7 +859,7 @@
         <div class="resize-edge bottom" id="edgeBottom"></div>
         <div class="resize-edge corner-br" id="edgeCornerBR"></div>
 
-        <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية" onclick="handleRocketNextCellClick()">🚀</button>
+        <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية وفتح الكيبورد" onclick="handleRocketNextCellClick()">🚀</button>
 
         <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
             <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
@@ -950,7 +949,6 @@
                     <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي" onclick="handleTopNotesFocusClick()">📝</button>
                     <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي" onclick="handleTopActionBtnClick()">📄</button>
                     
-                    <!-- زر الصاروخ العلوي -->
                     <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة وفتح الكيبورد" onclick="handleRocketNextCellClick()">🚀</button>
 
                     <span class="designer-credit">designed by Sami Arouj</span>
@@ -1075,7 +1073,7 @@
             }
         });
 
-        // دالة زر الصاروخ (الانتقال للخلية التي تحتها وفتح كيبورد الموبايل)
+        // زر الصاروخ للانتقال للخلية التالية وفتح الكيبورد
         function handleRocketNextCellClick() {
             evaluateRow(activeRowIndex);
             closeAllPads();
@@ -1096,7 +1094,6 @@
             renderCalculator(activeFieldIndex);
             scrollToActiveRow();
 
-            // تركيز إضافي لفتح الكيبورد افتراضياً للموبايل أو الخلية النشطة
             setTimeout(() => {
                 const targetInput = screenContainer.querySelector(`.calc-row.active ${activeFieldIndex === 'text' ? '.text-input' : '.calc-input'}`);
                 if (targetInput) {
@@ -1576,8 +1573,8 @@
             return keypadDiv;
         }
 
-        // دالة تفعيل المايك (التعرف على الصوت) في الخلية النشطة حالياً أينما كانت
-        function setupSpeechRecognition(micElement, index, targetField) {
+        // دالة المايك: تعمل بناءً على آخر خلية نشطة (سواء كانت في نفس السطر أو أي مكان حسب آخر ضغطة تركيز)
+        function setupSpeechRecognition(micElement, index) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
                 micElement.title = "خاصية الإدخال الصوتي غير متوفرة في متصفحك";
@@ -1592,39 +1589,39 @@
 
             micElement.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // تحديد السطر والحقل الحالي الذي يقف عليه المستخدم أو السطر المرتبط بهذا المايك
-                activeRowIndex = index;
-                activeFieldIndex = targetField;
-                
+                // المايك يوجه التسجيل للسطر والخانة النشطة حالياً (حيث يقف المؤشر)
+                let targetRow = activeRowIndex;
+                let targetField = activeFieldIndex || 'calc';
+
                 micElement.classList.add('recording');
                 try {
                     recognition.start();
                 } catch(err) {
                     micElement.classList.remove('recording');
                 }
+
+                recognition.onresult = (event) => {
+                    const speechResult = event.results[0][0].transcript;
+                    if (targetField === 'text') {
+                        rows[targetRow].textExpression += (rows[targetRow].textExpression ? ' ' : '') + speechResult;
+                        renderCalculator('text');
+                    } else {
+                        rows[targetRow].expression += (rows[targetRow].expression ? '' : '') + speechResult;
+                        evaluateRow(targetRow);
+                        renderCalculator('calc');
+                    }
+                    updateMobilePreviewText();
+                    micElement.classList.remove('recording');
+                };
+
+                recognition.onerror = () => {
+                    micElement.classList.remove('recording');
+                };
+
+                recognition.onend = () => {
+                    micElement.classList.remove('recording');
+                };
             });
-
-            recognition.onresult = (event) => {
-                const speechResult = event.results[0][0].transcript;
-                if (targetField === 'text') {
-                    rows[index].textExpression += (rows[index].textExpression ? ' ' : '') + speechResult;
-                    renderCalculator('text');
-                } else {
-                    rows[index].expression += (rows[index].expression ? '' : '') + speechResult;
-                    evaluateRow(index);
-                    renderCalculator('calc');
-                }
-                updateMobilePreviewText();
-                micElement.classList.remove('recording');
-            };
-
-            recognition.onerror = () => {
-                micElement.classList.remove('recording');
-            };
-
-            recognition.onend = () => {
-                micElement.classList.remove('recording');
-            };
         }
 
         function setupCellGestures(element, index, field) {
@@ -1868,12 +1865,12 @@
                 setupCellGestures(inputField, index, 'calc');
                 calcWrapper.appendChild(inputField);
 
-                // إضافة أيقونة المايك في الجهة الشمال (بجوار خانة الحسابات)
+                // أيقونة المايك في الجهة الشمال
                 const micWrapper = document.createElement('div');
                 micWrapper.className = 'mic-wrapper';
                 micWrapper.innerHTML = '🎤';
-                micWrapper.title = 'إدخال صوتي للعملية الحسابية';
-                setupSpeechRecognition(micWrapper, index, 'calc');
+                micWrapper.title = 'إدخال صوتي للخلية النشطة';
+                setupSpeechRecognition(micWrapper, index);
                 calcWrapper.appendChild(micWrapper);
 
                 inputsGroup.appendChild(textWrapper);
