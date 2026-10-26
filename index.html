@@ -97,28 +97,6 @@
             text-align: center;
         }
 
-        .desktop-mic-combo {
-            background-color: #1e293b;
-            color: #38bdf8;
-            border: 1px solid #38bdf8;
-            padding: 0 4px;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            outline: none;
-            height: 32px;
-            width: 32px;
-            text-align: center;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        .desktop-mic-combo:hover {
-            background-color: #38bdf8;
-            color: #0b0f19;
-        }
-
         .floating-keyboard-action-btn {
             position: fixed;
             bottom: 260px;
@@ -515,9 +493,7 @@
         }
 
         .mic-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 2px;
+            display: none !important;
         }
 
         .global-select-checkbox, .calc-select-checkbox {
@@ -802,41 +778,6 @@
             color: #ef4444 !important;
         }
 
-        .mic-btn {
-            background: transparent;
-            border: none;
-            color: #6b7280;
-            font-size: 1.1rem;
-            cursor: pointer;
-            padding: 2px 2px;
-            border-radius: 6px;
-            transition: all 0.2s;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .mic-btn:hover {
-            background-color: rgba(56, 189, 248, 0.15);
-            color: #38bdf8;
-        }
-
-        .mic-btn.listening {
-            color: #ef4444 !important;
-            animation: pulse 1.2s infinite;
-        }
-
-        .mic-btn.continuous-mode {
-            background-color: rgba(239, 68, 68, 0.2) !important;
-            border: 1px solid #ef4444 !important;
-            border-radius: 50%;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
-        }
-
         .keyboard-hint {
             padding: 6px 10px;
             text-align: center;
@@ -896,7 +837,6 @@
             <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
                 <select id="mobileControlCombo" class="mobile-combo-box" onchange="handleMobileComboChange(this)">
                     <option value="" disabled selected>⚙️</option>
-                    <option value="toggle_mics">إظهار/إخفاء المايكات</option>
                     <option value="toggle_tools">إظهار/إخفاء الأدوات</option>
                 </select>
                 <span id="previewTextContent"></span>
@@ -918,8 +858,8 @@
                                     <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
                                     إظهار كلمة جنيه
                                 </label>
-                                <label class="option-toggle-label">
-                                    <input type="checkbox" id="hideAllMicsCheckbox" onchange="renderCalculator()">
+                                <label class="option-toggle-label" style="display:none;">
+                                    <input type="checkbox" id="hideAllMicsCheckbox" checked onchange="renderCalculator()">
                                     إخفاء جميع المايكات
                                 </label>
                                 <label class="option-toggle-label">
@@ -985,12 +925,6 @@
 
                     <span class="designer-credit">designed by Sami Arouj</span>
                     
-                    <select id="desktopMicCombo" class="desktop-mic-combo" title="إظهار أو إخفاء المايكات" onchange="handleDesktopMicComboChange(this)">
-                        <option value="" selected>🎤</option>
-                        <option value="show">إظهار المايكات</option>
-                        <option value="hide">إخفاء المايكات</option>
-                    </select>
-
                     <button type="button" id="toggleHideBtn" class="toggle-hide-btn" title="تحديد العناصر المراد إخفاؤها" onclick="toggleHideSelectionMode()">
                         👁️
                     </button>
@@ -1040,7 +974,6 @@
         const previewTextContent = document.getElementById('previewTextContent');
         const previewResultContent = document.getElementById('previewResultContent');
         const mobileControlCombo = document.getElementById('mobileControlCombo');
-        const desktopMicCombo = document.getElementById('desktopMicCombo');
         const floatingKeyboardNewRowBtn = document.getElementById('floatingKeyboardNewRowBtn');
         const stickyTopSection = document.getElementById('stickyTopSection');
         const grandTotalEl = document.getElementById('grandTotal');
@@ -1085,7 +1018,6 @@
         const isMobileNormal = env === 'mobile-normal';
         const isMobileAny = env !== 'desktop';
 
-        // تطبيق الخيارات الافتراضية بدقة لكل من الموبايل والكمبيوتر حسب الطلب
         if (isMobileAny) {
             showCurrencyCheckbox.checked = true;
             hideAllMicsCheckbox.checked = true;
@@ -1093,7 +1025,7 @@
             hideRowToolsCheckbox.checked = true;
         } else {
             showCurrencyCheckbox.checked = true;
-            hideAllMicsCheckbox.checked = false;
+            hideAllMicsCheckbox.checked = true;
             hideOtherToolsCheckbox.checked = false;
             hideRowToolsCheckbox.checked = false;
         }
@@ -1133,7 +1065,6 @@
             renderCalculator(activeFieldIndex);
             scrollToActiveRow();
 
-            // للـ موبايل: زر الصاروخ يفتح كيبورد الموبايل عند الانتقال للخلية
             if (isMobileAny) {
                 setTimeout(() => {
                     const activeInput = screenContainer.querySelector(`.calc-row.active ${activeFieldIndex === 'text' ? '.text-input' : '.calc-input'}`);
@@ -1150,22 +1081,9 @@
 
         function handleMobileComboChange(selectEl) {
             const val = selectEl.value;
-            if (val === 'toggle_mics') {
-                hideAllMicsCheckbox.checked = !hideAllMicsCheckbox.checked;
-            } else if (val === 'toggle_tools') {
+            if (val === 'toggle_tools') {
                 hideOtherToolsCheckbox.checked = !hideOtherToolsCheckbox.checked;
                 updateGlobalHides();
-            }
-            selectEl.selectedIndex = 0;
-            renderCalculator();
-        }
-
-        function handleDesktopMicComboChange(selectEl) {
-            const val = selectEl.value;
-            if (val === 'show') {
-                hideAllMicsCheckbox.checked = false;
-            } else if (val === 'hide') {
-                hideAllMicsCheckbox.checked = true;
             }
             selectEl.selectedIndex = 0;
             renderCalculator();
@@ -1254,11 +1172,6 @@
         ];
         let activeRowIndex = 0;
         let activeFieldIndex = 'calc';
-
-        let activeSpeechRecognition = null;
-        let isMicContinuousMode = false;
-        let currentActiveMicBtn = null;
-        let micClickTimer = null;
 
         function toggleHideSelectionMode() {
             isSelectionModeActive = !isSelectionModeActive;
@@ -1688,7 +1601,6 @@
 
         let rowIsOpeningPad = false;
 
-        // إيماءات الخلايا بدقة مطلقة
         function setupCellGestures(element, index, field) {
             let longPressTimer = null;
             let lastTapTime = 0;
@@ -1696,7 +1608,6 @@
             let clickTimer = null;
 
             if (isMobileAny) {
-                // منع فتح الكيبورد باللمسة الواحدة تماماً
                 element.addEventListener('focus', (e) => {
                     if (!rowIsOpeningPad) {
                         element.blur();
@@ -1704,7 +1615,6 @@
                 });
 
                 element.addEventListener('touchstart', (e) => {
-                    // ضبط مؤقت للضغطة المطولة (Long Press) لتفتح كيبورد الموبايل
                     longPressTimer = setTimeout(() => {
                         rowIsOpeningPad = true;
                         activeRowIndex = index;
@@ -1712,7 +1622,7 @@
                         renderCalculator(field);
                         element.focus();
                         rowIsOpeningPad = false;
-                    }, 600); // 600 ميلي ثانية للضغطة المطولة
+                    }, 600);
                 }, { passive: true });
 
                 element.addEventListener('touchend', (e) => {
@@ -1720,7 +1630,6 @@
                     const currentTime = new Date().getTime();
                     const tapLength = currentTime - lastTapTime;
 
-                    // لمستين ورا بعض بسرعة (Double Tap) لفتح الآلة الحاسبة المصغرة
                     if (tapLength < 350 && tapLength > 0) {
                         e.preventDefault();
                         openCalcPadForField(index, field);
@@ -1734,7 +1643,6 @@
                     clearTimeout(longPressTimer);
                 });
             } else {
-                // الكمبيوتر: النقر ثلاث مرات متتالية (Triple Click) لتفتح الآلة الحاسبة المصغرة
                 element.addEventListener('click', (e) => {
                     clickCount++;
                     if (clickCount === 1) {
@@ -1799,7 +1707,6 @@
             let positiveSum = 0;
             let negativeSum = 0;
             const showCurrency = showCurrencyCheckbox.checked;
-            const hideAllMics = hideAllMicsCheckbox.checked;
             const hideRowTools = hideRowToolsCheckbox.checked;
 
             rows.forEach((row, index) => {
@@ -1807,7 +1714,6 @@
                 let rowClasses = `calc-row ${index === activeRowIndex ? 'active' : ''}`;
                 if (!row.isCalcVisible) rowClasses += ' hidden-calc';
                 if (!row.isTextVisible) rowClasses += ' hidden-text';
-                if (hideAllMics) rowClasses += ' hidden-mic';
                 if (hideRowTools) rowClasses += ' hidden-row-tools';
                 rowDiv.className = rowClasses;
 
@@ -2058,34 +1964,7 @@
                 inputsGroup.appendChild(outputContainer);
                 inputsGroup.appendChild(calcWrapper);
 
-                const micWrapper = document.createElement('div');
-                micWrapper.className = 'mic-wrapper';
-
-                const micBtn = document.createElement('button');
-                micBtn.className = 'mic-btn';
-                micBtn.innerHTML = '🎤';
-                micBtn.title = 'انقر مرة واحدة للتحدث المؤقت، أو انقر مرتين متتاليتين للتشغيل المستمر';
-                micBtn.type = 'button';
-
-                micBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (micClickTimer === null) {
-                        micClickTimer = setTimeout(() => {
-                            micClickTimer = null;
-                            handleMicClick(index, micBtn, false);
-                        }, 300);
-                    } else {
-                        clearTimeout(micClickTimer);
-                        micClickTimer = null;
-                        handleMicClick(index, micBtn, true);
-                    }
-                });
-
-                micWrapper.appendChild(micBtn);
-
                 rowMain.appendChild(inputsGroup);
-                rowMain.appendChild(micWrapper);
-
                 rowDiv.appendChild(rowMain);
 
                 if (index === activeRowIndex && (row.isTextPadVisible || row.isCalcPadVisible)) {
@@ -2119,7 +1998,6 @@
                 }
             });
 
-            // للكمبيوتر: تركيز تلقائي فوري على خلية العملية الحسابية للسطر الأول للكتابة المباشرة
             if (!isMobileAny) {
                 setTimeout(() => {
                     const targetEl = screenContainer.querySelector(`.calc-row.active .calc-input`);
@@ -2208,97 +2086,10 @@
             updateMobilePreviewText();
         }
 
-        function handleMicClick(index, micBtn, isDoubleClick) {
-            if (activeSpeechRecognition) {
-                stopActiveMic();
-                return;
-            }
-
-            isMicContinuousMode = isDoubleClick;
-            startSpeechRecognition(index, micBtn);
-        }
-
-        function stopActiveMic() {
-            if (activeSpeechRecognition) {
-                isMicContinuousMode = false;
-                try { activeSpeechRecognition.stop(); } catch(e) {}
-                activeSpeechRecognition = null;
-            }
-            if (currentActiveMicBtn) {
-                currentActiveMicBtn.classList.remove('listening', 'continuous-mode');
-                currentActiveMicBtn.innerHTML = '🎤';
-                currentActiveMicBtn = null;
-            }
-        }
-
-        function startSpeechRecognition(index, micBtn) {
-            const targetRow = activeRowIndex;
-            const targetField = activeFieldIndex;
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert('متصفحك لا يدعم خاصية التعرف على الصوت.');
-                return;
-            }
-
-            const recognition = new SpeechRecognition();
-            activeSpeechRecognition = recognition;
-            currentActiveMicBtn = micBtn;
-
-            recognition.lang = 'ar-SA';
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-            recognition.continuous = true;
-
-            micBtn.classList.add('listening');
-            micBtn.innerHTML = '🔴';
-
-            if (isMicContinuousMode) {
-                micBtn.classList.add('continuous-mode');
-                micBtn.title = 'المايك يعمل بوضع الاستمرار الدائم (اضغط لإيقافه)';
-            } else {
-                micBtn.title = 'تحدث للإدخال في الحقل النشط';
-            }
-
-            recognition.onresult = (event) => {
-                const speechToText = event.results[event.results.length - 1][0].transcript;
-                
-                if (targetField === 'text') {
-                    rows[targetRow].textExpression = rows[targetRow].textExpression ? rows[targetRow].textExpression + ' ' + speechToText : speechToText;
-                    renderCalculator('text');
-                } else {
-                    rows[targetRow].expression = rows[targetRow].expression ? rows[targetRow].expression + ' ' + speechToText : speechToText;
-                    rows[targetRow].forceCalc = false;
-                    evaluateRow(targetRow);
-                    renderCalculator('calc');
-                }
-                updateMobilePreviewText();
-            };
-
-            recognition.onerror = () => {
-                if (!isMicContinuousMode) {
-                    stopActiveMic();
-                }
-            };
-
-            recognition.onend = () => {
-                if (isMicContinuousMode && activeSpeechRecognition === recognition) {
-                    try {
-                        recognition.start();
-                    } catch (e) {}
-                } else {
-                    stopActiveMic();
-                }
-            };
-
-            recognition.start();
-        }
-
         window.addEventListener('keydown', (event) => {
             const key = event.key;
 
             if (key === 'Escape') {
-                stopActiveMic();
                 rows = [{ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
                     isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
