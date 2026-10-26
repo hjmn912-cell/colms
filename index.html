@@ -492,7 +492,6 @@
             min-width: 0;
         }
 
-        /* تنسيق أيقونة المايك في الشمال */
         .mic-wrapper {
             display: flex;
             align-items: center;
@@ -1424,6 +1423,10 @@
             activeFieldIndex = field;
             closeAllPads(); 
             renderCalculator(field);
+            setTimeout(() => {
+                const targetInput = screenContainer.querySelector(`.calc-row.active ${field === 'text' ? '.text-input' : '.calc-input'}`);
+                if (targetInput) targetInput.focus();
+            }, 50);
             updateMobilePreviewText();
         }
 
@@ -1438,6 +1441,50 @@
                 rows[index].isCalcPadVisible = true;
             }
             renderCalculator(field);
+            updateMobilePreviewText();
+        }
+
+        function addNewRowFromPad(index, field) {
+            evaluateRow(index);
+            closeAllPads();
+
+            if (index < rows.length - 1) {
+                activeRowIndex = index + 1;
+            } else {
+                rows.push({ 
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                });
+                activeRowIndex = rows.length - 1;
+            }
+            activeFieldIndex = field;
+            renderCalculator(field);
+            scrollToActiveRow();
+            updateMobilePreviewText();
+        }
+
+        function addNewRowAndOpenTool(index, field) {
+            evaluateRow(index);
+            closeAllPads();
+
+            if (index < rows.length - 1) {
+                activeRowIndex = index + 1;
+            } else {
+                rows.push({ 
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                });
+                activeRowIndex = rows.length - 1;
+            }
+            activeFieldIndex = field;
+            renderCalculator(field);
+            scrollToActiveRow();
+
+            setTimeout(() => {
+                const targetInput = screenContainer.querySelector(`.calc-row.active ${field === 'text' ? '.text-input' : '.calc-input'}`);
+                if (targetInput) targetInput.focus();
+            }, 50);
+
             updateMobilePreviewText();
         }
 
@@ -1572,7 +1619,6 @@
             return keypadDiv;
         }
 
-        // دالة المايك: تكتب في الخلية النشطة حالياً (آخر مكان تم الضغط عليه أو الكتابة فيه)
         function setupSpeechRecognition(micElement) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
@@ -1864,7 +1910,6 @@
                 setupCellGestures(inputField, index, 'calc');
                 calcWrapper.appendChild(inputField);
 
-                // أيقونة المايك في الجهة الشمال
                 const micWrapper = document.createElement('div');
                 micWrapper.className = 'mic-wrapper';
                 micWrapper.innerHTML = '🎤';
