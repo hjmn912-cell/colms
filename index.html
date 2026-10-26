@@ -1085,15 +1085,13 @@
         const isMobileNormal = env === 'mobile-normal';
         const isMobileAny = env !== 'desktop';
 
-        // تطبيق الخيارات الافتراضية بحسب الجهاز (كمبيوتر أو موبايل)
+        // تطبيق الخيارات الافتراضية بدقة لكل من الموبايل والكمبيوتر حسب الطلب
         if (isMobileAny) {
-            // خيارات الموبايل الافتراضية
             showCurrencyCheckbox.checked = true;
             hideAllMicsCheckbox.checked = true;
             hideOtherToolsCheckbox.checked = false;
             hideRowToolsCheckbox.checked = true;
         } else {
-            // خيارات الكمبيوتر الافتراضية
             showCurrencyCheckbox.checked = true;
             hideAllMicsCheckbox.checked = false;
             hideOtherToolsCheckbox.checked = false;
@@ -1134,6 +1132,18 @@
             activeFieldIndex = currentColumn;
             renderCalculator(activeFieldIndex);
             scrollToActiveRow();
+
+            // للـ موبايل: زر الصاروخ يفتح كيبورد الموبايل عند الانتقال للخلية
+            if (isMobileAny) {
+                setTimeout(() => {
+                    const activeInput = screenContainer.querySelector(`.calc-row.active ${activeFieldIndex === 'text' ? '.text-input' : '.calc-input'}`);
+                    if (activeInput) {
+                        rowIsOpeningPad = true;
+                        activeInput.focus();
+                        rowIsOpeningPad = false;
+                    }
+                }, 50);
+            }
 
             updateMobilePreviewText();
         }
@@ -1676,7 +1686,9 @@
             return keypadDiv;
         }
 
-        // إيماءات الخلايا المحدثة: الموبايل (لمسة واحدة لا تفتح الكيبورد، ضغطة مطولة تفتح الكيبورد، ضغطتان للآلة) | الكمبيوتر (3 نقرات للآلة)
+        let rowIsOpeningPad = false;
+
+        // إيماءات الخلايا بدقة مطلقة
         function setupCellGestures(element, index, field) {
             let longPressTimer = null;
             let lastTapTime = 0;
@@ -1684,19 +1696,23 @@
             let clickTimer = null;
 
             if (isMobileAny) {
-                // منع فتح الكيبورد باللمسة الواحدة في الموبايل
+                // منع فتح الكيبورد باللمسة الواحدة تماماً
                 element.addEventListener('focus', (e) => {
-                    // إذا لم تكن قادماً من زر أو كيبورد مصغر، امنع التركيز التلقائي الذي يفتح كيبورد النظام بالموبايل
                     if (!rowIsOpeningPad) {
                         element.blur();
                     }
                 });
 
                 element.addEventListener('touchstart', (e) => {
+                    // ضبط مؤقت للضغطة المطولة (Long Press) لتفتح كيبورد الموبايل
                     longPressTimer = setTimeout(() => {
-                        // ضغطة مطولة -> فتح كيبورد الموبايل
-                        openSystemKeyboard(index, field);
-                    }, 600);
+                        rowIsOpeningPad = true;
+                        activeRowIndex = index;
+                        activeFieldIndex = field;
+                        renderCalculator(field);
+                        element.focus();
+                        rowIsOpeningPad = false;
+                    }, 600); // 600 ميلي ثانية للضغطة المطولة
                 }, { passive: true });
 
                 element.addEventListener('touchend', (e) => {
@@ -1704,9 +1720,9 @@
                     const currentTime = new Date().getTime();
                     const tapLength = currentTime - lastTapTime;
 
+                    // لمستين ورا بعض بسرعة (Double Tap) لفتح الآلة الحاسبة المصغرة
                     if (tapLength < 350 && tapLength > 0) {
                         e.preventDefault();
-                        // ضغطتان متتاليتان -> فتح الآلة الحاسبة المصغرة
                         openCalcPadForField(index, field);
                         lastTapTime = 0;
                     } else {
@@ -1718,7 +1734,7 @@
                     clearTimeout(longPressTimer);
                 });
             } else {
-                // الكمبيوتر: ثلاث نقرات لتفتح الآلة المصغرة
+                // الكمبيوتر: النقر ثلاث مرات متتالية (Triple Click) لتفتح الآلة الحاسبة المصغرة
                 element.addEventListener('click', (e) => {
                     clickCount++;
                     if (clickCount === 1) {
@@ -1734,8 +1750,6 @@
                 });
             }
         }
-
-        let rowIsOpeningPad = false;
 
         function setupRowSwipeToDelete(rowDiv, index) {
             let startX = 0;
@@ -2105,7 +2119,7 @@
                 }
             });
 
-            // التركيز التلقائي للكمبيوتر على خلية العملية الحسابية للسطر الأول للكتابة مباشرة بدون أي ضغطة
+            // للكمبيوتر: تركيز تلقائي فوري على خلية العملية الحسابية للسطر الأول للكتابة المباشرة
             if (!isMobileAny) {
                 setTimeout(() => {
                     const targetEl = screenContainer.querySelector(`.calc-row.active .calc-input`);
