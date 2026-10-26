@@ -847,7 +847,7 @@
 
         <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية وفتح الكيبورد" onclick="handleSmartNextCellClick()">🚀</button>
 
-        <!-- الهيدر ثابت تماماً لا يتأثر بالتمرير ولا بفتح الكيبورد -->
+        <!-- الهيدر والقطعة العلوية ثابتة تماماً -->
         <div class="all-top-header-wrapper">
             <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
                 <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
@@ -980,7 +980,7 @@
         <div id="screenContainer" class="calculator-screen"></div>
 
         <div class="keyboard-hint">
-            <span>موبايل: ضغطتان</span> للآلة الحاسبة المصغرة | <span>كمبيوتر: الضغطان لا تفعل شيئاً</span> | <span>Enter</span> للتنقل
+            <span>كمبيوتر (3 كليك):</span> الآلة الحاسبة | <span>Delete:</span> مسح الخلية | <span>موبايل (ضغطتان):</span> الآلة الحاسبة
         </div>
     </div>
 
@@ -1670,8 +1670,8 @@
                 activeFieldIndex = field;
                 updateActiveRowClasses();
 
-                // شرط الموبايل فقط: ضغطتان تفتح الآلة الحاسبة المصغرة
                 if (isMobileAny) {
+                    // موبايل: ضغطتان تفتح الآلة الحاسبة المصغرة
                     tapCount++;
                     if (tapCount === 1) {
                         tapTimer = setTimeout(() => { tapCount = 0; }, 350);
@@ -1681,8 +1681,15 @@
                         openCalcPadForField(index, field);
                     }
                 } else {
-                    // الكمبيوتر: الضغط ضغطتين لا يفعل شيئاً للآلة الحاسبة نهائياً
-                    tapCount = 0;
+                    // كمبيوتر: 3 كليك متتالية تفتح الآلة الحاسبة المصغرة
+                    tapCount++;
+                    if (tapCount === 1) {
+                        tapTimer = setTimeout(() => { tapCount = 0; }, 400);
+                    } else if (tapCount === 3) {
+                        clearTimeout(tapTimer);
+                        tapCount = 0;
+                        openCalcPadForField(index, field);
+                    }
                 }
             });
         }
@@ -1954,11 +1961,20 @@
             updateMobilePreviewText();
         }
 
-        // التحكم العام والشامل بلوحة المفاتيح والأسهم والإنتر
+        // التحكم العام والشامل بلوحة المفاتيح والأسهم والإنتر وزر Delete
         window.addEventListener('keydown', (event) => {
             const key = event.key;
             const activeInput = document.activeElement;
             const isAnInputFocused = activeInput && (activeInput.classList.contains('calc-input') || activeInput.classList.contains('text-input'));
+
+            // دعم زر Delete لمسح محتوى الخلية النشطة بالكامل
+            if (key === 'Delete') {
+                if (isAnInputFocused) {
+                    event.preventDefault();
+                    clearCurrentField();
+                    return;
+                }
+            }
 
             if (key === 'Enter') {
                 event.preventDefault();
