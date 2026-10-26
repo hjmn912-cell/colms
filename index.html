@@ -1444,7 +1444,7 @@
             updateMobilePreviewText();
         }
 
-        // زر Enter: ينزل للخلية التي تحتها فقط بدون فتح الآلة الحاسبة
+        // [تعديل وتحسين] زر Enter: ينزل للخلية التي تحتها ويضمن التركيز
         function addNewRowFromPad(index, field) {
             evaluateRow(index);
             closeAllPads();
@@ -1463,9 +1463,14 @@
             renderCalculator(field);
             scrollToActiveRow();
             updateMobilePreviewText();
+
+            setTimeout(() => {
+                const targetInput = screenContainer.querySelector(`.calc-row.active ${field === 'text' ? '.text-input' : '.calc-input'}`);
+                if (targetInput) targetInput.focus();
+            }, 50);
         }
 
-        // زر Enter + Open: ينزل للخلية التي تحتها ويفتح الآلة الحاسبة المصغرة فيها فوراً
+        // [تعديل وتحسين] زر Enter + Open: ينزل للخلية التي تحتها ويفتح الآلة الحاسبة المصغرة فوراً
         function addNewRowAndOpenTool(index, field) {
             evaluateRow(index);
             closeAllPads();
@@ -1663,7 +1668,6 @@
             });
         }
 
-        // إيماءات الخلية (دبل كليك للموبايل، وثلاث نقرات متتالية Triple Click للكمبيوتر)
         function setupCellGestures(element, index, field) {
             let lastTapTime = 0;
             let clickCount = 0;
