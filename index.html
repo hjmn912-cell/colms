@@ -56,7 +56,7 @@
         .resize-edge.bottom { bottom: 0; left: 0; width: 100%; height: 12px; cursor: s-resize; }
         .resize-edge.corner-br { bottom: 0; right: 0; width: 20px; height: 20px; cursor: nwse-resize; }
 
-        /* تثبيت القطعة العلوية بالكامل بحيث لا تتأثر بفتح الكيبورد أو التمرير */
+        /* الهيدر والقطعة العلوية ثابتة تماماً لا تتأثر بفتح الكيبورد أو التمرير */
         .all-top-header-wrapper {
             position: sticky;
             top: 0;
@@ -847,7 +847,7 @@
 
         <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية وفتح الكيبورد" onclick="handleSmartNextCellClick()">🚀</button>
 
-        <!-- الهيدر والقطعة العلوية ثابتة تماماً -->
+        <!-- الهيدر ثابت تماماً لا يتأثر بالتمرير ولا بفتح الكيبورد -->
         <div class="all-top-header-wrapper">
             <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
                 <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
@@ -980,7 +980,7 @@
         <div id="screenContainer" class="calculator-screen"></div>
 
         <div class="keyboard-hint">
-            <span>موبايل: ضغطتان</span> للآلة الحاسبة | <span>كمبيوتر: 3 كليك</span> للآلة الحاسبة | <span>Enter</span> للتنقل بلا حدود
+            <span>موبايل: ضغطتان</span> للآلة الحاسبة المصغرة | <span>كمبيوتر: الضغطان لا تفعل شيئاً</span> | <span>Enter</span> للتنقل
         </div>
     </div>
 
@@ -1670,8 +1670,8 @@
                 activeFieldIndex = field;
                 updateActiveRowClasses();
 
+                // شرط الموبايل فقط: ضغطتان تفتح الآلة الحاسبة المصغرة
                 if (isMobileAny) {
-                    // الموبايل: ضغطتان تفتح الآلة الحاسبة المصغرة
                     tapCount++;
                     if (tapCount === 1) {
                         tapTimer = setTimeout(() => { tapCount = 0; }, 350);
@@ -1681,15 +1681,8 @@
                         openCalcPadForField(index, field);
                     }
                 } else {
-                    // الكمبيوتر: 3 كليك شمال تفتح الآلة الحاسبة المصغرة
-                    tapCount++;
-                    if (tapCount === 1) {
-                        tapTimer = setTimeout(() => { tapCount = 0; }, 400);
-                    } else if (tapCount === 3) {
-                        clearTimeout(tapTimer);
-                        tapCount = 0;
-                        openCalcPadForField(index, field);
-                    }
+                    // الكمبيوتر: الضغط ضغطتين لا يفعل شيئاً للآلة الحاسبة نهائياً
+                    tapCount = 0;
                 }
             });
         }
