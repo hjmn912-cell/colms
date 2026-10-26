@@ -487,7 +487,7 @@
         .calc-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 6px;
             flex: 2.2; 
             min-width: 0;
         }
@@ -500,7 +500,7 @@
             flex-shrink: 0;
         }
 
-        .row-mobile-arrow-btn, .row-calc-arrow-btn {
+        .row-mobile-arrow-btn, .row-calc-arrow-btn, .row-mic-btn {
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid #38bdf8;
             color: #38bdf8;
@@ -508,7 +508,7 @@
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            display: none;
+            display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
@@ -516,7 +516,7 @@
             transition: all 0.2s;
         }
 
-        .row-mobile-arrow-btn:active, .row-calc-arrow-btn:active {
+        .row-mobile-arrow-btn:active, .row-calc-arrow-btn:active, .row-mic-btn:active {
             background-color: #38bdf8;
             color: #0b0f19;
         }
@@ -737,8 +737,7 @@
             pointer-events: none !important;
         }
 
-        .calc-row.hidden-row-tools .row-mobile-arrow-btn,
-        .calc-row.hidden-row-tools .row-calc-arrow-btn {
+        .calc-row.hidden-mics .row-mic-btn {
             display: none !important;
         }
 
@@ -850,9 +849,9 @@
                                     <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
                                     إظهار كلمة جنيه
                                 </label>
-                                <label class="option-toggle-label" style="display:none;">
-                                    <input type="checkbox" id="hideAllMicsCheckbox" checked onchange="renderCalculator()">
-                                    إخفاء جميع المايكات
+                                <label class="option-toggle-label">
+                                    <input type="checkbox" id="hideAllMicsCheckbox" onchange="renderCalculator()">
+                                    إخفاء المايكات
                                 </label>
                                 <label class="option-toggle-label">
                                     <input type="checkbox" id="hideOtherToolsCheckbox" onchange="updateGlobalHides()">
@@ -955,7 +954,7 @@
         <div id="screenContainer" class="calculator-screen"></div>
 
         <div class="keyboard-hint">
-            <span>الأسهم</span> للتحرك بين الأسطر والحقول | <span>Home</span> للحساب بالقوة | <span>Page Up</span> لتجاهل ما قبل المؤشر | <span>Enter</span> للسطر التالي أو جديد
+            <span>الأسهم</span> للتحرك بين الأسطر والحقول | <span>Home</span> للحساب بالقوة | <span>Page Up</span> لتجاهل ما قبل المؤشر | <span>Enter</span> للسطر التالي أو جديد | <span>3 كليك شمال</span> لفتح الآلة
         </div>
     </div>
 
@@ -1012,12 +1011,12 @@
 
         if (isMobileAny) {
             showCurrencyCheckbox.checked = true;
-            hideAllMicsCheckbox.checked = true;
+            hideAllMicsCheckbox.checked = false;
             hideOtherToolsCheckbox.checked = false;
             hideRowToolsCheckbox.checked = true;
         } else {
             showCurrencyCheckbox.checked = true;
-            hideAllMicsCheckbox.checked = true;
+            hideAllMicsCheckbox.checked = false;
             hideOtherToolsCheckbox.checked = false;
             hideRowToolsCheckbox.checked = false;
         }
@@ -1393,7 +1392,6 @@
             closeAllPads(); 
             renderCalculator(field);
             
-            // فتح كيبورد الموبايل للخلية النشطة
             setTimeout(() => {
                 const targetInput = screenContainer.querySelector(`.calc-row.active ${field === 'text' ? '.text-input' : '.calc-input'}`);
                 if (targetInput) {
@@ -1420,6 +1418,37 @@
             updateMobilePreviewText();
         }
 
+        // الوظيفة الجديدة المحدثة لزر (Enter + Open): تنزل للخلية التي تحتها وتفتح الآلة الحاسبة مجدداً
+        function addNewRowAndOpenTool(index, field) {
+            evaluateRow(index);
+            closeAllPads();
+
+            let targetIndex;
+            if (index < rows.length - 1) {
+                targetIndex = index + 1;
+            } else {
+                rows.push({ 
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                });
+                targetIndex = rows.length - 1;
+            }
+
+            activeRowIndex = targetIndex;
+            activeFieldIndex = field;
+
+            // فتح الآلة الحاسبة المصغرة فوراً للسطر الجديد
+            if (field === 'text') {
+                rows[targetIndex].isTextPadVisible = true;
+            } else {
+                rows[targetIndex].isCalcPadVisible = true;
+            }
+            renderCalculator(field);
+
+            scrollToActiveRow();
+            updateMobilePreviewText();
+        }
+
         function addNewRowFromPad(index, field) {
             evaluateRow(index);
             closeAllPads();
@@ -1439,35 +1468,6 @@
                 renderCalculator(field);
                 screenContainer.scrollTop = screenContainer.scrollHeight;
             }
-            updateMobilePreviewText();
-        }
-
-        function addNewRowAndOpenTool(index, field) {
-            evaluateRow(index);
-            closeAllPads();
-
-            let targetIndex;
-            if (index < rows.length - 1) {
-                targetIndex = index + 1;
-            } else {
-                rows.push({ 
-                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                });
-                targetIndex = rows.length - 1;
-            }
-
-            activeRowIndex = targetIndex;
-            activeFieldIndex = field;
-
-            if (field === 'text') {
-                renderCalculator(field);
-            } else {
-                rows[targetIndex].isCalcPadVisible = true;
-                renderCalculator(field);
-            }
-
-            scrollToActiveRow();
             updateMobilePreviewText();
         }
 
@@ -1609,23 +1609,15 @@
             let lastTapTime = 0;
 
             if (isMobileAny) {
-                // للتحكم في التركيز على الهواتف فقط
-                element.addEventListener('focus', (e) => {
-                    if (!rowIsOpeningPad) {
-                        // إذا لم نكن نفتحه عن عمد، نمنعه من الإجبار إذا احتجنا، أو نتركه يتفاعل طبيعياً
-                    }
-                });
-
-                // عند الضغط المطول على الخلية في الموبايل، يتم فتح كيبورد الموبايل الافتراضي
                 element.addEventListener('touchstart', (e) => {
                     longPressTimer = setTimeout(() => {
                         rowIsOpeningPad = true;
                         activeRowIndex = index;
                         activeFieldIndex = field;
                         renderCalculator(field);
-                        element.focus(); // يفتح كيبورد الموبايل
+                        element.focus();
                         rowIsOpeningPad = false;
-                    }, 600); // 600 مللي ثانية للضغط المطول
+                    }, 600);
                 }, { passive: true });
 
                 element.addEventListener('touchend', (e) => {
@@ -1635,7 +1627,7 @@
 
                     if (tapLength < 350 && tapLength > 0) {
                         e.preventDefault();
-                        openCalcPadForField(index, field); // النقرتان السريعتان تفتحان الآلة المصغرة
+                        openCalcPadForField(index, field);
                         lastTapTime = 0;
                     } else {
                         lastTapTime = currentTime;
@@ -1646,7 +1638,6 @@
                     clearTimeout(longPressTimer);
                 });
             } else {
-                // للكمبيوتر: السماح بالكتابة الحرة تماماً دون أي قيود أو إغلاق للكيبورد
                 element.addEventListener('click', (e) => {
                     activeRowIndex = index;
                     activeFieldIndex = field;
@@ -1704,6 +1695,7 @@
             let negativeSum = 0;
             const showCurrency = showCurrencyCheckbox.checked;
             const hideRowTools = hideRowToolsCheckbox.checked;
+            const hideAllMics = hideAllMicsCheckbox.checked;
 
             rows.forEach((row, index) => {
                 const rowDiv = document.createElement('div');
@@ -1711,6 +1703,7 @@
                 if (!row.isCalcVisible) rowClasses += ' hidden-calc';
                 if (!row.isTextVisible) rowClasses += ' hidden-text';
                 if (hideRowTools) rowClasses += ' hidden-row-tools';
+                if (hideAllMics) rowClasses += ' hidden-mics';
                 rowDiv.className = rowClasses;
 
                 setupRowSwipeToDelete(rowDiv, index);
@@ -1738,18 +1731,12 @@
                     textWrapper.appendChild(selectTextCheckbox);
                 }
 
-                // زر أيقونة الكيبورد (أو السهم للتنقل وفتح الكيبورد)
                 const mobileKbdArrowBtn = document.createElement('button');
                 mobileKbdArrowBtn.type = 'button';
                 mobileKbdArrowBtn.className = 'row-mobile-arrow-btn';
                 mobileKbdArrowBtn.innerHTML = '⌨️';
                 mobileKbdArrowBtn.title = 'فتح كيبورد الموبايل للخلية';
 
-                if (isMobileAny) {
-                    mobileKbdArrowBtn.style.display = 'flex';
-                }
-
-                // عند الضغط على أيقونة الكيبورد، يتم فتح كيبورد الموبايل فوراً
                 mobileKbdArrowBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     openSystemKeyboard(index, 'text');
@@ -1830,20 +1817,15 @@
                     calcWrapper.appendChild(selectCheckbox);
                 }
 
-                const calcArrowBtn = document.createElement('button');
-                calcArrowBtn.type = 'button';
-                calcArrowBtn.className = 'row-calc-arrow-btn';
-                calcArrowBtn.innerHTML = '⌨️';
-                calcArrowBtn.title = 'فتح كيبورد الموبايل للحسابات';
-
-                if (isMobileAny) {
-                    calcArrowBtn.style.display = 'flex';
-                }
-
-                // عند الضغط على أيقونة الكيبورد الخاصة بالحسابات
-                calcArrowBtn.addEventListener('click', (e) => {
+                // مايك السطر (في الجهة اليسار بجانب الحقل)
+                const rowMicBtn = document.createElement('button');
+                rowMicBtn.type = 'button';
+                rowMicBtn.className = 'row-mic-btn';
+                rowMicBtn.innerHTML = '🎤';
+                rowMicBtn.title = 'زر المايك الصوتي';
+                rowMicBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    openSystemKeyboard(index, 'calc');
+                    alert(`تفعيل المايك للسطر رقم ${index + 1}`);
                 });
 
                 const inputField = document.createElement('input');
@@ -1854,6 +1836,22 @@
                 if (index === activeRowIndex && activeFieldIndex === 'calc') {
                     inputField.classList.add('calc-border-active');
                 }
+
+                // تفعيل خاصية 3 كليك شمال متتالية لفتح الآلة الحاسبة المصغرة على الكمبيوتر
+                let clickCount = 0;
+                let clickTimer = null;
+                inputField.addEventListener('click', () => {
+                    clickCount++;
+                    if (clickCount === 1) {
+                        clickTimer = setTimeout(() => {
+                            clickCount = 0;
+                        }, 400);
+                    } else if (clickCount === 3) {
+                        clearTimeout(clickTimer);
+                        clickCount = 0;
+                        openCalcPadForField(index, 'calc');
+                    }
+                });
 
                 inputField.addEventListener('input', (e) => {
                     let rawVal = e.target.value.replace(/x|X|×/g, '*');
@@ -1903,8 +1901,8 @@
 
                 setupCellGestures(inputField, index, 'calc');
 
-                calcWrapper.appendChild(calcArrowBtn);
                 calcWrapper.appendChild(inputField);
+                calcWrapper.appendChild(rowMicBtn);
 
                 inputsGroup.appendChild(textWrapper);
                 inputsGroup.appendChild(outputContainer);
