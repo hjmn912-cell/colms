@@ -45,7 +45,7 @@
             top: 0;
             left: 0;
             z-index: 9999;
-            touch-action: none;
+            /* تم إزالة touch-action: none لإظهار القائمة الافتراضية للنصوص في الموبايل */
         }
 
         .resize-edge {
@@ -451,7 +451,6 @@
             gap: 8px;
             width: 100%;
             min-width: 0 !important;
-            touch-action: pan-y;
         }
 
         .calc-row.active {
@@ -716,6 +715,8 @@
             font-family: inherit;
             width: 100%;
             transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+            -webkit-user-select: text; /* السماح بالتحديد والكتابة الطبيعية في الموبايل */
+            user-select: text;
         }
 
         .text-input {
@@ -1652,48 +1653,13 @@
             return keypadDiv;
         }
 
-        let rowIsOpeningPad = false;
-
         function setupCellGestures(element, index, field) {
-            let longPressTimer = null;
-            let lastTapTime = 0;
-
-            if (isMobileAny) {
-                element.addEventListener('touchstart', (e) => {
-                    longPressTimer = setTimeout(() => {
-                        rowIsOpeningPad = true;
-                        activeRowIndex = index;
-                        activeFieldIndex = field;
-                        renderCalculator(field);
-                        element.focus();
-                        rowIsOpeningPad = false;
-                    }, 600);
-                }, { passive: true });
-
-                element.addEventListener('touchend', (e) => {
-                    clearTimeout(longPressTimer);
-                    const currentTime = new Date().getTime();
-                    const tapLength = currentTime - lastTapTime;
-
-                    if (tapLength < 350 && tapLength > 0) {
-                        e.preventDefault();
-                        openCalcPadForField(index, field);
-                        lastTapTime = 0;
-                    } else {
-                        lastTapTime = currentTime;
-                    }
-                });
-
-                element.addEventListener('touchmove', () => {
-                    clearTimeout(longPressTimer);
-                });
-            } else {
-                element.addEventListener('click', (e) => {
-                    activeRowIndex = index;
-                    activeFieldIndex = field;
-                    updateActiveRowClasses();
-                });
-            }
+            // تم إزالة منع السلوك الافتراضي لكي تظهر قائمة النسخ والقص المعتادة عند الضغط المطول
+            element.addEventListener('click', (e) => {
+                activeRowIndex = index;
+                activeFieldIndex = field;
+                updateActiveRowClasses();
+            });
         }
 
         function setupRowSwipeToDelete(rowDiv, index) {
@@ -1869,19 +1835,6 @@
                     inputField.classList.add('calc-border-active');
                 }
 
-                let clickCount = 0;
-                let clickTimer = null;
-                inputField.addEventListener('click', () => {
-                    clickCount++;
-                    if (clickCount === 1) {
-                        clickTimer = setTimeout(() => { clickCount = 0; }, 400);
-                    } else if (clickCount === 3) {
-                        clearTimeout(clickTimer);
-                        clickCount = 0;
-                        openCalcPadForField(index, 'calc');
-                    }
-                });
-
                 inputField.addEventListener('input', (e) => {
                     let rawVal = e.target.value.replace(/x|X|×/g, '*');
                     let displayVal = rawVal.replace(/\*/g, 'x');
@@ -1976,13 +1929,12 @@
             updateMobilePreviewText();
         }
 
-        // التحكم العام والشامل والمباشر بلوحة المفاتيح والأسهم والإنتر دون أي تدخل من الماوس
+        // التحكم العام والكامل بلوحة المفاتيح والأسهم والإنتر
         window.addEventListener('keydown', (event) => {
             const key = event.key;
             const activeInput = document.activeElement;
             const isAnInputFocused = activeInput && (activeInput.classList.contains('calc-input') || activeInput.classList.contains('text-input'));
 
-            // زر Enter: ينشئ سطر جديد وينزل إليه فوراً بلا حدود من أي مكان
             if (key === 'Enter') {
                 event.preventDefault();
                 evaluateRow(activeRowIndex);
@@ -2003,7 +1955,6 @@
                 return;
             }
 
-            // زر السهم الأسفل (ArrowDown): ينزل للسطر التالي فوراً
             if (key === 'ArrowDown') {
                 event.preventDefault();
                 if (activeRowIndex < rows.length - 1) {
@@ -2022,7 +1973,6 @@
                 return;
             }
 
-            // زر السهم الأعلى (ArrowUp): يصعد للسطر السابق فوراً
             if (key === 'ArrowUp') {
                 event.preventDefault();
                 if (activeRowIndex > 0) {
@@ -2034,7 +1984,6 @@
                 return;
             }
 
-            // زر السهم الأيمن (ArrowRight): التنقل لعمود الملاحظات أو السطر السابق
             if (key === 'ArrowRight') {
                 event.preventDefault();
                 if (activeFieldIndex === 'calc') {
@@ -2049,7 +1998,6 @@
                 return;
             }
 
-            // زر السهم الأيسر (ArrowLeft): التنقل لعمود العملية الحسابية أو السطر التالي
             if (key === 'ArrowLeft') {
                 event.preventDefault();
                 if (activeFieldIndex === 'text') {
