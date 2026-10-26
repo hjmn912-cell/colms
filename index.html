@@ -56,6 +56,18 @@
         .resize-edge.bottom { bottom: 0; left: 0; width: 100%; height: 12px; cursor: s-resize; }
         .resize-edge.corner-br { bottom: 0; right: 0; width: 20px; height: 20px; cursor: nwse-resize; }
 
+        /* تثبيت القطعة العلوية بالكامل (الهيدر وما فوقه) */
+        .all-top-header-wrapper {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: #030712;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+        }
+
         .mobile-preview-top-bar {
             display: none;
             background-color: #020617;
@@ -126,8 +138,6 @@
             position: relative;
             background-color: #030712;
             width: 100%;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
-            flex-shrink: 0;
         }
 
         .top-controls-wrapper {
@@ -837,126 +847,129 @@
 
         <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية وفتح الكيبورد" onclick="handleSmartNextCellClick()">🚀</button>
 
-        <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
-            <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
-                <select id="mobileControlCombo" class="mobile-combo-box" onchange="handleMobileComboChange(this)">
-                    <option value="" disabled selected>⚙️</option>
-                    <option value="toggle_tools">إظهار/إخفاء الأدوات</option>
-                </select>
-                <span id="previewTextContent"></span>
+        <!-- حزمة القطعة العلوية بالكامل (تتضمن شريط المعاينة والهيدر) لتكون ثابتة تماماً لا تتأثر بالتمرير -->
+        <div class="all-top-header-wrapper">
+            <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
+                <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
+                    <select id="mobileControlCombo" class="mobile-combo-box" onchange="handleMobileComboChange(this)">
+                        <option value="" disabled selected>⚙️</option>
+                        <option value="toggle_tools">إظهار/إخفاء الأدوات</option>
+                    </select>
+                    <span id="previewTextContent"></span>
+                </div>
+                <span id="previewResultContent" class="mobile-preview-result"></span>
             </div>
-            <span id="previewResultContent" class="mobile-preview-result"></span>
-        </div>
 
-        <div class="sticky-top-section" id="stickyTopSection">
-            <div class="top-controls-wrapper">
-                <div class="left-controls-group">
-                    <div style="display: flex; align-items: center; gap: 4px;">
-                        <input type="checkbox" id="hideOptionsCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                        <div class="options-dropdown" id="optionsDropdown">
-                            <button class="options-btn" type="button" onclick="toggleOptionsMenu(event)">
-                                الخيارات <span>▼</span>
+            <div class="sticky-top-section" id="stickyTopSection">
+                <div class="top-controls-wrapper">
+                    <div class="left-controls-group">
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="hideOptionsCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                            <div class="options-dropdown" id="optionsDropdown">
+                                <button class="options-btn" type="button" onclick="toggleOptionsMenu(event)">
+                                    الخيارات <span>▼</span>
+                                </button>
+                                <div class="options-dropdown-content" id="optionsDropdownContent">
+                                    <label class="option-toggle-label">
+                                        <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
+                                        إظهار كلمة جنيه
+                                    </label>
+                                    <label class="option-toggle-label">
+                                        <input type="checkbox" id="hideAllMicsCheckbox" onchange="renderCalculator()">
+                                        إخفاء المايكات
+                                    </label>
+                                    <label class="option-toggle-label">
+                                        <input type="checkbox" id="hideOtherToolsCheckbox" onchange="updateGlobalHides()">
+                                        إخفاء الأدوات الأخرى
+                                    </label>
+                                    <label class="option-toggle-label">
+                                        <input type="checkbox" id="hideRowToolsCheckbox" onchange="renderCalculator()">
+                                        إخفاء أدوات السطر
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="hideRefreshCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                            <button class="refresh-btn" id="refreshBtnEl" type="button" title="إعادة تحميل الصفحة" onclick="location.reload()">
+                                🔄
                             </button>
-                            <div class="options-dropdown-content" id="optionsDropdownContent">
-                                <label class="option-toggle-label">
-                                    <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
-                                    إظهار كلمة جنيه
-                                </label>
-                                <label class="option-toggle-label">
-                                    <input type="checkbox" id="hideAllMicsCheckbox" onchange="renderCalculator()">
-                                    إخفاء المايكات
-                                </label>
-                                <label class="option-toggle-label">
-                                    <input type="checkbox" id="hideOtherToolsCheckbox" onchange="updateGlobalHides()">
-                                    إخفاء الأدوات الأخرى
-                                </label>
-                                <label class="option-toggle-label">
-                                    <input type="checkbox" id="hideRowToolsCheckbox" onchange="renderCalculator()">
-                                    إخفاء أدوات السطر
-                                </label>
+                        </div>
+                    </div>
+
+                    <div class="totals-summary-bar">
+                        <div class="sub-totals-row">
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <input type="checkbox" id="hidePositiveCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                                <div class="summary-item">
+                                    <input type="checkbox" id="showPositiveCheckbox" onchange="renderCalculator()">
+                                    <span id="positiveTotalVal" class="positive-sum"></span>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <input type="checkbox" id="hideNegativeCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                                <div class="summary-item">
+                                    <input type="checkbox" id="showNegativeCheckbox" onchange="renderCalculator()">
+                                    <span id="negativeTotalVal" class="negative-sum"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="total-value-container">
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <input type="checkbox" id="hideGrandTotalCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                                <div id="grandTotal" class="total-value">0</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <input type="checkbox" id="hideGrandCurrencyCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                                <div id="grandTotalCurrency" class="total-currency">جنيه</div>
                             </div>
                         </div>
                     </div>
 
-                    <div style="display: flex; align-items: center; gap: 4px;">
-                        <input type="checkbox" id="hideRefreshCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                        <button class="refresh-btn" id="refreshBtnEl" type="button" title="إعادة تحميل الصفحة" onclick="location.reload()">
-                            🔄
+                    <div style="width: 60px;"></div>
+                </div>
+
+                <div class="calculator-header">
+                    <div class="header-right-group" id="headerRightGroupContainer">
+                        <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
+                        <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
+                        
+                        <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة" onclick="handleSmartNextCellClick()">🚀</button>
+
+                        <span class="designer-credit">designed by Sami Arouj</span>
+                        
+                        <button type="button" id="toggleHideBtn" class="toggle-hide-btn" title="تحديد العناصر المراد إخفاؤها" onclick="toggleHideSelectionMode()">
+                            👁️
                         </button>
-                    </div>
-                </div>
 
-                <div class="totals-summary-bar">
-                    <div class="sub-totals-row">
-                        <div style="display: flex; align-items: center; gap: 4px;">
-                            <input type="checkbox" id="hidePositiveCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                            <div class="summary-item">
-                                <input type="checkbox" id="showPositiveCheckbox" onchange="renderCalculator()">
-                                <span id="positiveTotalVal" class="positive-sum"></span>
-                            </div>
-                        </div>
+                        <div style="display: flex; align-items: center; gap: 4px;" id="exportDropdownContainer">
+                            <input type="checkbox" id="hideExportCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                            <div class="export-dropdown" id="exportDropdown">
+                                <button class="export-btn" title="تصدير ومشاركة" onclick="toggleExportMenu(event)">
+                                    📊
+                                </button>
+                                <div class="dropdown-content">
+                                    <button onclick="exportToExcel()">📊 إكسيل (Excel)</button>
+                                    <button onclick="exportToWord()">📝 وورد (Word)</button>
+                                    <button onclick="exportToPDF()">📄 بي دي إف (PDF)</button>
+                                    <button onclick="exportToTXT()">📄 تصدير ملف نصي (TXT)</button>
+                                    <button onclick="exportToImage()">🖼️ تنزيل صورة</button>
+                                    
+                                    <div class="dropdown-divider"></div>
+                                    
+                                    <button onclick="openPhoneWhatsApp()">📱 فتح واتساب الهاتف</button>
+                                    <button onclick="openPhoneMessenger()">💬 فتح ماسنجر الهاتف</button>
+                                    <button onclick="copyReportTextOnly()">📋 نسخ التقرير نصياً</button>
 
-                        <div style="display: flex; align-items: center; gap: 4px;">
-                            <input type="checkbox" id="hideNegativeCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                            <div class="summary-item">
-                                <input type="checkbox" id="showNegativeCheckbox" onchange="renderCalculator()">
-                                <span id="negativeTotalVal" class="negative-sum"></span>
-                            </div>
-                        </div>
-                    </div>
+                                    <div class="dropdown-divider"></div>
 
-                    <div class="total-value-container">
-                        <div style="display: flex; align-items: center; gap: 4px;">
-                            <input type="checkbox" id="hideGrandTotalCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                            <div id="grandTotal" class="total-value">0</div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 4px;">
-                            <input type="checkbox" id="hideGrandCurrencyCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                            <div id="grandTotalCurrency" class="total-currency">جنيه</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="width: 60px;"></div>
-            </div>
-
-            <div class="calculator-header">
-                <div class="header-right-group" id="headerRightGroupContainer">
-                    <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
-                    <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
-                    
-                    <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة" onclick="handleSmartNextCellClick()">🚀</button>
-
-                    <span class="designer-credit">designed by Sami Arouj</span>
-                    
-                    <button type="button" id="toggleHideBtn" class="toggle-hide-btn" title="تحديد العناصر المراد إخفاؤها" onclick="toggleHideSelectionMode()">
-                        👁️
-                    </button>
-
-                    <div style="display: flex; align-items: center; gap: 4px;" id="exportDropdownContainer">
-                        <input type="checkbox" id="hideExportCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                        <div class="export-dropdown" id="exportDropdown">
-                            <button class="export-btn" title="تصدير ومشاركة" onclick="toggleExportMenu(event)">
-                                📊
-                            </button>
-                            <div class="dropdown-content">
-                                <button onclick="exportToExcel()">📊 إكسيل (Excel)</button>
-                                <button onclick="exportToWord()">📝 وورد (Word)</button>
-                                <button onclick="exportToPDF()">📄 بي دي إف (PDF)</button>
-                                <button onclick="exportToTXT()">📄 تصدير ملف نصي (TXT)</button>
-                                <button onclick="exportToImage()">🖼️ تنزيل صورة</button>
-                                
-                                <div class="dropdown-divider"></div>
-                                
-                                <button onclick="openPhoneWhatsApp()">📱 فتح واتساب الهاتف</button>
-                                <button onclick="openPhoneMessenger()">💬 فتح ماسنجر الهاتف</button>
-                                <button onclick="copyReportTextOnly()">📋 نسخ التقرير نصياً</button>
-
-                                <div class="dropdown-divider"></div>
-
-                                <button onclick="shareLinkToWhatsApp()">💬 إرسال التقرير للواتساب</button>
-                                <button onclick="shareLinkToMessenger()">⚡ إرسال التقرير للماسنجر</button>
-                                <button onclick="shareLinkToSMS()">📱 إرسال التقرير عبر رسالة نصية (SMS)</button>
+                                    <button onclick="shareLinkToWhatsApp()">💬 إرسال التقرير للواتساب</button>
+                                    <button onclick="shareLinkToMessenger()">⚡ إرسال التقرير للماسنجر</button>
+                                    <button onclick="shareLinkToSMS()">📱 إرسال التقرير عبر رسالة نصية (SMS)</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1674,10 +1687,8 @@
                     } else if (tapCount >= 3) {
                         clearTimeout(tapTimer);
                         tapCount = 0;
-                        // 3 ضغطات على الموبايل تترك المتصفح يظهر خيارات التحديد والنسخ الطبيعية
                     }
                 } else {
-                    // للكمبيوتر: ضغطتان تفتح الآلة الحاسبة المصغرة
                     tapCount++;
                     if (tapCount === 1) {
                         tapTimer = setTimeout(() => { tapCount = 0; }, 350);
