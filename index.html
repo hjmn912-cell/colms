@@ -1045,7 +1045,6 @@
         const isMobileNormal = env === 'mobile-normal';
         const isMobileAny = env !== 'desktop';
 
-        // تعيين القيمة الافتراضية لخيار إخفاء المايكات حسب الجهاز (موبايل = مفعل، كمبيوتر = غير مفعل)
         if (isMobileAny) {
             showCurrencyCheckbox.checked = true;
             hideAllMicsCheckbox.checked = true;
@@ -1445,7 +1444,6 @@
             updateMobilePreviewText();
         }
 
-        // عند الضغط على Enter من الآلة الحاسبة المصغرة: ينزل للخلية التي تحتها ويفتح الآلة الحاسبة المصغرة تلقائياً
         function addNewRowFromPad(index, field) {
             evaluateRow(index);
             closeAllPads();
@@ -1461,7 +1459,28 @@
             }
             activeFieldIndex = field;
 
-            // فتح لوحة الآلة الحاسبة المصغرة تلقائياً في الخلية الجديدة
+            renderCalculator(field);
+            scrollToActiveRow();
+            updateMobilePreviewText();
+        }
+
+        // تعديل وظيفة Enter + Open لتنزل في الخلية التي تحتها وتفتح الآلة الحاسبة المصغرة فوراً
+        function addNewRowAndOpenTool(index, field) {
+            evaluateRow(index);
+            closeAllPads();
+
+            if (index < rows.length - 1) {
+                activeRowIndex = index + 1;
+            } else {
+                rows.push({ 
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                });
+                activeRowIndex = rows.length - 1;
+            }
+            activeFieldIndex = field;
+
+            // فتح الآلة الحاسبة المصغرة للخلية الجديدة تلقائياً
             if (field === 'text') {
                 rows[activeRowIndex].isTextPadVisible = true;
             } else {
@@ -1471,20 +1490,6 @@
             renderCalculator(field);
             scrollToActiveRow();
             updateMobilePreviewText();
-        }
-
-        function addNewRowAndOpenTool(index, field) {
-            addNewRowFromPad(index, field);
-        }
-
-        function formatDisplayValue(val) {
-            if (typeof val === 'number') {
-                if (val < 0) {
-                    return { text: `(${Math.abs(val)})`, isNegative: true };
-                }
-                return { text: `${val}`, isNegative: false };
-            }
-            return { text: val, isNegative: false };
         }
 
         function createMiniKeypad(index, field) {
@@ -1639,7 +1644,7 @@
                     if (targetField === 'text') {
                         rows[targetRow].textExpression += (rows[targetRow].textExpression ? ' ' : '') + speechResult;
                         renderCalculator('text');
-                    } else { حدث
+                    } else {
                         rows[targetRow].expression += (rows[targetRow].expression ? '' : '') + speechResult;
                         evaluateRow(targetRow);
                         renderCalculator('calc');
@@ -1658,7 +1663,7 @@
             });
         }
 
-        // إيماءات الخلية (دبل كليك على الموبايل، و 3 دبل كليك/نقرات على الكمبيوتر لفتح الآلة الحاسبة)
+        // تحديث إيماءات الخلية: (دبل كليك على الموبايل، و 3 نقرات متتالية Triple Click على الكمبيوتر لفتح الآلة الحاسبة)
         function setupCellGestures(element, index, field) {
             let lastTapTime = 0;
             let clickCount = 0;
@@ -1678,7 +1683,7 @@
                     }
                 });
             } else {
-                // للكمبيوتر: تتبع النقرات لفتح الآلة الحاسبة عند النقر 3 مرات متتالية (Triple Click)
+                // للكمبيوتر: فتح الآلة الحاسبة المصغرة عند النقر 3 مرات متتالية (Triple Click)
                 element.addEventListener('click', (e) => {
                     activeRowIndex = index;
                     activeFieldIndex = field;
@@ -1698,6 +1703,7 @@
             }
         }
 
+        // تحديث إيماءة السحب يميناً أو يساراً لحذف السطر في الموبايل
         function setupRowSwipeToDelete(rowDiv, index) {
             let startX = 0;
             let currentX = 0;
@@ -1725,7 +1731,8 @@
                 isSwiping = false;
                 let diffX = currentX - startX;
 
-                if (Math.abs(diffX) > 100) {
+                // السحب مسافة كافية يميناً أو يساراً سيحذف السطر
+                if (Math.abs(diffX) > 80) {
                     rowDiv.style.transition = 'all 0.25s ease';
                     rowDiv.style.transform = diffX > 0 ? 'translateX(100vw)' : 'translateX(-100vw)';
                     rowDiv.style.opacity = '0';
