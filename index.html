@@ -45,10 +45,8 @@
             top: 0;
             left: 0;
             z-index: 9999;
-            touch-action: none;
         }
 
-        /* حواف السحب والتوسيع (مثل نوافذ الويندوز) */
         .resize-edge {
             position: absolute;
             z-index: 10000;
@@ -58,7 +56,18 @@
         .resize-edge.bottom { bottom: 0; left: 0; width: 100%; height: 12px; cursor: s-resize; }
         .resize-edge.corner-br { bottom: 0; right: 0; width: 20px; height: 20px; cursor: nwse-resize; }
 
-        /* سطر المعاينة العلوي للموبايل */
+        /* الهيدر والقطعة العلوية ثابتة تماماً لا تتأثر بفتح الكيبورد أو التمرير */
+        .all-top-header-wrapper {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: #030712;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+        }
+
         .mobile-preview-top-bar {
             display: none;
             background-color: #020617;
@@ -99,30 +108,6 @@
             text-align: center;
         }
 
-        /* كومبو بوكس إخفاء المايكات المصغر للكمبيوتر (بحجم زر العين تماماً) */
-        .desktop-mic-combo {
-            background-color: #1e293b;
-            color: #38bdf8;
-            border: 1px solid #38bdf8;
-            padding: 0 4px;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            outline: none;
-            height: 32px;
-            width: 32px;
-            text-align: center;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        .desktop-mic-combo:hover {
-            background-color: #38bdf8;
-            color: #0b0f19;
-        }
-
-        /* الأيقونة العائمة الصغيرة التي تظهر عند فتح الكيبورد */
         .floating-keyboard-action-btn {
             position: fixed;
             bottom: 260px;
@@ -153,8 +138,6 @@
             position: relative;
             background-color: #030712;
             width: 100%;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
-            flex-shrink: 0;
         }
 
         .top-controls-wrapper {
@@ -216,7 +199,7 @@
             right: 0;
             top: 110%;
             background-color: #1e293b;
-            min-width: 170px;
+            min-width: 210px;
             box-shadow: 0px 8px 16px rgba(0,0,0,0.5);
             border-radius: 6px;
             z-index: 2000;
@@ -470,14 +453,13 @@
             display: flex;
             flex-direction: column;
             background-color: #1e293b;
-            padding: 8px 6px;
+            padding: 10px 8px;
             border-radius: 8px;
             border: 1px solid transparent;
             transition: border-color 0.15s ease;
             gap: 8px;
             width: 100%;
             min-width: 0 !important;
-            touch-action: pan-y;
         }
 
         .calc-row.active {
@@ -489,41 +471,33 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             width: 100%;
         }
 
         .inputs-group {
             display: flex;
-            gap: 4px;
+            gap: 6px;
             flex-grow: 1;
             align-items: center;
             width: 100%;
             min-width: 0;
         }
 
-        /* خلية الملاحظات (أعرض) */
         .text-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 4px;
-            flex: 3.5; 
+            gap: 6px;
+            flex: 3.2; 
             min-width: 0;
         }
 
-        /* خلية العملية الحسابية (أقل عرضاً) */
         .calc-input-wrapper {
             display: flex;
             align-items: center;
-            gap: 2px;
-            flex: 1.5; 
+            gap: 6px;
+            flex: 2.2; 
             min-width: 0;
-        }
-
-        .mic-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 2px;
         }
 
         .global-select-checkbox, .calc-select-checkbox {
@@ -534,7 +508,7 @@
             flex-shrink: 0;
         }
 
-        .row-mobile-arrow-btn, .row-calc-arrow-btn {
+        .row-mic-btn {
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid #38bdf8;
             color: #38bdf8;
@@ -542,7 +516,7 @@
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            display: none;
+            display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
@@ -550,7 +524,20 @@
             transition: all 0.2s;
         }
 
-        .row-mobile-arrow-btn:active, .row-calc-arrow-btn:active {
+        .row-mic-btn.recording {
+            background-color: #ef4444 !important;
+            border-color: #f87171 !important;
+            color: #fff !important;
+            animation: pulseMic 1s infinite;
+        }
+
+        @keyframes pulseMic {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .row-mic-btn:active {
             background-color: #38bdf8;
             color: #0b0f19;
         }
@@ -729,7 +716,7 @@
             background: rgba(255, 255, 255, 0.03);
             border: 2px solid #334155;
             border-radius: 6px;
-            padding: 6px 6px;
+            padding: 8px 8px;
             color: #38bdf8;
             font-size: 1.3rem;
             font-weight: bold;
@@ -737,19 +724,21 @@
             font-family: inherit;
             width: 100%;
             transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+            -webkit-user-select: text;
+            user-select: text;
         }
 
         .text-input {
             flex: 1;
             resize: none;
             overflow-y: hidden;
-            min-height: 38px;
+            min-height: 42px;
             line-height: 1.2;
         }
 
         .calc-input {
             width: 100%;
-            height: 38px;
+            height: 42px;
             direction: ltr;
             text-align: right;
             font-size: 1.4rem;
@@ -771,27 +760,22 @@
             pointer-events: none !important;
         }
 
-        .calc-row.hidden-mic .mic-wrapper {
-            display: none !important;
-        }
-
-        .calc-row.hidden-tools .row-mobile-arrow-btn,
-        .calc-row.hidden-tools .row-calc-arrow-btn {
+        .calc-row.hidden-mics .row-mic-btn {
             display: none !important;
         }
 
         .calc-output-container {
             display: flex;
             align-items: baseline;
-            gap: 3px;
-            min-width: 75px;
+            gap: 4px;
+            min-width: 85px;
             text-align: left;
             white-space: nowrap;
             flex-shrink: 0;
         }
 
         .calc-output {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: #10b981;
             white-space: nowrap;
@@ -806,41 +790,6 @@
 
         .calc-output.negative {
             color: #ef4444 !important;
-        }
-
-        .mic-btn {
-            background: transparent;
-            border: none;
-            color: #6b7280;
-            font-size: 1.1rem;
-            cursor: pointer;
-            padding: 2px 2px;
-            border-radius: 6px;
-            transition: all 0.2s;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .mic-btn:hover {
-            background-color: rgba(56, 189, 248, 0.15);
-            color: #38bdf8;
-        }
-
-        .mic-btn.listening {
-            color: #ef4444 !important;
-            animation: pulse 1.2s infinite;
-        }
-
-        .mic-btn.continuous-mode {
-            background-color: rgba(239, 68, 68, 0.2) !important;
-            border: 1px solid #ef4444 !important;
-            border-radius: 50%;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
         }
 
         .keyboard-hint {
@@ -877,12 +826,12 @@
                 justify-content: space-between;
             }
             .calc-output-container {
-                min-width: 60px;
+                min-width: 65px;
             }
             .text-input, .calc-input, .calc-output {
                 font-size: 1.15rem;
-                height: 36px;
-                min-height: 36px;
+                height: 38px;
+                min-height: 38px;
             }
         }
     </style>
@@ -896,126 +845,131 @@
         <div class="resize-edge bottom" id="edgeBottom"></div>
         <div class="resize-edge corner-br" id="edgeCornerBR"></div>
 
-        <div id="updateIndicatorDot" style="position: fixed; top: 8px; left: 12px; width: 12px; height: 12px; background-color: #38bdf8; border-radius: 50%; z-index: 99999; box-shadow: 0 0 8px #38bdf8;" title="مؤشر التحديث النشط (أزرق)"></div>
-
         <button type="button" id="floatingKeyboardNewRowBtn" class="floating-keyboard-action-btn" title="الانتقال للخلية التالية وفتح الكيبورد" onclick="handleSmartNextCellClick()">🚀</button>
 
-        <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
-            <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
-                <select id="mobileControlCombo" class="mobile-combo-box" onchange="handleMobileComboChange(this)">
-                    <option value="" disabled selected>⚙️</option>
-                    <option value="toggle_mics">إظهار/إخفاء المايكات</option>
-                    <option value="toggle_tools">إظهار/إخفاء الأدوات</option>
-                </select>
-                <span id="previewTextContent"></span>
-            </div>
-            <span id="previewResultContent" class="mobile-preview-result"></span>
-        </div>
-
-        <div class="sticky-top-section" id="stickyTopSection">
-            <div class="top-controls-wrapper">
-                <div class="left-controls-group">
-                    <div style="display: flex; align-items: center; gap: 4px;">
-                        <input type="checkbox" id="hideOptionsCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                        <div class="options-dropdown" id="optionsDropdown">
-                            <button class="options-btn" type="button" onclick="toggleOptionsMenu(event)">
-                                الخيارات <span>▼</span>
-                            </button>
-                            <div class="options-dropdown-content" id="optionsDropdownContent">
-                                <label class="option-toggle-label">
-                                    <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
-                                    إظهار كلمة جنيه
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; align-items: center; gap: 4px;">
-                        <input type="checkbox" id="hideRefreshCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                        <button class="refresh-btn" id="refreshBtnEl" type="button" title="إعادة تحميل الصفحة" onclick="location.reload()">
-                            🔄
-                        </button>
-                    </div>
-                </div>
-
-                <div class="totals-summary-bar">
-                    <div class="sub-totals-row">
-                        <div style="display: flex; align-items: center; gap: 4px;">
-                            <input type="checkbox" id="hidePositiveCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                            <div class="summary-item">
-                                <input type="checkbox" id="showPositiveCheckbox" onchange="renderCalculator()">
-                                <span id="positiveTotalVal" class="positive-sum"></span>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; align-items: center; gap: 4px;">
-                            <input type="checkbox" id="hideNegativeCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                            <div class="summary-item">
-                                <input type="checkbox" id="showNegativeCheckbox" onchange="renderCalculator()">
-                                <span id="negativeTotalVal" class="negative-sum"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="total-value-container">
-                        <div style="display: flex; align-items: center; gap: 4px;">
-                            <input type="checkbox" id="hideGrandTotalCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                            <div id="grandTotal" class="total-value">0</div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 4px;">
-                            <input type="checkbox" id="hideGrandCurrencyCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                            <div id="grandTotalCurrency" class="total-currency">جنيه</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="width: 60px;"></div>
-            </div>
-
-            <div class="calculator-header">
-                <div class="header-right-group">
-                    <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
-                    <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
-                    
-                    <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة وفتح كيبورد الموبايل" onclick="handleSmartNextCellClick()">🚀</button>
-
-                    <span class="designer-credit">designed by Sami Arouj</span>
-                    
-                    <!-- كومبو بوكس إخفاء/إظهار المايكات للكمبيوتر (موجود في الأعلى ناحية اليمين وبحجم زر العين تماماً) -->
-                    <select id="desktopMicCombo" class="desktop-mic-combo" title="إظهار أو إخفاء المايكات" onchange="handleDesktopMicComboChange(this)">
-                        <option value="" selected>🎤</option>
-                        <option value="show">إظهار المايكات</option>
-                        <option value="hide">إخفاء المايكات</option>
+        <!-- الهيدر والقطعة العلوية ثابتة تماماً -->
+        <div class="all-top-header-wrapper">
+            <div id="mobilePreviewTopBar" class="mobile-preview-top-bar" style="display:none;">
+                <div style="display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1;">
+                    <select id="mobileControlCombo" class="mobile-combo-box" onchange="handleMobileComboChange(this)">
+                        <option value="" disabled selected>⚙️</option>
+                        <option value="toggle_tools">إظهار/إخفاء الأدوات</option>
                     </select>
+                    <span id="previewTextContent"></span>
+                </div>
+                <span id="previewResultContent" class="mobile-preview-result"></span>
+            </div>
 
-                    <button type="button" id="toggleHideBtn" class="toggle-hide-btn" title="تحديد العناصر المراد إخفاؤها" onclick="toggleHideSelectionMode()">
-                        👁️
-                    </button>
+            <div class="sticky-top-section" id="stickyTopSection">
+                <div class="top-controls-wrapper">
+                    <div class="left-controls-group">
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="hideOptionsCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                            <div class="options-dropdown" id="optionsDropdown">
+                                <button class="options-btn" type="button" onclick="toggleOptionsMenu(event)">
+                                    الخيارات <span>▼</span>
+                                </button>
+                                <div class="options-dropdown-content" id="optionsDropdownContent">
+                                    <label class="option-toggle-label">
+                                        <input type="checkbox" id="showCurrencyCheckbox" checked onchange="renderCalculator()">
+                                        إظهار كلمة جنيه
+                                    </label>
+                                    <label class="option-toggle-label">
+                                        <input type="checkbox" id="hideAllMicsCheckbox" onchange="renderCalculator()">
+                                        إخفاء المايكات
+                                    </label>
+                                    <label class="option-toggle-label">
+                                        <input type="checkbox" id="hideOtherToolsCheckbox" onchange="updateGlobalHides()">
+                                        إخفاء الأدوات الأخرى
+                                    </label>
+                                    <label class="option-toggle-label">
+                                        <input type="checkbox" id="hideRowToolsCheckbox" onchange="renderCalculator()">
+                                        إخفاء أدوات السطر
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div style="display: flex; align-items: center; gap: 4px;">
-                        <input type="checkbox" id="hideExportCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
-                        <div class="export-dropdown" id="exportDropdown">
-                            <button class="export-btn" title="تصدير ومشاركة" onclick="toggleExportMenu(event)">
-                                📊
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="hideRefreshCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                            <button class="refresh-btn" id="refreshBtnEl" type="button" title="إعادة تحميل الصفحة" onclick="location.reload()">
+                                🔄
                             </button>
-                            <div class="dropdown-content">
-                                <button onclick="exportToExcel()">📊 إكسيل (Excel)</button>
-                                <button onclick="exportToWord()">📝 وورد (Word)</button>
-                                <button onclick="exportToPDF()">📄 بي دي إف (PDF)</button>
-                                <button onclick="exportToTXT()">📄 تصدير ملف نصي (TXT)</button>
-                                <button onclick="exportToImage()">🖼️ تنزيل صورة</button>
-                                
-                                <div class="dropdown-divider"></div>
-                                
-                                <button onclick="openPhoneWhatsApp()">📱 فتح واتساب الهاتف</button>
-                                <button onclick="openPhoneMessenger()">💬 فتح ماسنجر الهاتف</button>
-                                <button onclick="copyReportTextOnly()">📋 نسخ التقرير نصياً</button>
+                        </div>
+                    </div>
 
-                                <div class="dropdown-divider"></div>
+                    <div class="totals-summary-bar">
+                        <div class="sub-totals-row">
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <input type="checkbox" id="hidePositiveCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                                <div class="summary-item">
+                                    <input type="checkbox" id="showPositiveCheckbox" onchange="renderCalculator()">
+                                    <span id="positiveTotalVal" class="positive-sum"></span>
+                                </div>
+                            </div>
 
-                                <button onclick="shareLinkToWhatsApp()">💬 إرسال التقرير للواتساب</button>
-                                <button onclick="shareLinkToMessenger()">⚡ إرسال التقرير للماسنجر</button>
-                                <button onclick="shareLinkToSMS()">📱 إرسال التقرير عبر رسالة نصية (SMS)</button>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <input type="checkbox" id="hideNegativeCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                                <div class="summary-item">
+                                    <input type="checkbox" id="showNegativeCheckbox" onchange="renderCalculator()">
+                                    <span id="negativeTotalVal" class="negative-sum"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="total-value-container">
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <input type="checkbox" id="hideGrandTotalCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                                <div id="grandTotal" class="total-value">0</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <input type="checkbox" id="hideGrandCurrencyCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                                <div id="grandTotalCurrency" class="total-currency">جنيه</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="width: 60px;"></div>
+                </div>
+
+                <div class="calculator-header">
+                    <div class="header-right-group" id="headerRightGroupContainer">
+                        <button type="button" id="topNotesFocusBtn" class="top-notes-focus-btn" title="النزول للسطر التالي أو إنشاء جديد في الملاحظات" onclick="handleTopNotesFocusClick()">📝</button>
+                        <button type="button" id="topActionBtn" class="top-action-btn" title="النزول للسطر التالي أو إنشاء جديد في العملية الحسابية" onclick="handleTopActionBtnClick()">📄</button>
+                        
+                        <button type="button" class="top-next-row-btn" title="الانتقال للخلية التي تحتها مباشرة" onclick="handleSmartNextCellClick()">🚀</button>
+
+                        <span class="designer-credit">designed by Sami Arouj</span>
+                        
+                        <button type="button" id="toggleHideBtn" class="toggle-hide-btn" title="تحديد العناصر المراد إخفاؤها" onclick="toggleHideSelectionMode()">
+                            👁️
+                        </button>
+
+                        <div style="display: flex; align-items: center; gap: 4px;" id="exportDropdownContainer">
+                            <input type="checkbox" id="hideExportCheckbox" class="global-select-checkbox" style="display:none;" onchange="updateGlobalHides()">
+                            <div class="export-dropdown" id="exportDropdown">
+                                <button class="export-btn" title="تصدير ومشاركة" onclick="toggleExportMenu(event)">
+                                    📊
+                                </button>
+                                <div class="dropdown-content">
+                                    <button onclick="exportToExcel()">📊 إكسيل (Excel)</button>
+                                    <button onclick="exportToWord()">📝 وورد (Word)</button>
+                                    <button onclick="exportToPDF()">📄 بي دي إف (PDF)</button>
+                                    <button onclick="exportToTXT()">📄 تصدير ملف نصي (TXT)</button>
+                                    <button onclick="exportToImage()">🖼️ تنزيل صورة</button>
+                                    
+                                    <div class="dropdown-divider"></div>
+                                    
+                                    <button onclick="openPhoneWhatsApp()">📱 فتح واتساب الهاتف</button>
+                                    <button onclick="openPhoneMessenger()">💬 فتح ماسنجر الهاتف</button>
+                                    <button onclick="copyReportTextOnly()">📋 نسخ التقرير نصياً</button>
+
+                                    <div class="dropdown-divider"></div>
+
+                                    <button onclick="shareLinkToWhatsApp()">💬 إرسال التقرير للواتساب</button>
+                                    <button onclick="shareLinkToMessenger()">⚡ إرسال التقرير للماسنجر</button>
+                                    <button onclick="shareLinkToSMS()">📱 إرسال التقرير عبر رسالة نصية (SMS)</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1026,7 +980,7 @@
         <div id="screenContainer" class="calculator-screen"></div>
 
         <div class="keyboard-hint">
-            <span>الأسهم</span> للتحرك بين الأسطر والحقول | <span>Home</span> للحساب بالقوة | <span>Page Up</span> لتجاهل ما قبل المؤشر | <span>Enter</span> للسطر التالي أو جديد
+            <span>كمبيوتر (3 كليك):</span> الآلة الحاسبة | <span>Delete:</span> مسح الخلية | <span>موبايل (ضغطتان):</span> الآلة الحاسبة
         </div>
     </div>
 
@@ -1037,12 +991,14 @@
         const previewTextContent = document.getElementById('previewTextContent');
         const previewResultContent = document.getElementById('previewResultContent');
         const mobileControlCombo = document.getElementById('mobileControlCombo');
-        const desktopMicCombo = document.getElementById('desktopMicCombo');
         const floatingKeyboardNewRowBtn = document.getElementById('floatingKeyboardNewRowBtn');
         const stickyTopSection = document.getElementById('stickyTopSection');
         const grandTotalEl = document.getElementById('grandTotal');
         const grandTotalCurrencyEl = document.getElementById('grandTotalCurrency');
         const showCurrencyCheckbox = document.getElementById('showCurrencyCheckbox');
+        const hideAllMicsCheckbox = document.getElementById('hideAllMicsCheckbox');
+        const hideOtherToolsCheckbox = document.getElementById('hideOtherToolsCheckbox');
+        const hideRowToolsCheckbox = document.getElementById('hideRowToolsCheckbox');
         const showPositiveCheckbox = document.getElementById('showPositiveCheckbox');
         const showNegativeCheckbox = document.getElementById('showNegativeCheckbox');
         const positiveTotalValEl = document.getElementById('positiveTotalVal');
@@ -1054,12 +1010,10 @@
         const optionsDropdownEl = document.getElementById('optionsDropdown');
         const refreshBtnEl = document.getElementById('refreshBtnEl');
         const exportDropdownEl = document.getElementById('exportDropdown');
+        const toggleHideBtnEl = document.getElementById('toggleHideBtn');
 
         let isSelectionModeActive = false;
         
-        let globalHideMics = false; // افتراضياً ظاهرة للكمبيوتر ما لم يتم إخفاؤها
-        let globalHideTools = true;
-
         function detectMobileEnvironment() {
             const ua = navigator.userAgent;
             const width = window.innerWidth;
@@ -1081,13 +1035,16 @@
         const isMobileNormal = env === 'mobile-normal';
         const isMobileAny = env !== 'desktop';
 
-        // إخفاء أو إظهار الكومبو بوكس الخاص بالكمبيوتر حسب البيئة
         if (isMobileAny) {
-            topActionBtn.style.display = 'inline-flex';
-            topNotesFocusBtn.style.display = 'inline-flex';
-            if (desktopMicCombo) desktopMicCombo.style.display = 'none';
+            showCurrencyCheckbox.checked = true;
+            hideAllMicsCheckbox.checked = true; 
+            hideOtherToolsCheckbox.checked = false;
+            hideRowToolsCheckbox.checked = true;
         } else {
-            if (desktopMicCombo) desktopMicCombo.style.display = 'inline-flex';
+            showCurrencyCheckbox.checked = true;
+            hideAllMicsCheckbox.checked = false;
+            hideOtherToolsCheckbox.checked = false;
+            hideRowToolsCheckbox.checked = false;
         }
 
         if (isMobileNormal) {
@@ -1109,7 +1066,7 @@
             evaluateRow(activeRowIndex);
             closeAllPads();
 
-            let currentColumn = activeFieldIndex || 'text';
+            let currentColumn = activeFieldIndex || 'calc';
 
             if (activeRowIndex < rows.length - 1) {
                 activeRowIndex++;
@@ -1125,35 +1082,23 @@
             renderCalculator(activeFieldIndex);
             scrollToActiveRow();
 
-            setTimeout(() => {
-                const targetEl = screenContainer.querySelector(`.calc-row.active .${activeFieldIndex === 'text' ? 'text-input' : 'calc-input'}`);
-                if (targetEl) {
-                    targetEl.removeAttribute('readonly');
-                    targetEl.removeAttribute('inputmode');
-                    targetEl.focus();
-                }
-            }, 30);
+            if (isMobileAny) {
+                setTimeout(() => {
+                    const activeInput = screenContainer.querySelector(`.calc-row.active ${activeFieldIndex === 'text' ? '.text-input' : '.calc-input'}`);
+                    if (activeInput) {
+                        activeInput.focus();
+                    }
+                }, 50);
+            }
 
             updateMobilePreviewText();
         }
 
         function handleMobileComboChange(selectEl) {
             const val = selectEl.value;
-            if (val === 'toggle_mics') {
-                globalHideMics = !globalHideMics;
-            } else if (val === 'toggle_tools') {
-                globalHideTools = !globalHideTools;
-            }
-            selectEl.selectedIndex = 0;
-            renderCalculator();
-        }
-
-        function handleDesktopMicComboChange(selectEl) {
-            const val = selectEl.value;
-            if (val === 'show') {
-                globalHideMics = false;
-            } else if (val === 'hide') {
-                globalHideMics = true;
+            if (val === 'toggle_tools') {
+                hideOtherToolsCheckbox.checked = !hideOtherToolsCheckbox.checked;
+                updateGlobalHides();
             }
             selectEl.selectedIndex = 0;
             renderCalculator();
@@ -1241,12 +1186,7 @@
             }
         ];
         let activeRowIndex = 0;
-        let activeFieldIndex = 'text';
-
-        let activeSpeechRecognition = null;
-        let isMicContinuousMode = false;
-        let currentActiveMicBtn = null;
-        let micClickTimer = null;
+        let activeFieldIndex = 'calc';
 
         function toggleHideSelectionMode() {
             isSelectionModeActive = !isSelectionModeActive;
@@ -1269,10 +1209,23 @@
             const hideOptions = document.getElementById('hideOptionsCheckbox').checked;
             const hideRefresh = document.getElementById('hideRefreshCheckbox').checked;
             const hideExport = document.getElementById('hideExportCheckbox').checked;
+            const hideOtherTools = hideOtherToolsCheckbox.checked;
             
             optionsDropdownEl.style.display = hideOptions ? 'none' : 'inline-block';
             refreshBtnEl.style.display = hideRefresh ? 'none' : 'inline-flex';
             exportDropdownEl.style.display = hideExport ? 'none' : 'inline-block';
+            
+            if (hideOtherTools) {
+                toggleHideBtnEl.style.display = 'none';
+                const nextRowBtn = document.querySelector('.top-next-row-btn');
+                if (nextRowBtn) nextRowBtn.style.display = 'none';
+                exportDropdownEl.style.display = 'none';
+            } else {
+                toggleHideBtnEl.style.display = 'inline-flex';
+                const nextRowBtn = document.querySelector('.top-next-row-btn');
+                if (nextRowBtn) nextRowBtn.style.display = 'inline-flex';
+                if (!hideExport) exportDropdownEl.style.display = 'inline-block';
+            }
             
             document.getElementById('positiveTotalVal').parentElement.parentElement.style.display = document.getElementById('hidePositiveCheckbox').checked ? 'none' : 'flex';
             document.getElementById('negativeTotalVal').parentElement.parentElement.style.display = document.getElementById('hideNegativeCheckbox').checked ? 'none' : 'flex';
@@ -1462,15 +1415,14 @@
             activeFieldIndex = field;
             closeAllPads(); 
             renderCalculator(field);
-
+            
             setTimeout(() => {
-                const activeEl = screenContainer.querySelector(`.calc-row.active .${field === 'text' ? 'text-input' : 'calc-input'}`);
-                if (activeEl) {
-                    activeEl.removeAttribute('readonly');
-                    activeEl.removeAttribute('inputmode');
-                    activeEl.focus();
+                const targetInput = screenContainer.querySelector(`.calc-row.active ${field === 'text' ? '.text-input' : '.calc-input'}`);
+                if (targetInput) {
+                    targetInput.focus();
                 }
-            }, 30);
+            }, 50);
+
             updateMobilePreviewText();
         }
 
@@ -1485,6 +1437,35 @@
                 rows[index].isCalcPadVisible = true;
             }
             renderCalculator(field);
+            updateMobilePreviewText();
+        }
+
+        function addNewRowAndOpenTool(index, field) {
+            evaluateRow(index);
+            closeAllPads();
+
+            let targetIndex;
+            if (index < rows.length - 1) {
+                targetIndex = index + 1;
+            } else {
+                rows.push({ 
+                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                });
+                targetIndex = rows.length - 1;
+            }
+
+            activeRowIndex = targetIndex;
+            activeFieldIndex = field;
+
+            if (field === 'text') {
+                rows[targetIndex].isTextPadVisible = true;
+            } else {
+                rows[targetIndex].isCalcPadVisible = true;
+            }
+            renderCalculator(field);
+
+            scrollToActiveRow();
             updateMobilePreviewText();
         }
 
@@ -1510,43 +1491,6 @@
             updateMobilePreviewText();
         }
 
-        function addNewRowAndOpenTool(index, field) {
-            evaluateRow(index);
-            closeAllPads();
-
-            let targetIndex;
-            if (index < rows.length - 1) {
-                targetIndex = index + 1;
-            } else {
-                rows.push({ 
-                    textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                    isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                });
-                targetIndex = rows.length - 1;
-            }
-
-            activeRowIndex = targetIndex;
-            activeFieldIndex = field;
-
-            if (field === 'text') {
-                renderCalculator(field);
-                setTimeout(() => {
-                    const activeText = screenContainer.querySelector('.calc-row.active .text-input');
-                    if (activeText) {
-                        activeText.removeAttribute('readonly');
-                        activeText.removeAttribute('inputmode');
-                        activeText.focus();
-                    }
-                }, 30);
-            } else {
-                rows[targetIndex].isCalcPadVisible = true;
-                renderCalculator(field);
-            }
-
-            scrollToActiveRow();
-            updateMobilePreviewText();
-        }
-
         function formatDisplayValue(val) {
             if (typeof val === 'number') {
                 if (val < 0) {
@@ -1555,6 +1499,45 @@
                 return { text: `${val}`, isNegative: false };
             }
             return { text: val, isNegative: false };
+        }
+
+        function startVoiceRecognition(index, micBtnEl) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("متصفحك لا يدعم التعرف على الصوت.");
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ar-EG';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            micBtnEl.classList.add('recording');
+
+            recognition.onresult = (event) => {
+                const speechResult = event.results[0][0].transcript;
+                micBtnEl.classList.remove('recording');
+
+                if (activeFieldIndex === 'text') {
+                    rows[index].textExpression += speechResult;
+                } else {
+                    let cleaned = speechResult
+                        .replace(/في|ضرب|علامة في/g, '*')
+                        .replace(/على|قسمة/g, '/')
+                        .replace(/زائد|جمع/g, '+')
+                        .replace(/ناقص|طرح/g, '-')
+                        .replace(/في المية| بالمية/g, '%');
+                    rows[index].expression += cleaned;
+                    evaluateRow(index);
+                }
+                renderCalculator(activeFieldIndex);
+            };
+
+            recognition.onerror = () => { micBtnEl.classList.remove('recording'); };
+            recognition.onend = () => { micBtnEl.classList.remove('recording'); };
+
+            recognition.start();
         }
 
         function createMiniKeypad(index, field) {
@@ -1679,78 +1662,34 @@
         }
 
         function setupCellGestures(element, index, field) {
-            let lastTapTime = 0;
-            let longPressTimer = null;
-            let isLongPressFired = false;
-            let clickCount = 0;
-            let clickTimer = null;
+            let tapCount = 0;
+            let tapTimer = null;
 
-            if (isMobileAny) {
-                element.setAttribute('readonly', 'true');
-                element.setAttribute('inputmode', 'none');
+            element.addEventListener('click', (e) => {
+                activeRowIndex = index;
+                activeFieldIndex = field;
+                updateActiveRowClasses();
 
-                element.addEventListener('touchstart', (e) => {
-                    isLongPressFired = false;
-                    activeRowIndex = index;
-                    activeFieldIndex = field;
-                    updateActiveRowClasses();
-                    updateMobilePreviewText();
-
-                    longPressTimer = setTimeout(() => {
-                        isLongPressFired = true;
-                        openSystemKeyboard(index, field);
-                    }, 400);
-
-                }, { passive: true });
-
-                element.addEventListener('touchend', (e) => {
-                    clearTimeout(longPressTimer);
-                    if (isLongPressFired) return;
-
-                    const currentTime = new Date().getTime();
-                    const tapLength = currentTime - lastTapTime;
-
-                    if (tapLength < 350 && tapLength > 0) {
-                        e.preventDefault();
-                        if (isMobileAny) {
-                            element.setAttribute('readonly', 'true');
-                            element.setAttribute('inputmode', 'none');
-                        }
-                        openCalcPadForField(index, field);
-                        lastTapTime = 0;
-                    } else {
-                        lastTapTime = currentTime;
-                    }
-                });
-
-                element.addEventListener('touchmove', () => {
-                    clearTimeout(longPressTimer);
-                });
-            } else {
-                element.addEventListener('mousedown', (e) => {
-                    activeRowIndex = index;
-                    activeFieldIndex = field;
-                    updateActiveRowClasses();
-                    updateMobilePreviewText();
-
-                    clickCount++;
-                    if (clickCount === 1) {
-                        clickTimer = setTimeout(() => {
-                            clickCount = 0;
-                        }, 400);
-                    } else if (clickCount === 3) {
-                        clearTimeout(clickTimer);
-                        clickCount = 0;
-                        e.preventDefault();
-                        openCalcPadForField(index, field);
-                    }
-                });
-            }
-
-            element.addEventListener('dblclick', (e) => {
-                e.preventDefault();
                 if (isMobileAny) {
-                    openCalcPadForField(index, field);
+                    // موبايل: ضغطتان تفتح الآلة الحاسبة المصغرة
+                    tapCount++;
+                    if (tapCount === 1) {
+                        tapTimer = setTimeout(() => { tapCount = 0; }, 350);
+                    } else if (tapCount === 2) {
+                        clearTimeout(tapTimer);
+                        tapCount = 0;
+                        openCalcPadForField(index, field);
+                    }
+                } else {
+                    // كمبيوتر: 3 كليك متتالية تفتح الآلة الحاسبة المصغرة
+                    tapCount++;
+                    if (tapCount === 1) {
+                        tapTimer = setTimeout(() => { tapCount = 0; }, 400);
+                    } else if (tapCount === 3) {
+                        clearTimeout(tapTimer);
+                        tapCount = 0;
+                        openCalcPadForField(index, field);
+                    }
                 }
             });
         }
@@ -1803,14 +1742,16 @@
             let positiveSum = 0;
             let negativeSum = 0;
             const showCurrency = showCurrencyCheckbox.checked;
+            const hideRowTools = hideRowToolsCheckbox.checked;
+            const hideAllMics = hideAllMicsCheckbox.checked;
 
             rows.forEach((row, index) => {
                 const rowDiv = document.createElement('div');
                 let rowClasses = `calc-row ${index === activeRowIndex ? 'active' : ''}`;
                 if (!row.isCalcVisible) rowClasses += ' hidden-calc';
                 if (!row.isTextVisible) rowClasses += ' hidden-text';
-                if (globalHideMics) rowClasses += ' hidden-mic';
-                if (globalHideTools) rowClasses += ' hidden-tools';
+                if (hideRowTools) rowClasses += ' hidden-row-tools';
+                if (hideAllMics) rowClasses += ' hidden-mics';
                 rowDiv.className = rowClasses;
 
                 setupRowSwipeToDelete(rowDiv, index);
@@ -1838,53 +1779,6 @@
                     textWrapper.appendChild(selectTextCheckbox);
                 }
 
-                const mobileArrowBtn = document.createElement('button');
-                mobileArrowBtn.type = 'button';
-                mobileArrowBtn.className = 'row-mobile-arrow-btn';
-                mobileArrowBtn.innerHTML = '🔽';
-                mobileArrowBtn.title = 'التنقل لأسفل أو إضافة سطر جديد';
-                
-                if (isMobileAny) {
-                    mobileArrowBtn.style.display = 'flex';
-                }
-
-                mobileArrowBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (index < rows.length - 1) {
-                        activeRowIndex = index + 1;
-                        activeFieldIndex = 'text';
-                        renderCalculator('text');
-                        scrollToActiveRow();
-                    } else {
-                        evaluateRow(index);
-                        closeAllPads();
-                        rows.push({ 
-                            textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                            isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                        });
-                        activeRowIndex = rows.length - 1;
-                        activeFieldIndex = 'text';
-                        renderCalculator('text');
-                        screenContainer.scrollTop = screenContainer.scrollHeight;
-                    }
-                    updateMobilePreviewText();
-                });
-
-                const mobileKbdArrowBtn = document.createElement('button');
-                mobileKbdArrowBtn.type = 'button';
-                mobileKbdArrowBtn.className = 'row-mobile-arrow-btn';
-                mobileKbdArrowBtn.innerHTML = '⌨️';
-                mobileKbdArrowBtn.title = 'إضافة سطر جديد وفتح الكيبورد';
-
-                if (isMobileAny) {
-                    mobileKbdArrowBtn.style.display = 'flex';
-                }
-
-                mobileKbdArrowBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    addNewRowAndOpenTool(index, 'text');
-                });
-
                 const textInput = document.createElement('textarea');
                 textInput.className = 'text-input';
                 textInput.value = row.textExpression;
@@ -1908,14 +1802,7 @@
                     updateMobilePreviewText();
                 });
 
-                textInput.addEventListener('keydown', (e) => {
-                    handleKeyNavigation(e, index, 'text');
-                });
-
                 setupCellGestures(textInput, index, 'text');
-
-                textWrapper.appendChild(mobileArrowBtn);
-                textWrapper.appendChild(mobileKbdArrowBtn);
                 textWrapper.appendChild(textInput);
 
                 const outputContainer = document.createElement('div');
@@ -1961,39 +1848,14 @@
                     calcWrapper.appendChild(selectCheckbox);
                 }
 
-                const calcArrowBtn = document.createElement('button');
-                calcArrowBtn.type = 'button';
-                calcArrowBtn.className = 'row-calc-arrow-btn';
-                calcArrowBtn.innerHTML = '🧮';
-                calcArrowBtn.title = 'إضافة سطر جديد وفتح الآلة الحاسبة المصغرة';
-
-                if (isMobileAny) {
-                    calcArrowBtn.style.display = 'flex';
-                }
-
-                calcArrowBtn.addEventListener('click', (e) => {
+                const rowMicBtn = document.createElement('button');
+                rowMicBtn.type = 'button';
+                rowMicBtn.className = 'row-mic-btn';
+                rowMicBtn.innerHTML = '🎤';
+                rowMicBtn.title = 'إملاء صوتي للخلية النشطة';
+                rowMicBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    evaluateRow(index);
-                    closeAllPads();
-                    
-                    let targetIndex;
-                    if (index < rows.length - 1) {
-                        targetIndex = index + 1;
-                    } else {
-                        rows.push({ 
-                            textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
-                            isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
-                        });
-                        targetIndex = rows.length - 1;
-                    }
-
-                    activeRowIndex = targetIndex;
-                    activeFieldIndex = 'calc';
-                    rows[targetIndex].isCalcPadVisible = true;
-
-                    renderCalculator('calc');
-                    scrollToActiveRow();
-                    updateMobilePreviewText();
+                    startVoiceRecognition(index, rowMicBtn);
                 });
 
                 const inputField = document.createElement('input');
@@ -2027,75 +1889,16 @@
                     updateMobilePreviewText();
                 });
 
-                inputField.addEventListener('keydown', (e) => {
-                    if (e.key === 'Home') {
-                        e.preventDefault();
-                        rows[index].forceCalc = true;
-                        rows[index].ignoreBeforeIndex = 0;
-                        evaluateRow(index);
-                        renderCalculator('calc');
-                    }
-                    else if (e.key === 'PageUp') {
-                        e.preventDefault();
-                        rows[index].ignoreBeforeIndex = inputField.selectionStart;
-                        evaluateRow(index);
-                        renderCalculator('calc');
-                    }
-                    else if (e.key === 'Delete') {
-                        e.preventDefault();
-                        clearCurrentField();
-                    }
-                    else {
-                        handleKeyNavigation(e, index, 'calc');
-                    }
-                    updateMobilePreviewText();
-                });
-
                 setupCellGestures(inputField, index, 'calc');
 
-                calcWrapper.appendChild(calcArrowBtn);
                 calcWrapper.appendChild(inputField);
+                calcWrapper.appendChild(rowMicBtn);
 
                 inputsGroup.appendChild(textWrapper);
                 inputsGroup.appendChild(outputContainer);
                 inputsGroup.appendChild(calcWrapper);
 
-                const micWrapper = document.createElement('div');
-                micWrapper.className = 'mic-wrapper';
-
-                const micBtn = document.createElement('button');
-                micBtn.className = 'mic-btn';
-                micBtn.innerHTML = '🎤';
-                micBtn.title = 'انقر مرة واحدة للتحدث المؤقت، أو انقر مرتين متتاليتين للتشغيل المستمر';
-                micBtn.type = 'button';
-
-                micBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (micClickTimer === null) {
-                        micClickTimer = setTimeout(() => {
-                            micClickTimer = null;
-                            handleMicClick(index, micBtn, false);
-                        }, 300);
-                    } else {
-                        clearTimeout(micClickTimer);
-                        micClickTimer = null;
-                        handleMicClick(index, micBtn, true);
-                    }
-                });
-
-                micWrapper.appendChild(micBtn);
-
-                // بناء السطر بناءً على جهاز الكمبيوتر أو الموبايل
-                // للكمبيوتر: المايك في الناحية الشمال (أقصى اليسار)
-                if (!isMobileAny) {
-                    rowMain.appendChild(inputsGroup);
-                    rowMain.appendChild(micWrapper);
-                } else {
-                    // للموبايل: المايك في مكانه الأصلي مع إخفائه افتراضياً حسب رغبتك السابقة
-                    rowMain.appendChild(inputsGroup);
-                    rowMain.appendChild(micWrapper);
-                }
-
+                rowMain.appendChild(inputsGroup);
                 rowDiv.appendChild(rowMain);
 
                 if (index === activeRowIndex && (row.isTextPadVisible || row.isCalcPadVisible)) {
@@ -2129,10 +1932,12 @@
                 }
             });
 
-            if (!isMobileAny && focusTarget) {
+            if (!isMobileAny) {
                 setTimeout(() => {
-                    const targetEl = screenContainer.querySelector(`.calc-row.active .${focusTarget === 'text' ? 'text-input' : 'calc-input'}`);
-                    if (targetEl) targetEl.focus();
+                    const targetEl = screenContainer.querySelector(`.calc-row.active .${activeFieldIndex === 'text' ? 'text-input' : 'calc-input'}`);
+                    if (targetEl && document.activeElement !== targetEl) {
+                        targetEl.focus();
+                    }
                 }, 10);
             }
 
@@ -2156,158 +1961,116 @@
             updateMobilePreviewText();
         }
 
-        function handleKeyNavigation(e, index, currentField) {
-            const key = e.key;
+        // التحكم العام والشامل بلوحة المفاتيح والأسهم والإنتر وزر Delete
+        window.addEventListener('keydown', (event) => {
+            const key = event.key;
+            const activeInput = document.activeElement;
+            const isAnInputFocused = activeInput && (activeInput.classList.contains('calc-input') || activeInput.classList.contains('text-input'));
+
+            // دعم زر Delete لمسح محتوى الخلية النشطة بالكامل
+            if (key === 'Delete') {
+                if (isAnInputFocused) {
+                    event.preventDefault();
+                    clearCurrentField();
+                    return;
+                }
+            }
 
             if (key === 'Enter') {
-                e.preventDefault();
-                evaluateRow(index);
+                event.preventDefault();
+                evaluateRow(activeRowIndex);
                 closeAllPads();
 
-                if (index < rows.length - 1) {
-                    activeRowIndex = index + 1;
-                    activeFieldIndex = currentField;
-                    renderCalculator(currentField);
-                    scrollToActiveRow();
+                if (activeRowIndex < rows.length - 1) {
+                    activeRowIndex++;
                 } else {
                     rows.push({ 
                         textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
                         isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
                     });
                     activeRowIndex = rows.length - 1;
-                    activeFieldIndex = currentField;
-                    renderCalculator(currentField);
+                }
+                renderCalculator(activeFieldIndex);
+                scrollToActiveRow();
+                updateMobilePreviewText();
+                return;
+            }
+
+            if (key === 'ArrowDown') {
+                event.preventDefault();
+                if (activeRowIndex < rows.length - 1) {
+                    activeRowIndex++;
+                } else {
+                    rows.push({ 
+                        textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
+                        isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
+                    });
+                    activeRowIndex = rows.length - 1;
                     screenContainer.scrollTop = screenContainer.scrollHeight;
                 }
-            }
-            else if (key === 'ArrowDown') {
-                if (index < rows.length - 1) {
-                    e.preventDefault();
-                    closeAllPads();
-                    activeRowIndex = index + 1;
-                    activeFieldIndex = currentField;
-                    renderCalculator(currentField);
-                    scrollToActiveRow();
-                }
-            } 
-            else if (key === 'ArrowUp') {
-                if (index > 0) {
-                    e.preventDefault();
-                    closeAllPads();
-                    activeRowIndex = index - 1;
-                    activeFieldIndex = currentField;
-                    renderCalculator(currentField);
-                    scrollToActiveRow();
-                }
-            } 
-            else if (key === 'ArrowRight') {
-                if (currentField === 'calc') {
-                    e.preventDefault();
-                    activeFieldIndex = 'text';
-                    renderCalculator('text');
-                }
-            } 
-            else if (key === 'ArrowLeft') {
-                if (currentField === 'text') {
-                    e.preventDefault();
-                    activeFieldIndex = 'calc';
-                    renderCalculator('calc');
-                }
-            }
-            updateMobilePreviewText();
-        }
-
-        function handleMicClick(index, micBtn, isDoubleClick) {
-            if (activeSpeechRecognition) {
-                stopActiveMic();
+                renderCalculator(activeFieldIndex);
+                scrollToActiveRow();
+                updateMobilePreviewText();
                 return;
             }
 
-            isMicContinuousMode = isDoubleClick;
-            startSpeechRecognition(index, micBtn);
-        }
-
-        function stopActiveMic() {
-            if (activeSpeechRecognition) {
-                isMicContinuousMode = false;
-                try { activeSpeechRecognition.stop(); } catch(e) {}
-                activeSpeechRecognition = null;
-            }
-            if (currentActiveMicBtn) {
-                currentActiveMicBtn.classList.remove('listening', 'continuous-mode');
-                currentActiveMicBtn.innerHTML = '🎤';
-                currentActiveMicBtn = null;
-            }
-        }
-
-        function startSpeechRecognition(index, micBtn) {
-            const targetRow = activeRowIndex;
-            const targetField = activeFieldIndex;
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert('متصفحك لا يدعم خاصية التعرف على الصوت.');
-                return;
-            }
-
-            const recognition = new SpeechRecognition();
-            activeSpeechRecognition = recognition;
-            currentActiveMicBtn = micBtn;
-
-            recognition.lang = 'ar-SA';
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-            recognition.continuous = true;
-
-            micBtn.classList.add('listening');
-            micBtn.innerHTML = '🔴';
-
-            if (isMicContinuousMode) {
-                micBtn.classList.add('continuous-mode');
-                micBtn.title = 'المايك يعمل بوضع الاستمرار الدائم (اضغط لإيقافه)';
-            } else {
-                micBtn.title = 'تحدث للإدخال في الحقل النشط';
-            }
-
-            recognition.onresult = (event) => {
-                const speechToText = event.results[event.results.length - 1][0].transcript;
-                
-                if (targetField === 'text') {
-                    rows[targetRow].textExpression = rows[targetRow].textExpression ? rows[targetRow].textExpression + ' ' + speechToText : speechToText;
-                    renderCalculator('text');
-                } else {
-                    rows[targetRow].expression = rows[targetRow].expression ? rows[targetRow].expression + ' ' + speechToText : speechToText;
-                    rows[targetRow].forceCalc = false;
-                    evaluateRow(targetRow);
-                    renderCalculator('calc');
+            if (key === 'ArrowUp') {
+                event.preventDefault();
+                if (activeRowIndex > 0) {
+                    activeRowIndex--;
+                    renderCalculator(activeFieldIndex);
+                    scrollToActiveRow();
                 }
                 updateMobilePreviewText();
-            };
+                return;
+            }
 
-            recognition.onerror = () => {
-                if (!isMicContinuousMode) {
-                    stopActiveMic();
+            if (key === 'ArrowRight') {
+                event.preventDefault();
+                if (activeFieldIndex === 'calc') {
+                    activeFieldIndex = 'text';
+                } else if (activeRowIndex > 0) {
+                    activeRowIndex--;
+                    activeFieldIndex = 'calc';
+                    scrollToActiveRow();
                 }
-            };
+                renderCalculator(activeFieldIndex);
+                updateMobilePreviewText();
+                return;
+            }
 
-            recognition.onend = () => {
-                if (isMicContinuousMode && activeSpeechRecognition === recognition) {
-                    try {
-                        recognition.start();
-                    } catch (e) {}
-                } else {
-                    stopActiveMic();
+            if (key === 'ArrowLeft') {
+                event.preventDefault();
+                if (activeFieldIndex === 'text') {
+                    activeFieldIndex = 'calc';
+                } else if (activeRowIndex < rows.length - 1) {
+                    activeRowIndex++;
+                    activeFieldIndex = 'text';
+                    scrollToActiveRow();
                 }
-            };
+                renderCalculator(activeFieldIndex);
+                updateMobilePreviewText();
+                return;
+            }
 
-            recognition.start();
-        }
-
-        window.addEventListener('keydown', (event) => {
-            const key = event.key;
-
-            if (key === 'Escape') {
-                stopActiveMic();
+            if (key === 'Home') {
+                event.preventDefault();
+                if (isAnInputFocused && activeFieldIndex === 'calc') {
+                    rows[activeRowIndex].forceCalc = true;
+                    rows[activeRowIndex].ignoreBeforeIndex = 0;
+                    evaluateRow(activeRowIndex);
+                    renderCalculator('calc');
+                }
+            }
+            else if (key === 'PageUp') {
+                event.preventDefault();
+                if (isAnInputFocused && activeFieldIndex === 'calc') {
+                    rows[activeRowIndex].ignoreBeforeIndex = activeInput.selectionStart;
+                    evaluateRow(activeRowIndex);
+                    renderCalculator('calc');
+                }
+            }
+            else if (key === 'Escape') {
                 rows = [{ 
                     textExpression: '', expression: '', result: 0, forceCalc: false, ignoreBeforeIndex: 0, 
                     isCalcVisible: true, isTextVisible: true, isMicVisible: true, isCalcPadVisible: false, isTextPadVisible: false
@@ -2317,8 +2080,7 @@
                 renderCalculator('calc');
             }
             else if (key === 'Backspace') {
-                const activeInput = document.activeElement;
-                if (activeInput && (activeInput.classList.contains('calc-input') || activeInput.classList.contains('text-input'))) {
+                if (isAnInputFocused) {
                     if (activeInput.value === '' && activeRowIndex > 0) {
                         event.preventDefault();
                         rows.splice(activeRowIndex, 1);
@@ -2329,7 +2091,6 @@
                     }
                 }
             }
-            updateMobilePreviewText();
         });
 
         function updateActiveRowClasses() {
@@ -2434,7 +2195,7 @@
                 return;
             }
 
-            let validMathPattern = /^[0-9+\-*/.\s()a-zA-Zأ-ي\u0600-\u06FF%]+$/;
+            let validMathPattern = /^[0-9+\-*/().\s()a-zA-Zأ-ي\u0600-\u06FF%]+$/;
 
             if (validMathPattern.test(sanitizedExpr)) {
                 try {
@@ -2516,6 +2277,7 @@
             positiveTotalValEl.innerText = showPositiveCheckbox.checked ? posFormatted.text : '';
             negativeTotalValEl.innerText = showNegativeCheckbox.checked ? negFormatted.text : '';
             
+            updateGlobalHides();
             updateMobilePreviewText();
         }
 
@@ -2611,7 +2373,7 @@
                 "السطر": i + 1,
                 "العمود النصي / الملاحظات (اليمين)": r.isTextVisible ? r.textExpression : '',
                 "النتيجة (الوسط)": showCurrency ? `${r.result} جنيه` : r.result,
-                "العملية الحسابية (اليسار)": r.isCalcVisible ? r.expression.replace(/\*/g, 'x') : ''
+                "العملية الحسابية (يسار)": r.isCalcVisible ? r.expression.replace(/\*/g, 'x') : ''
             }));
             
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -2673,7 +2435,7 @@
             });
         }
 
-        renderCalculator('text');
+        renderCalculator('calc');
     </script>
 </body>
 </html>
